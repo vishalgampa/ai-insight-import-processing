@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>InsightRCA</title>
+<style>
+  :root { --bg: #0f172a; --surface: #1e293b; --border: #334155; --text: #e2e8f0; --muted: #94a3b8; --accent: #3b82f6; --red: #ef4444; --green: #22c55e; --yellow: #eab308; --orange: #f97316; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+  .container { max-width: 1200px; margin: 0 auto; padding: 24px; }
+  h1 { font-size: 1.5rem; font-weight: 600; margin-bottom: 4px; }
+  .subtitle { color: var(--muted); font-size: 0.875rem; margin-bottom: 24px; }
+  .config-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 24px; margin-bottom: 24px; }
+  .form-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: end; }
+  .form-group { flex: 1; min-width: 200px; }
+  .form-group label { display: block; font-size: 0.75rem; color: var(--muted); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .form-group input, .form-group select { width: 100%; padding: 10px 12px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-size: 0.875rem; }
+  .form-group input:focus, .form-group select:focus { outline: none; border-color: var(--accent); }
+  .btn { padding: 10px 24px; background: var(--accent); color: white; border: none; border-radius: 8px; font-size: 0.875rem; font-weight: 500; cursor: pointer; white-space: nowrap; }
+  .btn:hover { opacity: 0.9; }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .spinner { display: inline-block; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.6s linear infinite; margin-right: 8px; vertical-align: middle; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>🔍 InsightRCA</h1>
+  <p class="subtitle">AI-driven root cause analysis and performance diagnostics from your Application Insights telemetry</p>
+
+  <!-- Shared credentials -->
+  <div class="config-panel">
+    <div class="form-row">
+      <div class="form-group">
+        <label>Application Insights App ID</label>
+        <input type="text" id="appId" value="f85427bb-0dfa-4546-b07a-e16614c04186">
+      </div>
+      <div class="form-group">
+        <label>Application Insights API Key</label>
+        <input type="password" id="apiKey" value="6uxxt60458ocoykprnu72oku75fbaaa2swnlzftd">
+      </div>
+      <div class="form-group">
+        <label>Gemini API Key <span style="color:var(--muted);font-weight:400">(optional — enables AI narrative)</span></label>
+        <input type="password" id="geminiApiKey" placeholder="AIza...">
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div style="display:flex;gap:4px;margin-bottom:16px">
+    <button class="tab-btn active" id="tab-rca" onclick="switchTab('rca')" style="padding:8px 20px;border-radius:8px 8px 0 0;border:1px solid var(--border);background:var(--surface);color:var(--text);cursor:pointer;font-size:0.875rem;font-weight:500">RCA Assistant</button>
+    <button class="tab-btn" id="tab-import" onclick="switchTab('import')" style="padding:8px 20px;border-radius:8px 8px 0 0;border:1px solid var(--border);background:var(--bg);color:var(--muted);cursor:pointer;font-size:0.875rem;font-weight:500">Import Analyzer</button>
+  </div>
+
+  <!-- RCA tab -->
+  <div id="panel-rca">
+    <div class="config-panel" style="border-radius:0 12px 12px 12px">
+      <div class="form-row">
+        <div class="form-group" style="max-width:140px">
+          <label>Time Range</label>
+          <select id="timespan">
+            <option value="PT1H">1 Hour</option>
+            <option value="PT6H">6 Hours</option>
+            <option value="PT24H">24 Hours</option>
+            <option value="P3D">3 Days</option>
+            <option value="P7D" selected>7 Days</option>
+            <option value="P30D">30 Days</option>
+          </select>
+        </div>
+        <div class="form-group" style="flex:2;min-width:250px">
+          <label>Query</label>
+          <input type="text" id="query" value="What caused the recent issues?" placeholder="Describe the incident...">
+        </div>
+        <button class="btn" id="analyzeBtn" onclick="runAnalysis()">Analyze</button>
+      </div>
+    </div>
+    <div id="results"></div>
+  </div>
+
+  <!-- Import Analyzer tab -->
+  <div id="panel-import" style="display:none">
+    <div class="config-panel" style="border-radius:0 12px 12px 12px">
+      <div class="form-row">
+        <div class="form-group" style="flex:2;min-width:280px">
+          <label>Client File Upload ID</label>
+          <input type="text" id="importClientId"
+            placeholder="e.g. 35dd5a22-275e-48ac-bf90-56b92a6e1b87  (or two UUIDs to compare)">
+        </div>
+        <div class="form-group" style="flex:3;min-width:260px">
+          <label>Question (optional)</label>
+          <input type="text" id="importQuestion"
+            placeholder="e.g. Was any step slow? What was the data count?">
+        </div>
+        <button class="btn" id="importBtn" onclick="runImportAnalysis()">Analyze Import</button>
+      </div>
+    </div>
+    <div id="importResults"></div>
+  </div>
+</div>
+<script src="app.js"></script>
+</body>
+</html>
