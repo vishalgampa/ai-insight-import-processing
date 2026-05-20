@@ -451,21 +451,36 @@ export function parseImportLogs(
   result.submissionBundleStats = [...subBundleMap.values()].sort((a, b) => a.bundleIdx - b.bundleIdx);
 
   // ── SUBMISSION — Batch logs ───────────────────────────────────────────
-  // batchIdx (k) = start row of that batch (0, 500, 1000, ...)
-  // bundleIdx    = start row of the bundle  (0, 5000, 10000, ...)
-  //
-  // Assign each batch to a bundle by checking:
-  //   bundle.startRow <= batchIdx < bundle.endRow
-  //
-  // Bundle boundaries come from the "For bundle" logs already parsed above.
-  // Batch size is inferred from consecutive batchIdx values.
+  // KEY INSIGHT: batchIdx resets to 0 for every bundle.
+  // Bundle 0 has batches 0, 500, 1000, 1500, 2000
+  // Bundle 1 has batches 0, 500, 1000, 1500, 2000  ← same numbers!
+  // So we CANNOT key by batchIdx alone — we must track which bundle we're
+  // currently inside (by watching "For bundle" and "Bulk Processing" logs in
+  // timestamp order) and use a composite key: `${currentBundleIdx}:${batchIdx}`.
 
-  const subBatchMap = new Map<number, SubmissionBatchStat>();
-  const ensureSubBatch = (batchIdx: number): SubmissionBatchStat => {
-    if (!subBatchMap.has(batchIdx))
-      subBatchMap.set(batchIdx, {
+  // Build a sorted timeline of bundle start timestamps from the already-parsed
+  // forBundleTimeline (built during bundle parsing above).
+  // For each batch log, find the bundle whose "For bundle" log most recently
+  // preceded it in time — that's the bundle this batch belongs to.
+
+  const subBatchMap = new Map<string, SubmissionBatchStat>();
+
+  // Helper: given a log timestamp, find the bundleIdx whose "For bundle" log
+  // fired most recently before (or at) that timestamp.
+  const bundleIdxAtTime = (ts: number): number => {
+    let best = forBundleTimeline[0]?.bundleIdx ?? 0;
+    for (const fb of forBundleTimeline) {
+      if (fb.ts <= ts) best = fb.bundleIdx;
+      else break;
+    }
+    return best;
+  };
+
+  const ensureSubBatch = (compositeKey: string, batchIdx: number, bundleIdx: number): SubmissionBatchStat => {
+    if (!subBatchMap.has(compositeKey))
+      subBatchMap.set(compositeKey, {
         batchIdx,
-        bundleIdx: -1,   // resolved after all batches are collected
+        bundleIdx,
         startRow: batchIdx,
         endRow: null,    // resolved after batch size is known
         loopProcessingMs: null,
@@ -473,67 +488,53 @@ export function parseImportLogs(
         startTime: null,
         endTime: null,
       });
-    return subBatchMap.get(batchIdx)!;
+    return subBatchMap.get(compositeKey)!;
   };
 
   for (const row of submissionRows) {
     const msg = row.message;
-    // batchIdx is the start-row number of the batch
+    const rowTs = new Date(row.timestamp).getTime();
     const bm = msg.match(/batch\s+(\d+)/i);
     const batchIdx = bm ? parseInt(bm[1], 10) : 0;
+    const bundleIdx = bundleIdxAtTime(rowTs);
+    const key = `${bundleIdx}:${batchIdx}`;
 
     if (msg.includes('Loop Processing batch')) {
       const ms = extractNumber(msg, /batch\s+\d+:\s*(\d+)/i);
-      ensureSubBatch(batchIdx).loopProcessingMs = ms;
+      ensureSubBatch(key, batchIdx, bundleIdx).loopProcessingMs = ms;
     }
     if (msg.includes('Bulk Processing started')) {
-      ensureSubBatch(batchIdx).startTime = row.timestamp;
+      ensureSubBatch(key, batchIdx, bundleIdx).startTime = row.timestamp;
     }
     if (msg.includes('Bulk Processing ended')) {
       const sec = extractSec(msg);
-      const b = ensureSubBatch(batchIdx);
+      const b = ensureSubBatch(key, batchIdx, bundleIdx);
       b.endTime = row.timestamp;
       b.bulkProcessingMs = sec !== null ? sec * 1000 : null;
     }
   }
 
-  // Resolve batch size and bundle membership
-  const sortedBatches = [...subBatchMap.values()].sort((a, b) => a.batchIdx - b.batchIdx);
+  // Resolve batch size and endRow for each batch
+  // Sort by (bundleIdx asc, batchIdx asc) for consistent ordering
+  const sortedBatches = [...subBatchMap.values()].sort((a, b) =>
+    a.bundleIdx !== b.bundleIdx ? a.bundleIdx - b.bundleIdx : a.batchIdx - b.batchIdx
+  );
 
-  // Build bundle boundary lookup from already-parsed bundle stats
-  // Note: startRow/endRow from "For bundle" logs are 1-indexed (Excel rows, header=1).
-  // batchIdx is 0-indexed (start row of the batch in 0-based terms).
-  // We use bundleIdx (which IS 0-based, e.g. 0, 2500, 5000) as the boundary anchor,
-  // and derive the bundle size from consecutive bundleIdx values.
-  const bundleBoundaries = result.submissionBundleStats
-    .filter(b => b.startRow !== null && b.endRow !== null)
-    .map(b => ({ bundleIdx: b.bundleIdx, startRow: b.startRow!, endRow: b.endRow! }));
-
-  // Infer bundle size from consecutive bundleIdx values (0-based)
-  const sortedBundleIdxs = result.submissionBundleStats.map(b => b.bundleIdx).sort((a, b) => a - b);
-  let bundleSize = 2500; // default
-  if (sortedBundleIdxs.length >= 2) {
-    const bundleGaps = sortedBundleIdxs.slice(1).map((v, i) => v - sortedBundleIdxs[i]).filter(g => g > 0);
-    if (bundleGaps.length > 0) bundleSize = Math.min(...bundleGaps);
-  }
-
-  // Infer batch size from the gap between consecutive batchIdx values
+  // Infer batch size from the gap between consecutive batchIdx values within a bundle
   let batchSize = 500; // default
-  if (sortedBatches.length >= 2) {
-    const gaps = sortedBatches.slice(1).map((b, i) => b.batchIdx - sortedBatches[i].batchIdx).filter(g => g > 0);
+  const batchIdxsInFirstBundle = sortedBatches
+    .filter(b => b.bundleIdx === (sortedBatches[0]?.bundleIdx ?? 0))
+    .map(b => b.batchIdx)
+    .sort((a, b) => a - b);
+  if (batchIdxsInFirstBundle.length >= 2) {
+    const gaps = batchIdxsInFirstBundle.slice(1)
+      .map((v, i) => v - batchIdxsInFirstBundle[i])
+      .filter(g => g > 0);
     if (gaps.length > 0) batchSize = Math.min(...gaps);
   }
 
   for (const batch of sortedBatches) {
     batch.endRow = batch.batchIdx + batchSize - 1;
-
-    // Use bundleIdx (0-based) ranges to assign: bundle covers [bundleIdx, bundleIdx + bundleSize)
-    const bundle = sortedBundleIdxs.find(
-      bIdx => batch.batchIdx >= bIdx && batch.batchIdx < bIdx + bundleSize
-    );
-    batch.bundleIdx = bundle !== undefined
-      ? bundle
-      : Math.floor(batch.batchIdx / bundleSize) * bundleSize;
   }
 
   result.submissionBatchStats = sortedBatches;

@@ -74,16 +74,23 @@ export interface ComparisonResult {
   insights: string[];
 }
 
-function toInsight(stat: PerRowStepStat, rowCount: number | null): PerRowInsight {
-  const projected = rowCount ? stat.avgMs * rowCount : 0;
+function toInsight(stat: PerRowStepStat, rowCount: number | null, useOccurrences = false): PerRowInsight {
+  // Both validation and submission filter ms_val > 0 before summarizing.
+  // So occurrences = rows where this step was measurably non-zero.
+  //
+  // useOccurrences=true  → project against occurrences (step is conditional / sparse)
+  // useOccurrences=false → project against rowCount    (step runs on every row, just
+  //                        fast enough to be filtered out most of the time)
+  const effectiveCount = useOccurrences ? stat.occurrences : (rowCount ?? 0);
+  const projected = effectiveCount ? stat.avgMs * effectiveCount : 0;
   const projectedMin = projected / 60_000;
   const f: 'ok' | 'slow' | 'critical' =
     projectedMin > THRESHOLDS.projectedMinutes * 2 ? 'critical' :
     projectedMin > THRESHOLDS.projectedMinutes ? 'slow' :
     stat.avgMs > THRESHOLDS.perRowStepMs ? 'slow' : 'ok';
   let note: string | undefined;
-  if (rowCount && projectedMin > THRESHOLDS.projectedMinutes)
-    note = `${stat.avgMs.toFixed(1)}ms/row × ${rowCount.toLocaleString()} rows = ${projectedMin.toFixed(1)} min projected` +
+  if (effectiveCount && projectedMin > THRESHOLDS.projectedMinutes)
+    note = `${stat.avgMs.toFixed(1)}ms × ${effectiveCount.toLocaleString()} occurrences = ${projectedMin.toFixed(1)} min projected` +
       (f === 'critical' ? ' — CRITICAL' : '');
   else if (stat.maxMs > stat.avgMs * 5 && stat.maxMs > 50)
     note = `High variance: avg ${stat.avgMs.toFixed(1)}ms, max ${stat.maxMs.toFixed(1)}ms`;
@@ -127,9 +134,13 @@ export function analyzeImport(id: string, logs: ParsedImportLogs): ImportAnalysi
   });
 
   // ── Per-row insights ─────────────────────────────────────────────────
-  const validationRowInsights = logs.validationRowStats.map(s => toInsight(s, rowCount))
+  // Both validation and submission filter ms_val > 0, so occurrences = rows where
+  // the step was measurably non-zero. For steps that run on every row but are usually
+  // instant, occurrences understates — but projecting by rowCount overstates for
+  // conditional steps. Using occurrences is the safer, more honest choice for both.
+  const validationRowInsights = logs.validationRowStats.map(s => toInsight(s, rowCount, true))
     .sort((a, b) => b.projectedTotalMs - a.projectedTotalMs);
-  const submissionRowInsights = logs.submissionRowStats.map(s => toInsight(s, rowCount))
+  const submissionRowInsights = logs.submissionRowStats.map(s => toInsight(s, rowCount, true))
     .sort((a, b) => b.projectedTotalMs - a.projectedTotalMs);
 
   // ── AI insights ──────────────────────────────────────────────────────
@@ -194,7 +205,7 @@ export function analyzeImport(id: string, logs: ParsedImportLogs): ImportAnalysi
     submissionBatchStats: logs.submissionBatchStats,
     submissionRowInsights,
     insights,
-    countsSummary: parts.join(' | ') || 'No count data found',
+    countsSummary:  '', // parts.join(' | ') incorrect
   };
 }
 

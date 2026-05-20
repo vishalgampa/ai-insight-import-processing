@@ -559,7 +559,7 @@ function renderSingleImport(a) {
       existingUsersMs: b.existingUsersMs ?? 0,
       redisBatchSizeMs: b.redisBatchSizeMs ?? 0,
       flag: 'ok',
-    })), ['Chunk', 'Rows', 'Fetched existing users', 'Fetched batch size from redis'],
+    })), ['Chunk', 'Rows', 'Fetched existing users (ms)', 'Fetched batch size from redis (ms)'],
       ['chunk', 'rows', 'existingUsersMs', 'redisBatchSizeMs']);
   }
 
@@ -568,11 +568,11 @@ function renderSingleImport(a) {
     html += sectionLabel('Validation — Batch Stats (BulkInsert, 1× per 500-row batch)');
     html += sortableTable('val-batch', a.validationBatchStats.map(b => ({
       range: `${b.startRow}–${b.endRow}`,
-      bulkInsertMs: b.bulkInsertMs,
+      bulkInsertSec: b.bulkInsertMs != null ? +(b.bulkInsertMs / 1000).toFixed(2) : 0,
       timestamp: fmtTimestampShort(b.timestamp),
       flag: b.bulkInsertMs > 3000 ? 'critical' : b.bulkInsertMs > 1000 ? 'slow' : 'ok',
-    })), ['Row Range', 'BulkInsert Duration', 'Timestamp (UTC)'],
-      ['range', 'bulkInsertMs', 'timestamp']);
+    })), ['Row Range', 'BulkInsert Duration (s)', 'Timestamp (UTC)'],
+      ['range', 'bulkInsertSec', 'timestamp']);
   }
 
   // ── VALIDATION — Row stats (per-row, conditional) ─────────────────
@@ -582,7 +582,7 @@ function renderSingleImport(a) {
       stepName: p.stepName, avgMs: p.avgMs, maxMs: p.maxMs, occurrences: p.occurrences,
       projected: p.projectedTotalMin > 0 ? p.projectedTotalMin.toFixed(1) + ' min' : '—',
       flag: p.flag, note: p.note || '',
-    })), ['Step', 'Avg/row', 'Max/row', 'Count', 'Projected', 'Note'],
+    })), ['Step', 'Avg/row (ms)', 'Max/row (ms)', 'Count', 'Projected', 'Note'],
       ['stepName', 'avgMs', 'maxMs', 'occurrences', 'projected', 'note']);
   }
 
@@ -594,7 +594,7 @@ function renderSingleImport(a) {
       <thead style="position:sticky;top:0;z-index:1;background:#1e293b">
         <tr style="border-bottom:2px solid var(--border)">
           <th style="text-align:left;padding:8px 12px;color:var(--muted);font-weight:500">Step</th>
-          <th style="text-align:right;padding:8px 12px;color:var(--muted);font-weight:500">Duration</th>
+          <th style="text-align:right;padding:8px 12px;color:var(--muted);font-weight:500">Duration (ms)</th>
           <th style="text-align:right;padding:8px 12px;color:var(--muted);font-weight:500">Extra</th>
         </tr>
       </thead><tbody>`;
@@ -615,13 +615,13 @@ function renderSingleImport(a) {
     html += sortableTable('sub-bundle', a.submissionBundleStats.map(b => ({
       bundle: b.bundleIdx,
       rows: b.startRow != null && b.endRow != null ? `${b.startRow}–${b.endRow}` : '—',
-      bundleDbFetchMs: b.bundleDbFetchMs ?? 0,
+      bundleDbFetchSec: b.bundleDbFetchMs != null ? +(b.bundleDbFetchMs / 1000).toFixed(2) : 0,
       attrCount: b.attributeCount ?? '—',
       accounts: b.accountIds ?? '—',
       linked: b.linkedAccountIds ?? '—',
       flag: (b.bundleDbFetchMs ?? 0) > 5000 ? 'critical' : (b.bundleDbFetchMs ?? 0) > 2000 ? 'slow' : 'ok',
-    })), ['Bundle', 'Row Range', 'Bundle DB Fetch', 'Attr Count', 'Accounts', 'Linked Accts'],
-      ['bundle', 'rows', 'bundleDbFetchMs', 'attrCount', 'accounts', 'linked']);
+    })), ['Bundle', 'Row Range', 'Bundle DB Fetch (s)', 'Attr Count', 'Accounts', 'Linked Accts'],
+      ['bundle', 'rows', 'bundleDbFetchSec', 'attrCount', 'accounts', 'linked']);
   }
 
   // ── SUBMISSION — Batch stats (1× per 500-row batch) ───────────────
@@ -639,6 +639,8 @@ function renderSingleImport(a) {
       const totalBulkMs = batches.reduce((s, b) => s + (b.bulkProcessingMs ?? 0), 0);
       const totalLoopMs = batches.reduce((s, b) => s + (b.loopProcessingMs ?? 0), 0);
       const slowCount = batches.filter(b => (b.bulkProcessingMs ?? 0) > 5000).length;
+      const totalLoopSec = (totalLoopMs / 1000).toFixed(2) + 's';
+      const totalBulkSec = (totalBulkMs / 1000).toFixed(2) + 's';
 
       html += `<details style="margin-bottom:10px">
         <summary style="cursor:pointer;padding:10px 14px;background:var(--surface);border:1px solid var(--border);border-radius:8px;list-style:none;display:flex;justify-content:space-between;align-items:center;font-size:0.82rem">
@@ -646,8 +648,8 @@ function renderSingleImport(a) {
           <div style="display:flex;gap:14px;align-items:center">
             ${slowCount > 0 ? `<span style="font-size:0.7rem;background:var(--yellow);color:#000;padding:1px 7px;border-radius:4px;font-weight:600">${slowCount} slow</span>` : ''}
             <span style="font-size:0.75rem;color:var(--muted)">${batches.length} batches</span>
-            <span style="font-size:0.75rem;color:var(--muted)">Loop total: <span style="font-family:monospace">${fmtMs(totalLoopMs)}</span></span>
-            <span style="font-size:0.75rem;color:var(--muted)">Bulk total: <span style="font-family:monospace;color:var(--accent)">${fmtMs(totalBulkMs)}</span></span>
+            <span style="font-size:0.75rem;color:var(--muted)">Loop total: <span style="font-family:monospace">${totalLoopSec}</span></span>
+            <span style="font-size:0.75rem;color:var(--muted)">Bulk total: <span style="font-family:monospace;color:var(--accent)">${totalBulkSec}</span></span>
           </div>
         </summary>
         <div style="border:1px solid var(--border);border-top:none;border-radius:0 0 8px 8px;overflow:hidden">`;
@@ -656,12 +658,12 @@ function renderSingleImport(a) {
       html += sortableTable(tblId, batches.map(b => ({
         batchStart: b.batchIdx,
         endRow: b.endRow ?? '—',
-        loopMs: b.loopProcessingMs ?? 0,
-        bulkMs: b.bulkProcessingMs ?? 0,
+        loopSec: b.loopProcessingMs != null ? +(b.loopProcessingMs / 1000).toFixed(2) : 0,
+        bulkSec: b.bulkProcessingMs != null ? +(b.bulkProcessingMs / 1000).toFixed(2) : 0,
         start: b.startTime ? fmtTimestampShort(b.startTime) : '—',
         flag: (b.bulkProcessingMs ?? 0) > 5000 ? 'critical' : (b.bulkProcessingMs ?? 0) > 2000 ? 'slow' : 'ok',
-      })), ['Batch Start Row', 'End Row', 'Loop Processing', 'Bulk Processing', 'Start (UTC)'],
-        ['batchStart', 'endRow', 'loopMs', 'bulkMs', 'start']);
+      })), ['Batch Start Row', 'End Row', 'Loop Processing (s)', 'Bulk Processing (s)', 'Start (UTC)'],
+        ['batchStart', 'endRow', 'loopSec', 'bulkSec', 'start']);
 
       html += `</div></details>`;
     }
@@ -674,7 +676,7 @@ function renderSingleImport(a) {
       stepName: s.stepName, avgMs: s.avgMs, maxMs: s.maxMs, occurrences: s.occurrences,
       projected: s.projectedTotalMin > 0 ? s.projectedTotalMin.toFixed(1) + ' min' : '—',
       flag: s.flag, note: s.note || '',
-    })), ['Step', 'Avg/row', 'Max/row', 'Count', 'Projected', 'Note'],
+    })), ['Step', 'Avg/row (ms)', 'Max/row (ms)', 'Count', 'Projected', 'Note'],
       ['stepName', 'avgMs', 'maxMs', 'occurrences', 'projected', 'note']);
   }
 
@@ -962,9 +964,9 @@ function renderTableData(id) {
       const val = r[k];
       const isNum = typeof val === 'number';
       const display = isNum
-        ? (k === 'avgMs' || k === 'maxMs' ? val.toFixed(1) + 'ms' : val)
+        ? (k.endsWith('Sec') ? val.toFixed(2) + 's' : (k === 'avgMs' || k === 'maxMs' || k.endsWith('Ms') ? val.toFixed(2) + 'ms' : val))
         : (val ?? '—');
-      const color = i === 0 ? fc(r) : (k === 'avgMs' || k === 'maxMs' ? fc(r) : 'var(--text)');
+      const color = i === 0 ? fc(r) : (k === 'avgMs' || k === 'maxMs' || k.endsWith('Ms') || k.endsWith('Sec') ? fc(r) : 'var(--text)');
       return `<td style="padding:7px 12px;text-align:${i === 0 ? 'left' : 'right'};color:${color};overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(String(val ?? ''))}">${esc(String(display))}</td>`;
     }).join('') + `</tr>`
   ).join('');
