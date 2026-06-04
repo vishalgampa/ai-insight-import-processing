@@ -275,7 +275,7 @@ export class ImportLogFetcher {
       }
 
       const subOpId = subStartLogs[0]?.operation_Id || null;
-      dbg('SUBMISSION:operationId', subOpId ?? 'NOT FOUND — submission logs will be empty');
+      dbg('SUBMISSION:operationId', subOpId ?? 'NOT FOUND — will attempt time-window fallback');
 
       if (subOpId) {
         submissionMeta.operationId = subOpId;
@@ -320,6 +320,94 @@ export class ImportLogFetcher {
           submissionMeta.endTime = new Date(submissionRows[submissionRows.length - 1].timestamp);
 
         dbg('SUBMISSION:rows', `submissionRows=${submissionRows.length}, countRows=${submissionCountRows.length}`);
+      } else {
+        // ── Submission time-window fallback ───────────────────────────
+        // WHY: When operation_Id is not present (e.g. the MappedContentCount log
+        // was not emitted or the search window was too narrow), we fall back to a
+        // pure time-window search.
+        //
+        // Start time: anchor.saveStartTime (SaveApprovedRecords started)
+        // End time:   derived from the completion log that contains the UUID:
+        //   "ExportGenericUpdateContentCSVBackground completed successfully for
+        //    userId: ..., clientFileUploadId: {uuid}, Time Elapsed: ..."
+        // This log fires on the same pod as the submission job and marks the true
+        // end of the process, so the window [saveStartTime, completionTime] covers
+        // the entire submission job regardless of which pod it ran on.
+        dbg('SUBMISSION:fallback', 'operationId not found — searching for completion log to bound time window');
+
+        const completionLogKql = `
+          traces
+          | where timestamp > ago(90d)
+          | where message contains 'ExportGenericUpdateContentCSVBackground completed successfully'
+                 and message contains '${clientFileUploadId}'
+          | project timestamp, message, operation_Id, cloud_RoleInstance
+          | order by timestamp asc
+          | take 1
+        `;
+        const completionLogs = await this.query(completionLogKql).catch(() => [] as RawRow[]);
+        dbg('SUBMISSION:fallback', `completion log search returned ${completionLogs.length} rows`);
+
+        if (completionLogs.length > 0) {
+          const subEndTime = new Date(completionLogs[0].timestamp);
+          // Add a small buffer past the completion log to catch any trailing logs
+          const subWindowEnd = fmtDt(addMinutes(subEndTime, 2));
+          const subWindowStart = t1; // saveStartTime
+
+          dbg('SUBMISSION:fallback', `time window: ${subWindowStart} → ${subWindowEnd}`);
+
+          // Fetch submission rows by time window + message filter
+          // We cannot filter by operation_Id here, so we use the message prefix
+          // and exclude the same noise patterns as the opId path.
+          submissionRows = await this.query(`
+            traces
+            | where timestamp between (datetime('${subWindowStart}') .. datetime('${subWindowEnd}'))
+            | where message contains 'ImportGenericUpdateApprovedContent'
+            | where message !contains '${PATTERNS.submission.excludeBatch}'
+                   and message !contains '${PATTERNS.submission.excludeRow}'
+                   and message !contains '${PATTERNS.submission.excludeBky}'
+            | project timestamp, message, operation_Id, cloud_RoleInstance
+            | order by timestamp asc
+          `).catch(() => []);
+
+          submissionCountRows = await this.query(`
+            traces
+            | where timestamp between (datetime('${subWindowStart}') .. datetime('${subWindowEnd}'))
+            | where message contains 'Data Count'
+                   or message contains 'MappedContentCount'
+                   or message contains 'Dictionary created'
+                   or message contains 'total rows'
+            | project timestamp, message, operation_Id, cloud_RoleInstance
+            | order by timestamp asc
+          `).catch(() => []);
+
+          // Derive operationId and pod from the first submission row found
+          if (submissionRows.length > 0) {
+            submissionMeta.operationId = submissionRows[0].operation_Id || null;
+            submissionMeta.pod = submissionRows[0].cloud_RoleInstance || null;
+          }
+
+          // Set time bounds from actual logs
+          for (const r of submissionRows) {
+            if (r.message.includes('Bulk Processing started') && !submissionMeta.startTime) {
+              submissionMeta.startTime = new Date(r.timestamp);
+            }
+            if (r.message.includes('Bulk Processing ended')) {
+              submissionMeta.endTime = new Date(r.timestamp);
+            }
+          }
+          // Fallback: use first/last row timestamps
+          if (!submissionMeta.startTime && submissionRows.length > 0)
+            submissionMeta.startTime = new Date(submissionRows[0].timestamp);
+          if (!submissionMeta.endTime && submissionRows.length > 0)
+            submissionMeta.endTime = new Date(submissionRows[submissionRows.length - 1].timestamp);
+
+          dbg('SUBMISSION:fallback', `submissionRows=${submissionRows.length}, countRows=${submissionCountRows.length}, opId=${submissionMeta.operationId ?? 'none'}`);
+        } else {
+          // WHY: No completion log found either. The job may not have finished,
+          // or the log format differs. Nothing more we can do without an opId or
+          // a bounded time window.
+          dbg('SUBMISSION:fallback', 'completion log not found — submission data will be empty');
+        }
       }
     } else {
       // WHY: If we reach here, parseAnchor found no SaveApprovedRecords log.
