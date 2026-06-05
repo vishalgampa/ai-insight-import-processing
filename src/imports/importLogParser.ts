@@ -22,13 +22,6 @@ export interface StepTiming {
   operationId?: string;
 }
 
-export interface SlowCheckpoint {
-  chunk: number;
-  step: string;
-  ms: number;
-  timestamp: string;
-}
-
 export interface DataCounts {
   totalRows: number | null;
   mappedContentCount: number | null;
@@ -113,9 +106,6 @@ export interface ParsedImportLogs {
   // Validation — Row (aggregated, conditional — only fires when >0ms)
   validationRowStats: PerRowStepStat[];
 
-  // Slow row checkpoints (>5ms)
-  slowCheckpoints: SlowCheckpoint[];
-
   // Submission — Stage (1× per job)
   submissionStageStats: SubmissionStageStat[];
 
@@ -195,7 +185,6 @@ export function parseImportLogs(
     validationBundleStats: [],
     validationBatchStats: [],
     validationRowStats: [],
-    slowCheckpoints: [],
     submissionStageStats: [],
     submissionBundleStats: [],
     submissionBatchStats: [],
@@ -321,24 +310,6 @@ export function parseImportLogs(
         maxMs: parseFloat(r.max_ms ?? 0) || 0,
         occurrences: parseInt(r.count_ ?? 0, 10) || 0,
       });
-  }
-
-  // ── VALIDATION — Slow checkpoints (>5ms per-row ops) ─────────────────
-  const SLOW_MS = 5;
-  currentChunk = 0;
-  for (const row of validationPerRowRaw) {
-    const msg = row.message;
-    const chunkMatch = msg.match(/Processing generic update chunk\s+(\d+)/i);
-    if (chunkMatch) { currentChunk = parseInt(chunkMatch[1], 10); continue; }
-    if (!msg.includes('UploadGenericUpdateAccountDataWithValidations:')) continue;
-    // Skip bundle-level logs
-    if (msg.includes('Fetched existing users') || msg.includes('Fetched batch size from redis')) continue;
-    const ms = extractMs(msg);
-    if (ms === null || ms <= SLOW_MS) continue;
-    const stepMatch = msg.match(/UploadGenericUpdateAccountDataWithValidations:\s*(.+?)(?:\s+(?:in|took|for)\s+\d)/i);
-    const step = stepMatch ? stepMatch[1].trim()
-      : msg.split('UploadGenericUpdateAccountDataWithValidations:')[1]?.trim() ?? 'unknown';
-    result.slowCheckpoints.push({ chunk: currentChunk, step, ms, timestamp: row.timestamp });
   }
 
   // ── SUBMISSION — Stage logs ───────────────────────────────────────────

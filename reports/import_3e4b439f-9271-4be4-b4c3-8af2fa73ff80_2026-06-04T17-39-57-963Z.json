@@ -1,0 +1,2749 @@
+{
+  "type": "single",
+  "primary": {
+    "clientFileUploadId": "3e4b439f-9271-4be4-b4c3-8af2fa73ff80",
+    "rowCount": 75009,
+    "totalEstimatedMs": 9071413.539299998,
+    "diagnostics": {
+      "anchorFound": true,
+      "anchorRowCount": 0,
+      "validationFound": true,
+      "submissionFound": true,
+      "noDataReason": null
+    },
+    "stepMeta": {
+      "mapping": {
+        "operationId": "7ff9de6aacad306d61102db3ffaf0dad",
+        "pod": "collectlogic-uploads-api-7b67dfc848-f688f.(none)",
+        "startTime": "2026-04-07T15:53:42.623Z",
+        "endTime": "2026-04-07T15:55:37.701Z"
+      },
+      "validation": {
+        "operationId": "9daa843269b480ec6c9883abe2a1ca8d",
+        "pod": "collectlogic-uploads-api-7b67dfc848-f688f.(none)",
+        "startTime": "2026-04-07T16:13:00.694Z",
+        "endTime": "2026-04-07T17:01:47.861Z"
+      },
+      "submission": {
+        "operationId": "eaccd4a43d14ff75198df37992292b59",
+        "pod": "collectlogic-uploads-api-7b67dfc848-f688f.(none)",
+        "startTime": "2026-04-07T18:06:42.294Z",
+        "endTime": "2026-04-07T20:06:22.390Z"
+      }
+    },
+    "stepContributions": [
+      {
+        "stepName": "Validation: Initial DB Fetches",
+        "durationMs": 22274,
+        "percentOfTotal": 0.2,
+        "flag": "critical",
+        "note": "22.3s — check query plans"
+      },
+      {
+        "stepName": "Validation: All Chunks",
+        "durationMs": 2394183,
+        "percentOfTotal": 26.4,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Bundle 15000 DB fetch",
+        "durationMs": 90555,
+        "percentOfTotal": 1,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Bundle 17500 DB fetch",
+        "durationMs": 85551,
+        "percentOfTotal": 0.9,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Bundle 20000 DB fetch",
+        "durationMs": 83094,
+        "percentOfTotal": 0.9,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Bundle 22500 DB fetch",
+        "durationMs": 79425,
+        "percentOfTotal": 0.9,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Bundle 25000 DB fetch",
+        "durationMs": 79292,
+        "percentOfTotal": 0.9,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Bundle 27500 DB fetch",
+        "durationMs": 76774,
+        "percentOfTotal": 0.8,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Bundle 30000 DB fetch",
+        "durationMs": 77929,
+        "percentOfTotal": 0.9,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Bundle 32500 DB fetch",
+        "durationMs": 80506,
+        "percentOfTotal": 0.9,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Bundle 35000 DB fetch",
+        "durationMs": 75192,
+        "percentOfTotal": 0.8,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Bundle 37500 DB fetch",
+        "durationMs": 82381,
+        "percentOfTotal": 0.9,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Bundle 40000 DB fetch",
+        "durationMs": 84029,
+        "percentOfTotal": 0.9,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Bundle 42500 DB fetch",
+        "durationMs": 81835,
+        "percentOfTotal": 0.9,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Bundle 45000 DB fetch",
+        "durationMs": 169126,
+        "percentOfTotal": 1.9,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Bundle 47500 DB fetch",
+        "durationMs": 101411,
+        "percentOfTotal": 1.1,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Bundle 50000 DB fetch",
+        "durationMs": 91646,
+        "percentOfTotal": 1,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Bundle 52500 DB fetch",
+        "durationMs": 96662,
+        "percentOfTotal": 1.1,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Bundle 55000 DB fetch",
+        "durationMs": 91552,
+        "percentOfTotal": 1,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Bundle 57500 DB fetch",
+        "durationMs": 86444,
+        "percentOfTotal": 1,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Bundle 60000 DB fetch",
+        "durationMs": 84605,
+        "percentOfTotal": 0.9,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Bundle 62500 DB fetch",
+        "durationMs": 86180,
+        "percentOfTotal": 1,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Bundle 65000 DB fetch",
+        "durationMs": 91532,
+        "percentOfTotal": 1,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Bundle 67500 DB fetch",
+        "durationMs": 129835,
+        "percentOfTotal": 1.4,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Bundle 70000 DB fetch",
+        "durationMs": 92366,
+        "percentOfTotal": 1,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Bundle 72500 DB fetch",
+        "durationMs": 84494,
+        "percentOfTotal": 0.9,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Bundle 75000 DB fetch",
+        "durationMs": 27484,
+        "percentOfTotal": 0.3,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 0 Bulk Processing",
+        "durationMs": 52812.4981,
+        "percentOfTotal": 0.6,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 500 Bulk Processing",
+        "durationMs": 53562.9722,
+        "percentOfTotal": 0.6,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 1000 Bulk Processing",
+        "durationMs": 60838.3936,
+        "percentOfTotal": 0.7,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 1500 Bulk Processing",
+        "durationMs": 54855.226,
+        "percentOfTotal": 0.6,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 2000 Bulk Processing",
+        "durationMs": 50883.128300000004,
+        "percentOfTotal": 0.6,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 0 Bulk Processing",
+        "durationMs": 50142.9477,
+        "percentOfTotal": 0.6,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 500 Bulk Processing",
+        "durationMs": 48318.3636,
+        "percentOfTotal": 0.5,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 1000 Bulk Processing",
+        "durationMs": 47077.7182,
+        "percentOfTotal": 0.5,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 1500 Bulk Processing",
+        "durationMs": 48746.3688,
+        "percentOfTotal": 0.5,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 2000 Bulk Processing",
+        "durationMs": 45554.5299,
+        "percentOfTotal": 0.5,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 0 Bulk Processing",
+        "durationMs": 46117.7396,
+        "percentOfTotal": 0.5,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 500 Bulk Processing",
+        "durationMs": 48145.3109,
+        "percentOfTotal": 0.5,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 1000 Bulk Processing",
+        "durationMs": 48910.6146,
+        "percentOfTotal": 0.5,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 1500 Bulk Processing",
+        "durationMs": 46167.2336,
+        "percentOfTotal": 0.5,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 2000 Bulk Processing",
+        "durationMs": 43309.2919,
+        "percentOfTotal": 0.5,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 0 Bulk Processing",
+        "durationMs": 42526.526699999995,
+        "percentOfTotal": 0.5,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 500 Bulk Processing",
+        "durationMs": 43835.7765,
+        "percentOfTotal": 0.5,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 1000 Bulk Processing",
+        "durationMs": 42242.0331,
+        "percentOfTotal": 0.5,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 1500 Bulk Processing",
+        "durationMs": 40831.966799999995,
+        "percentOfTotal": 0.5,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 2000 Bulk Processing",
+        "durationMs": 44248.8946,
+        "percentOfTotal": 0.5,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 0 Bulk Processing",
+        "durationMs": 42435.95,
+        "percentOfTotal": 0.5,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 500 Bulk Processing",
+        "durationMs": 48430.129100000006,
+        "percentOfTotal": 0.5,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 1000 Bulk Processing",
+        "durationMs": 39228.432,
+        "percentOfTotal": 0.4,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 1500 Bulk Processing",
+        "durationMs": 40329.0008,
+        "percentOfTotal": 0.4,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 2000 Bulk Processing",
+        "durationMs": 39093.2914,
+        "percentOfTotal": 0.4,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 0 Bulk Processing",
+        "durationMs": 38857.983400000005,
+        "percentOfTotal": 0.4,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 500 Bulk Processing",
+        "durationMs": 38123.4631,
+        "percentOfTotal": 0.4,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 1000 Bulk Processing",
+        "durationMs": 39923.8762,
+        "percentOfTotal": 0.4,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 1500 Bulk Processing",
+        "durationMs": 39369.816,
+        "percentOfTotal": 0.4,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 2000 Bulk Processing",
+        "durationMs": 38401.100999999995,
+        "percentOfTotal": 0.4,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 0 Bulk Processing",
+        "durationMs": 46737.3803,
+        "percentOfTotal": 0.5,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 500 Bulk Processing",
+        "durationMs": 38872.300500000005,
+        "percentOfTotal": 0.4,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 1000 Bulk Processing",
+        "durationMs": 44462.200600000004,
+        "percentOfTotal": 0.5,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 1500 Bulk Processing",
+        "durationMs": 38741.5521,
+        "percentOfTotal": 0.4,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 2000 Bulk Processing",
+        "durationMs": 40398.926,
+        "percentOfTotal": 0.4,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 0 Bulk Processing",
+        "durationMs": 38623.0539,
+        "percentOfTotal": 0.4,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 500 Bulk Processing",
+        "durationMs": 37993.0406,
+        "percentOfTotal": 0.4,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 1000 Bulk Processing",
+        "durationMs": 37160.217000000004,
+        "percentOfTotal": 0.4,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 1500 Bulk Processing",
+        "durationMs": 35965.6965,
+        "percentOfTotal": 0.4,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 2000 Bulk Processing",
+        "durationMs": 35461.9463,
+        "percentOfTotal": 0.4,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 0 Bulk Processing",
+        "durationMs": 35166.2907,
+        "percentOfTotal": 0.4,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 500 Bulk Processing",
+        "durationMs": 37331.9628,
+        "percentOfTotal": 0.4,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 1000 Bulk Processing",
+        "durationMs": 33715.7668,
+        "percentOfTotal": 0.4,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 1500 Bulk Processing",
+        "durationMs": 36412.7875,
+        "percentOfTotal": 0.4,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 2000 Bulk Processing",
+        "durationMs": 36340.7942,
+        "percentOfTotal": 0.4,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 0 Bulk Processing",
+        "durationMs": 34812.8182,
+        "percentOfTotal": 0.4,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 500 Bulk Processing",
+        "durationMs": 33520.4355,
+        "percentOfTotal": 0.4,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 1000 Bulk Processing",
+        "durationMs": 37305.9101,
+        "percentOfTotal": 0.4,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 1500 Bulk Processing",
+        "durationMs": 33044.5919,
+        "percentOfTotal": 0.4,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 2000 Bulk Processing",
+        "durationMs": 32699.2712,
+        "percentOfTotal": 0.4,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 0 Bulk Processing",
+        "durationMs": 32969.1537,
+        "percentOfTotal": 0.4,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 500 Bulk Processing",
+        "durationMs": 32436.8653,
+        "percentOfTotal": 0.4,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 1000 Bulk Processing",
+        "durationMs": 31898.7373,
+        "percentOfTotal": 0.4,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 1500 Bulk Processing",
+        "durationMs": 32921.694299999996,
+        "percentOfTotal": 0.4,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 2000 Bulk Processing",
+        "durationMs": 31990.333899999998,
+        "percentOfTotal": 0.4,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 0 Bulk Processing",
+        "durationMs": 31808.0314,
+        "percentOfTotal": 0.4,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 500 Bulk Processing",
+        "durationMs": 30944.3658,
+        "percentOfTotal": 0.3,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 1000 Bulk Processing",
+        "durationMs": 31934.1561,
+        "percentOfTotal": 0.4,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 1500 Bulk Processing",
+        "durationMs": 30907.5832,
+        "percentOfTotal": 0.3,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 2000 Bulk Processing",
+        "durationMs": 33195.0758,
+        "percentOfTotal": 0.4,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 0 Bulk Processing",
+        "durationMs": 58714.344,
+        "percentOfTotal": 0.6,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 500 Bulk Processing",
+        "durationMs": 57091.7878,
+        "percentOfTotal": 0.6,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 1000 Bulk Processing",
+        "durationMs": 35833.2952,
+        "percentOfTotal": 0.4,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 1500 Bulk Processing",
+        "durationMs": 42296.7261,
+        "percentOfTotal": 0.5,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 2000 Bulk Processing",
+        "durationMs": 37570.6952,
+        "percentOfTotal": 0.4,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 0 Bulk Processing",
+        "durationMs": 32917.3293,
+        "percentOfTotal": 0.4,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 500 Bulk Processing",
+        "durationMs": 34761.3499,
+        "percentOfTotal": 0.4,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 1000 Bulk Processing",
+        "durationMs": 35059.1308,
+        "percentOfTotal": 0.4,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 1500 Bulk Processing",
+        "durationMs": 47780.265999999996,
+        "percentOfTotal": 0.5,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 2000 Bulk Processing",
+        "durationMs": 45600.3879,
+        "percentOfTotal": 0.5,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 0 Bulk Processing",
+        "durationMs": 37370.159100000004,
+        "percentOfTotal": 0.4,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 500 Bulk Processing",
+        "durationMs": 32369.4111,
+        "percentOfTotal": 0.4,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 1000 Bulk Processing",
+        "durationMs": 38110.1879,
+        "percentOfTotal": 0.4,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 1500 Bulk Processing",
+        "durationMs": 30194.0909,
+        "percentOfTotal": 0.3,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 2000 Bulk Processing",
+        "durationMs": 32132.851899999998,
+        "percentOfTotal": 0.4,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 0 Bulk Processing",
+        "durationMs": 33604.860700000005,
+        "percentOfTotal": 0.4,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 500 Bulk Processing",
+        "durationMs": 43089.253,
+        "percentOfTotal": 0.5,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 1000 Bulk Processing",
+        "durationMs": 34358.8334,
+        "percentOfTotal": 0.4,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 1500 Bulk Processing",
+        "durationMs": 33570.6076,
+        "percentOfTotal": 0.4,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 2000 Bulk Processing",
+        "durationMs": 39111.8601,
+        "percentOfTotal": 0.4,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 0 Bulk Processing",
+        "durationMs": 30655.916,
+        "percentOfTotal": 0.3,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 500 Bulk Processing",
+        "durationMs": 31859.6614,
+        "percentOfTotal": 0.4,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 1000 Bulk Processing",
+        "durationMs": 36545.424699999996,
+        "percentOfTotal": 0.4,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 1500 Bulk Processing",
+        "durationMs": 30633.8511,
+        "percentOfTotal": 0.3,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 2000 Bulk Processing",
+        "durationMs": 35013.191999999995,
+        "percentOfTotal": 0.4,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 0 Bulk Processing",
+        "durationMs": 30754.8212,
+        "percentOfTotal": 0.3,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 500 Bulk Processing",
+        "durationMs": 37710.914699999994,
+        "percentOfTotal": 0.4,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 1000 Bulk Processing",
+        "durationMs": 30794.207400000003,
+        "percentOfTotal": 0.3,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 1500 Bulk Processing",
+        "durationMs": 31964.8671,
+        "percentOfTotal": 0.4,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 2000 Bulk Processing",
+        "durationMs": 31019.8407,
+        "percentOfTotal": 0.3,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 0 Bulk Processing",
+        "durationMs": 30781.713,
+        "percentOfTotal": 0.3,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 500 Bulk Processing",
+        "durationMs": 32027.8949,
+        "percentOfTotal": 0.4,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 1000 Bulk Processing",
+        "durationMs": 30438.1368,
+        "percentOfTotal": 0.3,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 1500 Bulk Processing",
+        "durationMs": 30261.7614,
+        "percentOfTotal": 0.3,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 2000 Bulk Processing",
+        "durationMs": 29309.181500000002,
+        "percentOfTotal": 0.3,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 0 Bulk Processing",
+        "durationMs": 29672.894800000002,
+        "percentOfTotal": 0.3,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 500 Bulk Processing",
+        "durationMs": 29727.1628,
+        "percentOfTotal": 0.3,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 1000 Bulk Processing",
+        "durationMs": 29595.9175,
+        "percentOfTotal": 0.3,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 1500 Bulk Processing",
+        "durationMs": 29882.3763,
+        "percentOfTotal": 0.3,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 2000 Bulk Processing",
+        "durationMs": 29405.5256,
+        "percentOfTotal": 0.3,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 0 Bulk Processing",
+        "durationMs": 29835.575800000002,
+        "percentOfTotal": 0.3,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 500 Bulk Processing",
+        "durationMs": 29791.2903,
+        "percentOfTotal": 0.3,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 1000 Bulk Processing",
+        "durationMs": 28520.5583,
+        "percentOfTotal": 0.3,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 1500 Bulk Processing",
+        "durationMs": 28083.7208,
+        "percentOfTotal": 0.3,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 2000 Bulk Processing",
+        "durationMs": 35341.4552,
+        "percentOfTotal": 0.4,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 0 Bulk Processing",
+        "durationMs": 40615.1312,
+        "percentOfTotal": 0.4,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 500 Bulk Processing",
+        "durationMs": 29997.3289,
+        "percentOfTotal": 0.3,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 1000 Bulk Processing",
+        "durationMs": 28496.4284,
+        "percentOfTotal": 0.3,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 1500 Bulk Processing",
+        "durationMs": 28007.6093,
+        "percentOfTotal": 0.3,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 2000 Bulk Processing",
+        "durationMs": 28533.238999999998,
+        "percentOfTotal": 0.3,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 0 Bulk Processing",
+        "durationMs": 31069.109099999998,
+        "percentOfTotal": 0.3,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 500 Bulk Processing",
+        "durationMs": 29505.9919,
+        "percentOfTotal": 0.3,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 1000 Bulk Processing",
+        "durationMs": 28927.5032,
+        "percentOfTotal": 0.3,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 1500 Bulk Processing",
+        "durationMs": 28435.6789,
+        "percentOfTotal": 0.3,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 2000 Bulk Processing",
+        "durationMs": 30791.803600000003,
+        "percentOfTotal": 0.3,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 0 Bulk Processing",
+        "durationMs": 28787.8871,
+        "percentOfTotal": 0.3,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 500 Bulk Processing",
+        "durationMs": 28660.2611,
+        "percentOfTotal": 0.3,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 1000 Bulk Processing",
+        "durationMs": 28902.3584,
+        "percentOfTotal": 0.3,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 1500 Bulk Processing",
+        "durationMs": 28019.017300000003,
+        "percentOfTotal": 0.3,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 2000 Bulk Processing",
+        "durationMs": 27768.1749,
+        "percentOfTotal": 0.3,
+        "flag": "critical"
+      },
+      {
+        "stepName": "Submission Batch 0 Bulk Processing",
+        "durationMs": 8280.2106,
+        "percentOfTotal": 0.1,
+        "flag": "slow"
+      }
+    ],
+    "validationBundleStats": [
+      {
+        "chunkIndex": 0,
+        "rowCount": null,
+        "existingUsersMs": 0,
+        "redisBatchSizeMs": 69
+      }
+    ],
+    "validationBatchStats": [],
+    "validationRowInsights": [
+      {
+        "stepName": "For loop",
+        "avgMs": 3.237211534615846,
+        "maxMs": 366,
+        "occurrences": 75009,
+        "projectedTotalMs": 242820,
+        "projectedTotalMin": 4.047,
+        "flag": "ok",
+        "note": "High variance: avg 3.2ms, max 366.0ms"
+      },
+      {
+        "stepName": "Fetched cell value and field name",
+        "avgMs": 11.23404255319149,
+        "maxMs": 314,
+        "occurrences": 423,
+        "projectedTotalMs": 4752,
+        "projectedTotalMin": 0.0792,
+        "flag": "slow",
+        "note": "High variance: avg 11.2ms, max 314.0ms"
+      },
+      {
+        "stepName": "Fetched mapping value and column name",
+        "avgMs": 11.565737051792828,
+        "maxMs": 361,
+        "occurrences": 251,
+        "projectedTotalMs": 2903,
+        "projectedTotalMin": 0.048383333333333334,
+        "flag": "slow",
+        "note": "High variance: avg 11.6ms, max 361.0ms"
+      },
+      {
+        "stepName": "Fields validation",
+        "avgMs": 15.930232558139535,
+        "maxMs": 273,
+        "occurrences": 129,
+        "projectedTotalMs": 2055,
+        "projectedTotalMin": 0.03425,
+        "flag": "slow",
+        "note": "High variance: avg 15.9ms, max 273.0ms"
+      },
+      {
+        "stepName": "Country, State and ZIP processing",
+        "avgMs": 16.36842105263158,
+        "maxMs": 339,
+        "occurrences": 57,
+        "projectedTotalMs": 933,
+        "projectedTotalMin": 0.01555,
+        "flag": "slow",
+        "note": "High variance: avg 16.4ms, max 339.0ms"
+      },
+      {
+        "stepName": "ValidateGenericUpdateContentValue",
+        "avgMs": 15.75,
+        "maxMs": 282,
+        "occurrences": 56,
+        "projectedTotalMs": 882,
+        "projectedTotalMin": 0.0147,
+        "flag": "slow",
+        "note": "High variance: avg 15.8ms, max 282.0ms"
+      },
+      {
+        "stepName": "Date only field check",
+        "avgMs": 11.157142857142857,
+        "maxMs": 185,
+        "occurrences": 70,
+        "projectedTotalMs": 781,
+        "projectedTotalMin": 0.013016666666666666,
+        "flag": "slow",
+        "note": "High variance: avg 11.2ms, max 185.0ms"
+      },
+      {
+        "stepName": "Required/Blank field validation",
+        "avgMs": 7.754385964912281,
+        "maxMs": 32,
+        "occurrences": 57,
+        "projectedTotalMs": 442,
+        "projectedTotalMin": 0.007366666666666666,
+        "flag": "ok"
+      },
+      {
+        "stepName": "Phone number processing",
+        "avgMs": 9.1875,
+        "maxMs": 72,
+        "occurrences": 32,
+        "projectedTotalMs": 294,
+        "projectedTotalMin": 0.0049,
+        "flag": "ok",
+        "note": "High variance: avg 9.2ms, max 72.0ms"
+      },
+      {
+        "stepName": "MP Status Override Permission Check processing",
+        "avgMs": 57.6,
+        "maxMs": 262,
+        "occurrences": 5,
+        "projectedTotalMs": 288,
+        "projectedTotalMin": 0.0048,
+        "flag": "slow"
+      },
+      {
+        "stepName": "Adding errors and warnings",
+        "avgMs": 9.826086956521738,
+        "maxMs": 28,
+        "occurrences": 23,
+        "projectedTotalMs": 225.99999999999997,
+        "projectedTotalMin": 0.003766666666666666,
+        "flag": "ok"
+      },
+      {
+        "stepName": "Address processing",
+        "avgMs": 11.23076923076923,
+        "maxMs": 60,
+        "occurrences": 13,
+        "projectedTotalMs": 146,
+        "projectedTotalMin": 0.0024333333333333334,
+        "flag": "slow",
+        "note": "High variance: avg 11.2ms, max 60.0ms"
+      },
+      {
+        "stepName": "SetGenericUpdateContentValue",
+        "avgMs": 6.75,
+        "maxMs": 32,
+        "occurrences": 16,
+        "projectedTotalMs": 108,
+        "projectedTotalMin": 0.0018,
+        "flag": "ok"
+      },
+      {
+        "stepName": "Adding to mapped content",
+        "avgMs": 8,
+        "maxMs": 24,
+        "occurrences": 7,
+        "projectedTotalMs": 56,
+        "projectedTotalMin": 0.0009333333333333333,
+        "flag": "ok"
+      },
+      {
+        "stepName": "Email processing",
+        "avgMs": 3.7142857142857144,
+        "maxMs": 9,
+        "occurrences": 7,
+        "projectedTotalMs": 26,
+        "projectedTotalMin": 0.0004333333333333333,
+        "flag": "ok"
+      },
+      {
+        "stepName": "GenericFileContentCleaner",
+        "avgMs": 4.166666666666667,
+        "maxMs": 20,
+        "occurrences": 6,
+        "projectedTotalMs": 25,
+        "projectedTotalMin": 0.0004166666666666667,
+        "flag": "ok"
+      },
+      {
+        "stepName": "Dispute and Lot Group validations",
+        "avgMs": 1.375,
+        "maxMs": 3,
+        "occurrences": 8,
+        "projectedTotalMs": 11,
+        "projectedTotalMin": 0.00018333333333333334,
+        "flag": "ok"
+      },
+      {
+        "stepName": "Adding identifier errors and warnings",
+        "avgMs": 5,
+        "maxMs": 5,
+        "occurrences": 1,
+        "projectedTotalMs": 5,
+        "projectedTotalMin": 0.00008333333333333333,
+        "flag": "ok"
+      },
+      {
+        "stepName": "GetClAcctNumbersFromAcctInfo",
+        "avgMs": 3,
+        "maxMs": 3,
+        "occurrences": 1,
+        "projectedTotalMs": 3,
+        "projectedTotalMin": 0.00005,
+        "flag": "ok"
+      },
+      {
+        "stepName": "ValidateFileField",
+        "avgMs": 0.000004443911175103432,
+        "maxMs": 1,
+        "occurrences": 225027,
+        "projectedTotalMs": 1,
+        "projectedTotalMin": 0.000016666666666666667,
+        "flag": "ok"
+      },
+      {
+        "stepName": "Pre GetClAcctNumbersFromAcctInfo",
+        "avgMs": 1,
+        "maxMs": 1,
+        "occurrences": 1,
+        "projectedTotalMs": 1,
+        "projectedTotalMin": 0.000016666666666666667,
+        "flag": "ok"
+      }
+    ],
+    "submissionStageStats": [],
+    "submissionBundleStats": [
+      {
+        "bundleIdx": 15000,
+        "startRow": 15002,
+        "endRow": 17501,
+        "attributeCount": 745,
+        "bundleDbFetchMs": 90555,
+        "accountIds": 2500,
+        "linkedAccountIds": 0,
+        "customFields": 0,
+        "bankruptcyRecords": 1236
+      },
+      {
+        "bundleIdx": 17500,
+        "startRow": 17502,
+        "endRow": 20001,
+        "attributeCount": 767,
+        "bundleDbFetchMs": 85551,
+        "accountIds": 2500,
+        "linkedAccountIds": 0,
+        "customFields": 0,
+        "bankruptcyRecords": 1232
+      },
+      {
+        "bundleIdx": 20000,
+        "startRow": 20002,
+        "endRow": 22501,
+        "attributeCount": 825,
+        "bundleDbFetchMs": 83094,
+        "accountIds": 2500,
+        "linkedAccountIds": 0,
+        "customFields": 0,
+        "bankruptcyRecords": 1168
+      },
+      {
+        "bundleIdx": 22500,
+        "startRow": 22502,
+        "endRow": 25001,
+        "attributeCount": 789,
+        "bundleDbFetchMs": 79425,
+        "accountIds": 2500,
+        "linkedAccountIds": 0,
+        "customFields": 0,
+        "bankruptcyRecords": 1256
+      },
+      {
+        "bundleIdx": 25000,
+        "startRow": 25002,
+        "endRow": 27501,
+        "attributeCount": 774,
+        "bundleDbFetchMs": 79292,
+        "accountIds": 2500,
+        "linkedAccountIds": 0,
+        "customFields": 0,
+        "bankruptcyRecords": 1264
+      },
+      {
+        "bundleIdx": 27500,
+        "startRow": 27502,
+        "endRow": 30001,
+        "attributeCount": 776,
+        "bundleDbFetchMs": 76774,
+        "accountIds": 2500,
+        "linkedAccountIds": 0,
+        "customFields": 0,
+        "bankruptcyRecords": 1308
+      },
+      {
+        "bundleIdx": 30000,
+        "startRow": 30002,
+        "endRow": 32501,
+        "attributeCount": 744,
+        "bundleDbFetchMs": 77929,
+        "accountIds": 2500,
+        "linkedAccountIds": 0,
+        "customFields": 0,
+        "bankruptcyRecords": 1224
+      },
+      {
+        "bundleIdx": 32500,
+        "startRow": 32502,
+        "endRow": 35001,
+        "attributeCount": 806,
+        "bundleDbFetchMs": 80506,
+        "accountIds": 2500,
+        "linkedAccountIds": 0,
+        "customFields": 0,
+        "bankruptcyRecords": 1192
+      },
+      {
+        "bundleIdx": 35000,
+        "startRow": 35002,
+        "endRow": 37501,
+        "attributeCount": 817,
+        "bundleDbFetchMs": 75192,
+        "accountIds": 2500,
+        "linkedAccountIds": 0,
+        "customFields": 0,
+        "bankruptcyRecords": 1309
+      },
+      {
+        "bundleIdx": 37500,
+        "startRow": 37502,
+        "endRow": 40001,
+        "attributeCount": 788,
+        "bundleDbFetchMs": 82381,
+        "accountIds": 2500,
+        "linkedAccountIds": 0,
+        "customFields": 0,
+        "bankruptcyRecords": 1329
+      },
+      {
+        "bundleIdx": 40000,
+        "startRow": 40002,
+        "endRow": 42501,
+        "attributeCount": 791,
+        "bundleDbFetchMs": 84029,
+        "accountIds": 2500,
+        "linkedAccountIds": 0,
+        "customFields": 0,
+        "bankruptcyRecords": 1196
+      },
+      {
+        "bundleIdx": 42500,
+        "startRow": 42502,
+        "endRow": 45001,
+        "attributeCount": 784,
+        "bundleDbFetchMs": 81835,
+        "accountIds": 2500,
+        "linkedAccountIds": 0,
+        "customFields": 0,
+        "bankruptcyRecords": 1212
+      },
+      {
+        "bundleIdx": 45000,
+        "startRow": 45002,
+        "endRow": 47501,
+        "attributeCount": 761,
+        "bundleDbFetchMs": 169126,
+        "accountIds": 2500,
+        "linkedAccountIds": 0,
+        "customFields": 0,
+        "bankruptcyRecords": 1180
+      },
+      {
+        "bundleIdx": 47500,
+        "startRow": 47502,
+        "endRow": 50001,
+        "attributeCount": 794,
+        "bundleDbFetchMs": 101411,
+        "accountIds": 2500,
+        "linkedAccountIds": 0,
+        "customFields": 0,
+        "bankruptcyRecords": 1048
+      },
+      {
+        "bundleIdx": 50000,
+        "startRow": 50002,
+        "endRow": 52501,
+        "attributeCount": 779,
+        "bundleDbFetchMs": 91646,
+        "accountIds": 2500,
+        "linkedAccountIds": 1,
+        "customFields": 0,
+        "bankruptcyRecords": 1272
+      },
+      {
+        "bundleIdx": 52500,
+        "startRow": 52502,
+        "endRow": 55001,
+        "attributeCount": 831,
+        "bundleDbFetchMs": 96662,
+        "accountIds": 2500,
+        "linkedAccountIds": 0,
+        "customFields": 0,
+        "bankruptcyRecords": 1204
+      },
+      {
+        "bundleIdx": 55000,
+        "startRow": 55002,
+        "endRow": 57501,
+        "attributeCount": 787,
+        "bundleDbFetchMs": 91552,
+        "accountIds": 2500,
+        "linkedAccountIds": 0,
+        "customFields": 0,
+        "bankruptcyRecords": 1264
+      },
+      {
+        "bundleIdx": 57500,
+        "startRow": 57502,
+        "endRow": 60001,
+        "attributeCount": 757,
+        "bundleDbFetchMs": 86444,
+        "accountIds": 2500,
+        "linkedAccountIds": 0,
+        "customFields": 0,
+        "bankruptcyRecords": 1249
+      },
+      {
+        "bundleIdx": 60000,
+        "startRow": 60002,
+        "endRow": 62501,
+        "attributeCount": 829,
+        "bundleDbFetchMs": 84605,
+        "accountIds": 2500,
+        "linkedAccountIds": 0,
+        "customFields": 0,
+        "bankruptcyRecords": 1228
+      },
+      {
+        "bundleIdx": 62500,
+        "startRow": 62502,
+        "endRow": 65001,
+        "attributeCount": 750,
+        "bundleDbFetchMs": 86180,
+        "accountIds": 2500,
+        "linkedAccountIds": 0,
+        "customFields": 0,
+        "bankruptcyRecords": 1260
+      },
+      {
+        "bundleIdx": 65000,
+        "startRow": 65002,
+        "endRow": 67501,
+        "attributeCount": 720,
+        "bundleDbFetchMs": 91532,
+        "accountIds": 2500,
+        "linkedAccountIds": 0,
+        "customFields": 0,
+        "bankruptcyRecords": 1164
+      },
+      {
+        "bundleIdx": 67500,
+        "startRow": 67502,
+        "endRow": 70001,
+        "attributeCount": 765,
+        "bundleDbFetchMs": 129835,
+        "accountIds": 2500,
+        "linkedAccountIds": 0,
+        "customFields": 0,
+        "bankruptcyRecords": 1196
+      },
+      {
+        "bundleIdx": 70000,
+        "startRow": 70002,
+        "endRow": 72501,
+        "attributeCount": 787,
+        "bundleDbFetchMs": 92366,
+        "accountIds": 2500,
+        "linkedAccountIds": 0,
+        "customFields": 0,
+        "bankruptcyRecords": 1176
+      },
+      {
+        "bundleIdx": 72500,
+        "startRow": 72502,
+        "endRow": 75001,
+        "attributeCount": 785,
+        "bundleDbFetchMs": 84494,
+        "accountIds": 2500,
+        "linkedAccountIds": 0,
+        "customFields": 0,
+        "bankruptcyRecords": 1204
+      },
+      {
+        "bundleIdx": 75000,
+        "startRow": 75002,
+        "endRow": 75010,
+        "attributeCount": 2,
+        "bundleDbFetchMs": 27484,
+        "accountIds": 9,
+        "linkedAccountIds": 0,
+        "customFields": 0,
+        "bankruptcyRecords": 4
+      }
+    ],
+    "submissionBatchStats": [
+      {
+        "batchIdx": 0,
+        "bundleIdx": 15000,
+        "startRow": 0,
+        "endRow": 499,
+        "loopProcessingMs": 2192,
+        "bulkProcessingMs": 52812.4981,
+        "startTime": "2026-04-07T18:11:56.0662842Z",
+        "endTime": "2026-04-07T18:12:48.8789633Z"
+      },
+      {
+        "batchIdx": 500,
+        "bundleIdx": 15000,
+        "startRow": 500,
+        "endRow": 999,
+        "loopProcessingMs": 2906,
+        "bulkProcessingMs": 53562.9722,
+        "startTime": "2026-04-07T18:12:51.8534547Z",
+        "endTime": "2026-04-07T18:13:45.4194447Z"
+      },
+      {
+        "batchIdx": 1000,
+        "bundleIdx": 15000,
+        "startRow": 1000,
+        "endRow": 1499,
+        "loopProcessingMs": 2398,
+        "bulkProcessingMs": 60838.3936,
+        "startTime": "2026-04-07T18:13:47.8856702Z",
+        "endTime": "2026-04-07T18:14:48.7265248Z"
+      },
+      {
+        "batchIdx": 1500,
+        "bundleIdx": 15000,
+        "startRow": 1500,
+        "endRow": 1999,
+        "loopProcessingMs": 2289,
+        "bulkProcessingMs": 54855.226,
+        "startTime": "2026-04-07T18:14:51.0862752Z",
+        "endTime": "2026-04-07T18:15:45.9416662Z"
+      },
+      {
+        "batchIdx": 2000,
+        "bundleIdx": 15000,
+        "startRow": 2000,
+        "endRow": 2499,
+        "loopProcessingMs": 2782,
+        "bulkProcessingMs": 50883.128300000004,
+        "startTime": "2026-04-07T18:15:48.7950128Z",
+        "endTime": "2026-04-07T18:16:39.6783353Z"
+      },
+      {
+        "batchIdx": 0,
+        "bundleIdx": 17500,
+        "startRow": 0,
+        "endRow": 499,
+        "loopProcessingMs": 2622,
+        "bulkProcessingMs": 50142.9477,
+        "startTime": "2026-04-07T18:18:07.9213451Z",
+        "endTime": "2026-04-07T18:18:58.0660736Z"
+      },
+      {
+        "batchIdx": 500,
+        "bundleIdx": 17500,
+        "startRow": 500,
+        "endRow": 999,
+        "loopProcessingMs": 2181,
+        "bulkProcessingMs": 48318.3636,
+        "startTime": "2026-04-07T18:19:00.3182833Z",
+        "endTime": "2026-04-07T18:19:48.636843Z"
+      },
+      {
+        "batchIdx": 1000,
+        "bundleIdx": 17500,
+        "startRow": 1000,
+        "endRow": 1499,
+        "loopProcessingMs": 2396,
+        "bulkProcessingMs": 47077.7182,
+        "startTime": "2026-04-07T18:19:51.1014711Z",
+        "endTime": "2026-04-07T18:20:38.1813409Z"
+      },
+      {
+        "batchIdx": 1500,
+        "bundleIdx": 17500,
+        "startRow": 1500,
+        "endRow": 1999,
+        "loopProcessingMs": 2493,
+        "bulkProcessingMs": 48746.3688,
+        "startTime": "2026-04-07T18:20:40.7420731Z",
+        "endTime": "2026-04-07T18:21:29.4909429Z"
+      },
+      {
+        "batchIdx": 2000,
+        "bundleIdx": 17500,
+        "startRow": 2000,
+        "endRow": 2499,
+        "loopProcessingMs": 2545,
+        "bulkProcessingMs": 45554.5299,
+        "startTime": "2026-04-07T18:21:32.1052996Z",
+        "endTime": "2026-04-07T18:22:17.6617055Z"
+      },
+      {
+        "batchIdx": 0,
+        "bundleIdx": 20000,
+        "startRow": 0,
+        "endRow": 499,
+        "loopProcessingMs": 2562,
+        "bulkProcessingMs": 46117.7396,
+        "startTime": "2026-04-07T18:23:43.3899531Z",
+        "endTime": "2026-04-07T18:24:29.5078982Z"
+      },
+      {
+        "batchIdx": 500,
+        "bundleIdx": 20000,
+        "startRow": 500,
+        "endRow": 999,
+        "loopProcessingMs": 2560,
+        "bulkProcessingMs": 48145.3109,
+        "startTime": "2026-04-07T18:24:32.1383564Z",
+        "endTime": "2026-04-07T18:25:20.2838197Z"
+      },
+      {
+        "batchIdx": 1000,
+        "bundleIdx": 20000,
+        "startRow": 1000,
+        "endRow": 1499,
+        "loopProcessingMs": 2266,
+        "bulkProcessingMs": 48910.6146,
+        "startTime": "2026-04-07T18:25:22.6180179Z",
+        "endTime": "2026-04-07T18:26:11.5315463Z"
+      },
+      {
+        "batchIdx": 1500,
+        "bundleIdx": 20000,
+        "startRow": 1500,
+        "endRow": 1999,
+        "loopProcessingMs": 2378,
+        "bulkProcessingMs": 46167.2336,
+        "startTime": "2026-04-07T18:26:13.989947Z",
+        "endTime": "2026-04-07T18:27:00.1573405Z"
+      },
+      {
+        "batchIdx": 2000,
+        "bundleIdx": 20000,
+        "startRow": 2000,
+        "endRow": 2499,
+        "loopProcessingMs": 2494,
+        "bulkProcessingMs": 43309.2919,
+        "startTime": "2026-04-07T18:27:02.7219594Z",
+        "endTime": "2026-04-07T18:27:46.0314019Z"
+      },
+      {
+        "batchIdx": 0,
+        "bundleIdx": 22500,
+        "startRow": 0,
+        "endRow": 499,
+        "loopProcessingMs": 2557,
+        "bulkProcessingMs": 42526.526699999995,
+        "startTime": "2026-04-07T18:29:08.0819283Z",
+        "endTime": "2026-04-07T18:29:50.6111387Z"
+      },
+      {
+        "batchIdx": 500,
+        "bundleIdx": 22500,
+        "startRow": 500,
+        "endRow": 999,
+        "loopProcessingMs": 2442,
+        "bulkProcessingMs": 43835.7765,
+        "startTime": "2026-04-07T18:29:53.1217972Z",
+        "endTime": "2026-04-07T18:30:36.9594952Z"
+      },
+      {
+        "batchIdx": 1000,
+        "bundleIdx": 22500,
+        "startRow": 1000,
+        "endRow": 1499,
+        "loopProcessingMs": 2597,
+        "bulkProcessingMs": 42242.0331,
+        "startTime": "2026-04-07T18:30:39.6270483Z",
+        "endTime": "2026-04-07T18:31:21.8692624Z"
+      },
+      {
+        "batchIdx": 1500,
+        "bundleIdx": 22500,
+        "startRow": 1500,
+        "endRow": 1999,
+        "loopProcessingMs": 2647,
+        "bulkProcessingMs": 40831.966799999995,
+        "startTime": "2026-04-07T18:31:24.5857549Z",
+        "endTime": "2026-04-07T18:32:05.4202886Z"
+      },
+      {
+        "batchIdx": 2000,
+        "bundleIdx": 22500,
+        "startRow": 2000,
+        "endRow": 2499,
+        "loopProcessingMs": 2594,
+        "bulkProcessingMs": 44248.8946,
+        "startTime": "2026-04-07T18:32:08.0856121Z",
+        "endTime": "2026-04-07T18:32:52.3368109Z"
+      },
+      {
+        "batchIdx": 0,
+        "bundleIdx": 25000,
+        "startRow": 0,
+        "endRow": 499,
+        "loopProcessingMs": 2361,
+        "bulkProcessingMs": 42435.95,
+        "startTime": "2026-04-07T18:34:14.0578655Z",
+        "endTime": "2026-04-07T18:34:56.496702Z"
+      },
+      {
+        "batchIdx": 500,
+        "bundleIdx": 25000,
+        "startRow": 500,
+        "endRow": 999,
+        "loopProcessingMs": 2346,
+        "bulkProcessingMs": 48430.129100000006,
+        "startTime": "2026-04-07T18:34:58.91406Z",
+        "endTime": "2026-04-07T18:35:47.3443619Z"
+      },
+      {
+        "batchIdx": 1000,
+        "bundleIdx": 25000,
+        "startRow": 1000,
+        "endRow": 1499,
+        "loopProcessingMs": 2227,
+        "bulkProcessingMs": 39228.432,
+        "startTime": "2026-04-07T18:35:49.6415823Z",
+        "endTime": "2026-04-07T18:36:28.8701771Z"
+      },
+      {
+        "batchIdx": 1500,
+        "bundleIdx": 25000,
+        "startRow": 1500,
+        "endRow": 1999,
+        "loopProcessingMs": 2241,
+        "bulkProcessingMs": 40329.0008,
+        "startTime": "2026-04-07T18:36:31.1813828Z",
+        "endTime": "2026-04-07T18:37:11.5105708Z"
+      },
+      {
+        "batchIdx": 2000,
+        "bundleIdx": 25000,
+        "startRow": 2000,
+        "endRow": 2499,
+        "loopProcessingMs": 2544,
+        "bulkProcessingMs": 39093.2914,
+        "startTime": "2026-04-07T18:37:14.1218165Z",
+        "endTime": "2026-04-07T18:37:53.217865Z"
+      },
+      {
+        "batchIdx": 0,
+        "bundleIdx": 27500,
+        "startRow": 0,
+        "endRow": 499,
+        "loopProcessingMs": 2722,
+        "bulkProcessingMs": 38857.983400000005,
+        "startTime": "2026-04-07T18:39:12.7820236Z",
+        "endTime": "2026-04-07T18:39:51.6431326Z"
+      },
+      {
+        "batchIdx": 500,
+        "bundleIdx": 27500,
+        "startRow": 500,
+        "endRow": 999,
+        "loopProcessingMs": 2653,
+        "bulkProcessingMs": 38123.4631,
+        "startTime": "2026-04-07T18:39:54.3666098Z",
+        "endTime": "2026-04-07T18:40:32.4902187Z"
+      },
+      {
+        "batchIdx": 1000,
+        "bundleIdx": 27500,
+        "startRow": 1000,
+        "endRow": 1499,
+        "loopProcessingMs": 2194,
+        "bulkProcessingMs": 39923.8762,
+        "startTime": "2026-04-07T18:40:34.7534049Z",
+        "endTime": "2026-04-07T18:41:14.6790316Z"
+      },
+      {
+        "batchIdx": 1500,
+        "bundleIdx": 27500,
+        "startRow": 1500,
+        "endRow": 1999,
+        "loopProcessingMs": 2243,
+        "bulkProcessingMs": 39369.816,
+        "startTime": "2026-04-07T18:41:16.993293Z",
+        "endTime": "2026-04-07T18:41:56.3631809Z"
+      },
+      {
+        "batchIdx": 2000,
+        "bundleIdx": 27500,
+        "startRow": 2000,
+        "endRow": 2499,
+        "loopProcessingMs": 2682,
+        "bulkProcessingMs": 38401.100999999995,
+        "startTime": "2026-04-07T18:41:59.1223435Z",
+        "endTime": "2026-04-07T18:42:37.5236044Z"
+      },
+      {
+        "batchIdx": 0,
+        "bundleIdx": 30000,
+        "startRow": 0,
+        "endRow": 499,
+        "loopProcessingMs": 2423,
+        "bulkProcessingMs": 46737.3803,
+        "startTime": "2026-04-07T18:43:57.9456986Z",
+        "endTime": "2026-04-07T18:44:44.6855613Z"
+      },
+      {
+        "batchIdx": 500,
+        "bundleIdx": 30000,
+        "startRow": 500,
+        "endRow": 999,
+        "loopProcessingMs": 2579,
+        "bulkProcessingMs": 38872.300500000005,
+        "startTime": "2026-04-07T18:44:47.3348108Z",
+        "endTime": "2026-04-07T18:45:26.2072779Z"
+      },
+      {
+        "batchIdx": 1000,
+        "bundleIdx": 30000,
+        "startRow": 1000,
+        "endRow": 1499,
+        "loopProcessingMs": 2459,
+        "bulkProcessingMs": 44462.200600000004,
+        "startTime": "2026-04-07T18:45:28.7376713Z",
+        "endTime": "2026-04-07T18:46:13.2000433Z"
+      },
+      {
+        "batchIdx": 1500,
+        "bundleIdx": 30000,
+        "startRow": 1500,
+        "endRow": 1999,
+        "loopProcessingMs": 2937,
+        "bulkProcessingMs": 38741.5521,
+        "startTime": "2026-04-07T18:46:16.2059026Z",
+        "endTime": "2026-04-07T18:46:54.9501037Z"
+      },
+      {
+        "batchIdx": 2000,
+        "bundleIdx": 30000,
+        "startRow": 2000,
+        "endRow": 2499,
+        "loopProcessingMs": 2377,
+        "bulkProcessingMs": 40398.926,
+        "startTime": "2026-04-07T18:46:57.4015512Z",
+        "endTime": "2026-04-07T18:47:37.8006575Z"
+      },
+      {
+        "batchIdx": 0,
+        "bundleIdx": 32500,
+        "startRow": 0,
+        "endRow": 499,
+        "loopProcessingMs": 2363,
+        "bulkProcessingMs": 38623.0539,
+        "startTime": "2026-04-07T18:49:00.7413664Z",
+        "endTime": "2026-04-07T18:49:39.3645789Z"
+      },
+      {
+        "batchIdx": 500,
+        "bundleIdx": 32500,
+        "startRow": 500,
+        "endRow": 999,
+        "loopProcessingMs": 2555,
+        "bulkProcessingMs": 37993.0406,
+        "startTime": "2026-04-07T18:49:41.9897095Z",
+        "endTime": "2026-04-07T18:50:19.9829348Z"
+      },
+      {
+        "batchIdx": 1000,
+        "bundleIdx": 32500,
+        "startRow": 1000,
+        "endRow": 1499,
+        "loopProcessingMs": 2336,
+        "bulkProcessingMs": 37160.217000000004,
+        "startTime": "2026-04-07T18:50:22.3899163Z",
+        "endTime": "2026-04-07T18:50:59.5503032Z"
+      },
+      {
+        "batchIdx": 1500,
+        "bundleIdx": 32500,
+        "startRow": 1500,
+        "endRow": 1999,
+        "loopProcessingMs": 2505,
+        "bulkProcessingMs": 35965.6965,
+        "startTime": "2026-04-07T18:51:02.1258077Z",
+        "endTime": "2026-04-07T18:51:38.091688Z"
+      },
+      {
+        "batchIdx": 2000,
+        "bundleIdx": 32500,
+        "startRow": 2000,
+        "endRow": 2499,
+        "loopProcessingMs": 2321,
+        "bulkProcessingMs": 35461.9463,
+        "startTime": "2026-04-07T18:51:40.481456Z",
+        "endTime": "2026-04-07T18:52:15.9459807Z"
+      },
+      {
+        "batchIdx": 0,
+        "bundleIdx": 35000,
+        "startRow": 0,
+        "endRow": 499,
+        "loopProcessingMs": 2295,
+        "bulkProcessingMs": 35166.2907,
+        "startTime": "2026-04-07T18:53:33.5064931Z",
+        "endTime": "2026-04-07T18:54:08.6729771Z"
+      },
+      {
+        "batchIdx": 500,
+        "bundleIdx": 35000,
+        "startRow": 500,
+        "endRow": 999,
+        "loopProcessingMs": 2331,
+        "bulkProcessingMs": 37331.9628,
+        "startTime": "2026-04-07T18:54:11.0734577Z",
+        "endTime": "2026-04-07T18:54:48.4079194Z"
+      },
+      {
+        "batchIdx": 1000,
+        "bundleIdx": 35000,
+        "startRow": 1000,
+        "endRow": 1499,
+        "loopProcessingMs": 2726,
+        "bulkProcessingMs": 33715.7668,
+        "startTime": "2026-04-07T18:54:51.2018828Z",
+        "endTime": "2026-04-07T18:55:24.9205066Z"
+      },
+      {
+        "batchIdx": 1500,
+        "bundleIdx": 35000,
+        "startRow": 1500,
+        "endRow": 1999,
+        "loopProcessingMs": 2791,
+        "bulkProcessingMs": 36412.7875,
+        "startTime": "2026-04-07T18:55:27.7813282Z",
+        "endTime": "2026-04-07T18:56:04.1957936Z"
+      },
+      {
+        "batchIdx": 2000,
+        "bundleIdx": 35000,
+        "startRow": 2000,
+        "endRow": 2499,
+        "loopProcessingMs": 2521,
+        "bulkProcessingMs": 36340.7942,
+        "startTime": "2026-04-07T18:56:06.7858491Z",
+        "endTime": "2026-04-07T18:56:43.1285329Z"
+      },
+      {
+        "batchIdx": 0,
+        "bundleIdx": 37500,
+        "startRow": 0,
+        "endRow": 499,
+        "loopProcessingMs": 2295,
+        "bulkProcessingMs": 34812.8182,
+        "startTime": "2026-04-07T18:58:07.8734075Z",
+        "endTime": "2026-04-07T18:58:42.6888882Z"
+      },
+      {
+        "batchIdx": 500,
+        "bundleIdx": 37500,
+        "startRow": 500,
+        "endRow": 999,
+        "loopProcessingMs": 2393,
+        "bulkProcessingMs": 33520.4355,
+        "startTime": "2026-04-07T18:58:45.1532889Z",
+        "endTime": "2026-04-07T18:59:18.6737948Z"
+      },
+      {
+        "batchIdx": 1000,
+        "bundleIdx": 37500,
+        "startRow": 1000,
+        "endRow": 1499,
+        "loopProcessingMs": 2925,
+        "bulkProcessingMs": 37305.9101,
+        "startTime": "2026-04-07T18:59:21.6703631Z",
+        "endTime": "2026-04-07T18:59:58.9764246Z"
+      },
+      {
+        "batchIdx": 1500,
+        "bundleIdx": 37500,
+        "startRow": 1500,
+        "endRow": 1999,
+        "loopProcessingMs": 2338,
+        "bulkProcessingMs": 33044.5919,
+        "startTime": "2026-04-07T19:00:01.3853366Z",
+        "endTime": "2026-04-07T19:00:34.4338678Z"
+      },
+      {
+        "batchIdx": 2000,
+        "bundleIdx": 37500,
+        "startRow": 2000,
+        "endRow": 2499,
+        "loopProcessingMs": 2353,
+        "bulkProcessingMs": 32699.2712,
+        "startTime": "2026-04-07T19:00:36.8574714Z",
+        "endTime": "2026-04-07T19:01:09.5584884Z"
+      },
+      {
+        "batchIdx": 0,
+        "bundleIdx": 40000,
+        "startRow": 0,
+        "endRow": 499,
+        "loopProcessingMs": 2250,
+        "bulkProcessingMs": 32969.1537,
+        "startTime": "2026-04-07T19:02:35.9101213Z",
+        "endTime": "2026-04-07T19:03:08.879451Z"
+      },
+      {
+        "batchIdx": 500,
+        "bundleIdx": 40000,
+        "startRow": 500,
+        "endRow": 999,
+        "loopProcessingMs": 2424,
+        "bulkProcessingMs": 32436.8653,
+        "startTime": "2026-04-07T19:03:11.374435Z",
+        "endTime": "2026-04-07T19:03:43.8114771Z"
+      },
+      {
+        "batchIdx": 1000,
+        "bundleIdx": 40000,
+        "startRow": 1000,
+        "endRow": 1499,
+        "loopProcessingMs": 2223,
+        "bulkProcessingMs": 31898.7373,
+        "startTime": "2026-04-07T19:03:46.10591Z",
+        "endTime": "2026-04-07T19:04:18.00481Z"
+      },
+      {
+        "batchIdx": 1500,
+        "bundleIdx": 40000,
+        "startRow": 1500,
+        "endRow": 1999,
+        "loopProcessingMs": 2797,
+        "bulkProcessingMs": 32921.694299999996,
+        "startTime": "2026-04-07T19:04:20.8697888Z",
+        "endTime": "2026-04-07T19:04:53.7941967Z"
+      },
+      {
+        "batchIdx": 2000,
+        "bundleIdx": 40000,
+        "startRow": 2000,
+        "endRow": 2499,
+        "loopProcessingMs": 2469,
+        "bulkProcessingMs": 31990.333899999998,
+        "startTime": "2026-04-07T19:04:56.334247Z",
+        "endTime": "2026-04-07T19:05:28.3247352Z"
+      },
+      {
+        "batchIdx": 0,
+        "bundleIdx": 42500,
+        "startRow": 0,
+        "endRow": 499,
+        "loopProcessingMs": 2642,
+        "bulkProcessingMs": 31808.0314,
+        "startTime": "2026-04-07T19:06:52.8741771Z",
+        "endTime": "2026-04-07T19:07:24.6823359Z"
+      },
+      {
+        "batchIdx": 500,
+        "bundleIdx": 42500,
+        "startRow": 500,
+        "endRow": 999,
+        "loopProcessingMs": 2308,
+        "bulkProcessingMs": 30944.3658,
+        "startTime": "2026-04-07T19:07:27.0613401Z",
+        "endTime": "2026-04-07T19:07:58.005892Z"
+      },
+      {
+        "batchIdx": 1000,
+        "bundleIdx": 42500,
+        "startRow": 1000,
+        "endRow": 1499,
+        "loopProcessingMs": 2177,
+        "bulkProcessingMs": 31934.1561,
+        "startTime": "2026-04-07T19:08:00.2533339Z",
+        "endTime": "2026-04-07T19:08:32.1876691Z"
+      },
+      {
+        "batchIdx": 1500,
+        "bundleIdx": 42500,
+        "startRow": 1500,
+        "endRow": 1999,
+        "loopProcessingMs": 2267,
+        "bulkProcessingMs": 30907.5832,
+        "startTime": "2026-04-07T19:08:34.5256374Z",
+        "endTime": "2026-04-07T19:09:05.4333615Z"
+      },
+      {
+        "batchIdx": 2000,
+        "bundleIdx": 42500,
+        "startRow": 2000,
+        "endRow": 2499,
+        "loopProcessingMs": 2374,
+        "bulkProcessingMs": 33195.0758,
+        "startTime": "2026-04-07T19:09:07.8776834Z",
+        "endTime": "2026-04-07T19:09:41.0744283Z"
+      },
+      {
+        "batchIdx": 0,
+        "bundleIdx": 45000,
+        "startRow": 0,
+        "endRow": 499,
+        "loopProcessingMs": 2338,
+        "bulkProcessingMs": 58714.344,
+        "startTime": "2026-04-07T19:12:32.6098708Z",
+        "endTime": "2026-04-07T19:13:31.3266881Z"
+      },
+      {
+        "batchIdx": 500,
+        "bundleIdx": 45000,
+        "startRow": 500,
+        "endRow": 999,
+        "loopProcessingMs": 2513,
+        "bulkProcessingMs": 57091.7878,
+        "startTime": "2026-04-07T19:13:33.9094379Z",
+        "endTime": "2026-04-07T19:14:31.0013984Z"
+      },
+      {
+        "batchIdx": 1000,
+        "bundleIdx": 45000,
+        "startRow": 1000,
+        "endRow": 1499,
+        "loopProcessingMs": 2374,
+        "bulkProcessingMs": 35833.2952,
+        "startTime": "2026-04-07T19:14:33.4413189Z",
+        "endTime": "2026-04-07T19:15:09.2785022Z"
+      },
+      {
+        "batchIdx": 1500,
+        "bundleIdx": 45000,
+        "startRow": 1500,
+        "endRow": 1999,
+        "loopProcessingMs": 2586,
+        "bulkProcessingMs": 42296.7261,
+        "startTime": "2026-04-07T19:15:11.9340712Z",
+        "endTime": "2026-04-07T19:15:54.2309528Z"
+      },
+      {
+        "batchIdx": 2000,
+        "bundleIdx": 45000,
+        "startRow": 2000,
+        "endRow": 2499,
+        "loopProcessingMs": 2259,
+        "bulkProcessingMs": 37570.6952,
+        "startTime": "2026-04-07T19:15:56.557765Z",
+        "endTime": "2026-04-07T19:16:34.1312416Z"
+      },
+      {
+        "batchIdx": 0,
+        "bundleIdx": 47500,
+        "startRow": 0,
+        "endRow": 499,
+        "loopProcessingMs": 2218,
+        "bulkProcessingMs": 32917.3293,
+        "startTime": "2026-04-07T19:18:17.8302864Z",
+        "endTime": "2026-04-07T19:18:50.7477828Z"
+      },
+      {
+        "batchIdx": 500,
+        "bundleIdx": 47500,
+        "startRow": 500,
+        "endRow": 999,
+        "loopProcessingMs": 2552,
+        "bulkProcessingMs": 34761.3499,
+        "startTime": "2026-04-07T19:18:53.3692918Z",
+        "endTime": "2026-04-07T19:19:28.13066Z"
+      },
+      {
+        "batchIdx": 1000,
+        "bundleIdx": 47500,
+        "startRow": 1000,
+        "endRow": 1499,
+        "loopProcessingMs": 2520,
+        "bulkProcessingMs": 35059.1308,
+        "startTime": "2026-04-07T19:19:30.7177412Z",
+        "endTime": "2026-04-07T19:20:05.7791846Z"
+      },
+      {
+        "batchIdx": 1500,
+        "bundleIdx": 47500,
+        "startRow": 1500,
+        "endRow": 1999,
+        "loopProcessingMs": 2321,
+        "bulkProcessingMs": 47780.265999999996,
+        "startTime": "2026-04-07T19:20:08.169749Z",
+        "endTime": "2026-04-07T19:20:55.9501675Z"
+      },
+      {
+        "batchIdx": 2000,
+        "bundleIdx": 47500,
+        "startRow": 2000,
+        "endRow": 2499,
+        "loopProcessingMs": 2393,
+        "bulkProcessingMs": 45600.3879,
+        "startTime": "2026-04-07T19:20:58.4102452Z",
+        "endTime": "2026-04-07T19:21:44.0136703Z"
+      },
+      {
+        "batchIdx": 0,
+        "bundleIdx": 50000,
+        "startRow": 0,
+        "endRow": 499,
+        "loopProcessingMs": 2358,
+        "bulkProcessingMs": 37370.159100000004,
+        "startTime": "2026-04-07T19:23:18.0900029Z",
+        "endTime": "2026-04-07T19:23:55.4604011Z"
+      },
+      {
+        "batchIdx": 500,
+        "bundleIdx": 50000,
+        "startRow": 500,
+        "endRow": 999,
+        "loopProcessingMs": 2437,
+        "bulkProcessingMs": 32369.4111,
+        "startTime": "2026-04-07T19:23:57.966073Z",
+        "endTime": "2026-04-07T19:24:30.3383133Z"
+      },
+      {
+        "batchIdx": 1000,
+        "bundleIdx": 50000,
+        "startRow": 1000,
+        "endRow": 1499,
+        "loopProcessingMs": 2497,
+        "bulkProcessingMs": 38110.1879,
+        "startTime": "2026-04-07T19:24:32.9054565Z",
+        "endTime": "2026-04-07T19:25:11.0173584Z"
+      },
+      {
+        "batchIdx": 1500,
+        "bundleIdx": 50000,
+        "startRow": 1500,
+        "endRow": 1999,
+        "loopProcessingMs": 2582,
+        "bulkProcessingMs": 30194.0909,
+        "startTime": "2026-04-07T19:25:13.6697441Z",
+        "endTime": "2026-04-07T19:25:43.8640064Z"
+      },
+      {
+        "batchIdx": 2000,
+        "bundleIdx": 50000,
+        "startRow": 2000,
+        "endRow": 2499,
+        "loopProcessingMs": 2634,
+        "bulkProcessingMs": 32132.851899999998,
+        "startTime": "2026-04-07T19:25:46.5658376Z",
+        "endTime": "2026-04-07T19:26:18.7021183Z"
+      },
+      {
+        "batchIdx": 0,
+        "bundleIdx": 52500,
+        "startRow": 0,
+        "endRow": 499,
+        "loopProcessingMs": 2274,
+        "bulkProcessingMs": 33604.860700000005,
+        "startTime": "2026-04-07T19:27:57.7135522Z",
+        "endTime": "2026-04-07T19:28:31.3185665Z"
+      },
+      {
+        "batchIdx": 500,
+        "bundleIdx": 52500,
+        "startRow": 500,
+        "endRow": 999,
+        "loopProcessingMs": 2342,
+        "bulkProcessingMs": 43089.253,
+        "startTime": "2026-04-07T19:28:33.7296447Z",
+        "endTime": "2026-04-07T19:29:16.8205473Z"
+      },
+      {
+        "batchIdx": 1000,
+        "bundleIdx": 52500,
+        "startRow": 1000,
+        "endRow": 1499,
+        "loopProcessingMs": 2192,
+        "bulkProcessingMs": 34358.8334,
+        "startTime": "2026-04-07T19:29:19.0817151Z",
+        "endTime": "2026-04-07T19:29:53.4422021Z"
+      },
+      {
+        "batchIdx": 1500,
+        "bundleIdx": 52500,
+        "startRow": 1500,
+        "endRow": 1999,
+        "loopProcessingMs": 2210,
+        "bulkProcessingMs": 33570.6076,
+        "startTime": "2026-04-07T19:29:55.7214103Z",
+        "endTime": "2026-04-07T19:30:29.2946779Z"
+      },
+      {
+        "batchIdx": 2000,
+        "bundleIdx": 52500,
+        "startRow": 2000,
+        "endRow": 2499,
+        "loopProcessingMs": 2774,
+        "bulkProcessingMs": 39111.8601,
+        "startTime": "2026-04-07T19:30:32.1378854Z",
+        "endTime": "2026-04-07T19:31:11.251601Z"
+      },
+      {
+        "batchIdx": 0,
+        "bundleIdx": 55000,
+        "startRow": 0,
+        "endRow": 499,
+        "loopProcessingMs": 2416,
+        "bulkProcessingMs": 30655.916,
+        "startTime": "2026-04-07T19:32:45.2935139Z",
+        "endTime": "2026-04-07T19:33:15.9521218Z"
+      },
+      {
+        "batchIdx": 500,
+        "bundleIdx": 55000,
+        "startRow": 500,
+        "endRow": 999,
+        "loopProcessingMs": 2573,
+        "bulkProcessingMs": 31859.6614,
+        "startTime": "2026-04-07T19:33:18.5937038Z",
+        "endTime": "2026-04-07T19:33:50.4551343Z"
+      },
+      {
+        "batchIdx": 1000,
+        "bundleIdx": 55000,
+        "startRow": 1000,
+        "endRow": 1499,
+        "loopProcessingMs": 2659,
+        "bulkProcessingMs": 36545.424699999996,
+        "startTime": "2026-04-07T19:33:53.1854815Z",
+        "endTime": "2026-04-07T19:34:29.7327823Z"
+      },
+      {
+        "batchIdx": 1500,
+        "bundleIdx": 55000,
+        "startRow": 1500,
+        "endRow": 1999,
+        "loopProcessingMs": 2554,
+        "bulkProcessingMs": 30633.8511,
+        "startTime": "2026-04-07T19:34:32.3579304Z",
+        "endTime": "2026-04-07T19:35:02.9919453Z"
+      },
+      {
+        "batchIdx": 2000,
+        "bundleIdx": 55000,
+        "startRow": 2000,
+        "endRow": 2499,
+        "loopProcessingMs": 2951,
+        "bulkProcessingMs": 35013.191999999995,
+        "startTime": "2026-04-07T19:35:06.0138023Z",
+        "endTime": "2026-04-07T19:35:41.0271582Z"
+      },
+      {
+        "batchIdx": 0,
+        "bundleIdx": 57500,
+        "startRow": 0,
+        "endRow": 499,
+        "loopProcessingMs": 2399,
+        "bulkProcessingMs": 30754.8212,
+        "startTime": "2026-04-07T19:37:09.9373055Z",
+        "endTime": "2026-04-07T19:37:40.6958646Z"
+      },
+      {
+        "batchIdx": 500,
+        "bundleIdx": 57500,
+        "startRow": 500,
+        "endRow": 999,
+        "loopProcessingMs": 2162,
+        "bulkProcessingMs": 37710.914699999994,
+        "startTime": "2026-04-07T19:37:42.9258913Z",
+        "endTime": "2026-04-07T19:38:20.6394499Z"
+      },
+      {
+        "batchIdx": 1000,
+        "bundleIdx": 57500,
+        "startRow": 1000,
+        "endRow": 1499,
+        "loopProcessingMs": 2747,
+        "bulkProcessingMs": 30794.207400000003,
+        "startTime": "2026-04-07T19:38:23.4574256Z",
+        "endTime": "2026-04-07T19:38:54.2517872Z"
+      },
+      {
+        "batchIdx": 1500,
+        "bundleIdx": 57500,
+        "startRow": 1500,
+        "endRow": 1999,
+        "loopProcessingMs": 2674,
+        "bulkProcessingMs": 31964.8671,
+        "startTime": "2026-04-07T19:38:56.9941142Z",
+        "endTime": "2026-04-07T19:39:28.9618266Z"
+      },
+      {
+        "batchIdx": 2000,
+        "bundleIdx": 57500,
+        "startRow": 2000,
+        "endRow": 2499,
+        "loopProcessingMs": 2680,
+        "bulkProcessingMs": 31019.8407,
+        "startTime": "2026-04-07T19:39:31.7099125Z",
+        "endTime": "2026-04-07T19:40:02.7327394Z"
+      },
+      {
+        "batchIdx": 0,
+        "bundleIdx": 60000,
+        "startRow": 0,
+        "endRow": 499,
+        "loopProcessingMs": 2263,
+        "bulkProcessingMs": 30781.713,
+        "startTime": "2026-04-07T19:41:29.6695134Z",
+        "endTime": "2026-04-07T19:42:00.4533854Z"
+      },
+      {
+        "batchIdx": 500,
+        "bundleIdx": 60000,
+        "startRow": 500,
+        "endRow": 999,
+        "loopProcessingMs": 2588,
+        "bulkProcessingMs": 32027.8949,
+        "startTime": "2026-04-07T19:42:03.1093304Z",
+        "endTime": "2026-04-07T19:42:35.1404521Z"
+      },
+      {
+        "batchIdx": 1000,
+        "bundleIdx": 60000,
+        "startRow": 1000,
+        "endRow": 1499,
+        "loopProcessingMs": 2640,
+        "bulkProcessingMs": 30438.1368,
+        "startTime": "2026-04-07T19:42:37.8506967Z",
+        "endTime": "2026-04-07T19:43:08.2889963Z"
+      },
+      {
+        "batchIdx": 1500,
+        "bundleIdx": 60000,
+        "startRow": 1500,
+        "endRow": 1999,
+        "loopProcessingMs": 2649,
+        "bulkProcessingMs": 30261.7614,
+        "startTime": "2026-04-07T19:43:11.0060892Z",
+        "endTime": "2026-04-07T19:43:41.2709116Z"
+      },
+      {
+        "batchIdx": 2000,
+        "bundleIdx": 60000,
+        "startRow": 2000,
+        "endRow": 2499,
+        "loopProcessingMs": 2450,
+        "bulkProcessingMs": 29309.181500000002,
+        "startTime": "2026-04-07T19:43:43.7895087Z",
+        "endTime": "2026-04-07T19:44:13.100336Z"
+      },
+      {
+        "batchIdx": 0,
+        "bundleIdx": 62500,
+        "startRow": 0,
+        "endRow": 499,
+        "loopProcessingMs": 2500,
+        "bulkProcessingMs": 29672.894800000002,
+        "startTime": "2026-04-07T19:45:41.8496345Z",
+        "endTime": "2026-04-07T19:46:11.5243431Z"
+      },
+      {
+        "batchIdx": 500,
+        "bundleIdx": 62500,
+        "startRow": 500,
+        "endRow": 999,
+        "loopProcessingMs": 2459,
+        "bulkProcessingMs": 29727.1628,
+        "startTime": "2026-04-07T19:46:14.0535064Z",
+        "endTime": "2026-04-07T19:46:43.7827565Z"
+      },
+      {
+        "batchIdx": 1000,
+        "bundleIdx": 62500,
+        "startRow": 1000,
+        "endRow": 1499,
+        "loopProcessingMs": 2264,
+        "bulkProcessingMs": 29595.9175,
+        "startTime": "2026-04-07T19:46:46.1173768Z",
+        "endTime": "2026-04-07T19:47:15.7133639Z"
+      },
+      {
+        "batchIdx": 1500,
+        "bundleIdx": 62500,
+        "startRow": 1500,
+        "endRow": 1999,
+        "loopProcessingMs": 2274,
+        "bulkProcessingMs": 29882.3763,
+        "startTime": "2026-04-07T19:47:18.0576425Z",
+        "endTime": "2026-04-07T19:47:47.9402052Z"
+      },
+      {
+        "batchIdx": 2000,
+        "bundleIdx": 62500,
+        "startRow": 2000,
+        "endRow": 2499,
+        "loopProcessingMs": 2384,
+        "bulkProcessingMs": 29405.5256,
+        "startTime": "2026-04-07T19:47:50.3936212Z",
+        "endTime": "2026-04-07T19:48:19.8011117Z"
+      },
+      {
+        "batchIdx": 0,
+        "bundleIdx": 65000,
+        "startRow": 0,
+        "endRow": 499,
+        "loopProcessingMs": 2180,
+        "bulkProcessingMs": 29835.575800000002,
+        "startTime": "2026-04-07T19:49:53.5813077Z",
+        "endTime": "2026-04-07T19:50:23.4206236Z"
+      },
+      {
+        "batchIdx": 500,
+        "bundleIdx": 65000,
+        "startRow": 500,
+        "endRow": 999,
+        "loopProcessingMs": 2687,
+        "bulkProcessingMs": 29791.2903,
+        "startTime": "2026-04-07T19:50:26.1779851Z",
+        "endTime": "2026-04-07T19:50:55.9694385Z"
+      },
+      {
+        "batchIdx": 1000,
+        "bundleIdx": 65000,
+        "startRow": 1000,
+        "endRow": 1499,
+        "loopProcessingMs": 2287,
+        "bulkProcessingMs": 28520.5583,
+        "startTime": "2026-04-07T19:50:58.3258768Z",
+        "endTime": "2026-04-07T19:51:26.8482051Z"
+      },
+      {
+        "batchIdx": 1500,
+        "bundleIdx": 65000,
+        "startRow": 1500,
+        "endRow": 1999,
+        "loopProcessingMs": 2205,
+        "bulkProcessingMs": 28083.7208,
+        "startTime": "2026-04-07T19:51:29.1213579Z",
+        "endTime": "2026-04-07T19:51:57.2074018Z"
+      },
+      {
+        "batchIdx": 2000,
+        "bundleIdx": 65000,
+        "startRow": 2000,
+        "endRow": 2499,
+        "loopProcessingMs": 2257,
+        "bulkProcessingMs": 35341.4552,
+        "startTime": "2026-04-07T19:51:59.5333821Z",
+        "endTime": "2026-04-07T19:52:34.8767602Z"
+      },
+      {
+        "batchIdx": 0,
+        "bundleIdx": 67500,
+        "startRow": 0,
+        "endRow": 499,
+        "loopProcessingMs": 2240,
+        "bulkProcessingMs": 40615.1312,
+        "startTime": "2026-04-07T19:54:47.0228037Z",
+        "endTime": "2026-04-07T19:55:27.6380971Z"
+      },
+      {
+        "batchIdx": 500,
+        "bundleIdx": 67500,
+        "startRow": 500,
+        "endRow": 999,
+        "loopProcessingMs": 2207,
+        "bulkProcessingMs": 29997.3289,
+        "startTime": "2026-04-07T19:55:29.9174279Z",
+        "endTime": "2026-04-07T19:55:59.9149185Z"
+      },
+      {
+        "batchIdx": 1000,
+        "bundleIdx": 67500,
+        "startRow": 1000,
+        "endRow": 1499,
+        "loopProcessingMs": 2351,
+        "bulkProcessingMs": 28496.4284,
+        "startTime": "2026-04-07T19:56:02.3337902Z",
+        "endTime": "2026-04-07T19:56:30.8326172Z"
+      },
+      {
+        "batchIdx": 1500,
+        "bundleIdx": 67500,
+        "startRow": 1500,
+        "endRow": 1999,
+        "loopProcessingMs": 2549,
+        "bulkProcessingMs": 28007.6093,
+        "startTime": "2026-04-07T19:56:33.4496682Z",
+        "endTime": "2026-04-07T19:57:01.4599581Z"
+      },
+      {
+        "batchIdx": 2000,
+        "bundleIdx": 67500,
+        "startRow": 2000,
+        "endRow": 2499,
+        "loopProcessingMs": 2276,
+        "bulkProcessingMs": 28533.238999999998,
+        "startTime": "2026-04-07T19:57:03.8060983Z",
+        "endTime": "2026-04-07T19:57:32.3395103Z"
+      },
+      {
+        "batchIdx": 0,
+        "bundleIdx": 70000,
+        "startRow": 0,
+        "endRow": 499,
+        "loopProcessingMs": 2597,
+        "bulkProcessingMs": 31069.109099999998,
+        "startTime": "2026-04-07T19:59:07.3738446Z",
+        "endTime": "2026-04-07T19:59:38.4431395Z"
+      },
+      {
+        "batchIdx": 500,
+        "bundleIdx": 70000,
+        "startRow": 500,
+        "endRow": 999,
+        "loopProcessingMs": 2565,
+        "bulkProcessingMs": 29505.9919,
+        "startTime": "2026-04-07T19:59:41.0777061Z",
+        "endTime": "2026-04-07T20:00:10.5854918Z"
+      },
+      {
+        "batchIdx": 1000,
+        "bundleIdx": 70000,
+        "startRow": 1000,
+        "endRow": 1499,
+        "loopProcessingMs": 2578,
+        "bulkProcessingMs": 28927.5032,
+        "startTime": "2026-04-07T20:00:13.23364Z",
+        "endTime": "2026-04-07T20:00:42.1613297Z"
+      },
+      {
+        "batchIdx": 1500,
+        "bundleIdx": 70000,
+        "startRow": 1500,
+        "endRow": 1999,
+        "loopProcessingMs": 2377,
+        "bulkProcessingMs": 28435.6789,
+        "startTime": "2026-04-07T20:00:44.6058288Z",
+        "endTime": "2026-04-07T20:01:13.0442066Z"
+      },
+      {
+        "batchIdx": 2000,
+        "bundleIdx": 70000,
+        "startRow": 2000,
+        "endRow": 2499,
+        "loopProcessingMs": 2697,
+        "bulkProcessingMs": 30791.803600000003,
+        "startTime": "2026-04-07T20:01:15.8096079Z",
+        "endTime": "2026-04-07T20:01:46.6035923Z"
+      },
+      {
+        "batchIdx": 0,
+        "bundleIdx": 72500,
+        "startRow": 0,
+        "endRow": 499,
+        "loopProcessingMs": 2640,
+        "bulkProcessingMs": 28787.8871,
+        "startTime": "2026-04-07T20:03:13.8098517Z",
+        "endTime": "2026-04-07T20:03:42.6009371Z"
+      },
+      {
+        "batchIdx": 500,
+        "bundleIdx": 72500,
+        "startRow": 500,
+        "endRow": 999,
+        "loopProcessingMs": 2537,
+        "bulkProcessingMs": 28660.2611,
+        "startTime": "2026-04-07T20:03:45.2053564Z",
+        "endTime": "2026-04-07T20:04:13.8694257Z"
+      },
+      {
+        "batchIdx": 1000,
+        "bundleIdx": 72500,
+        "startRow": 1000,
+        "endRow": 1499,
+        "loopProcessingMs": 2428,
+        "bulkProcessingMs": 28902.3584,
+        "startTime": "2026-04-07T20:04:16.3655673Z",
+        "endTime": "2026-04-07T20:04:45.2707011Z"
+      },
+      {
+        "batchIdx": 1500,
+        "bundleIdx": 72500,
+        "startRow": 1500,
+        "endRow": 1999,
+        "loopProcessingMs": 2387,
+        "bulkProcessingMs": 28019.017300000003,
+        "startTime": "2026-04-07T20:04:47.7257401Z",
+        "endTime": "2026-04-07T20:05:15.7474807Z"
+      },
+      {
+        "batchIdx": 2000,
+        "bundleIdx": 72500,
+        "startRow": 2000,
+        "endRow": 2499,
+        "loopProcessingMs": 2926,
+        "bulkProcessingMs": 27768.1749,
+        "startTime": "2026-04-07T20:05:18.7460262Z",
+        "endTime": "2026-04-07T20:05:46.5143886Z"
+      },
+      {
+        "batchIdx": 0,
+        "bundleIdx": 75000,
+        "startRow": 0,
+        "endRow": 499,
+        "loopProcessingMs": 40,
+        "bulkProcessingMs": 8280.2106,
+        "startTime": "2026-04-07T20:06:14.1097449Z",
+        "endTime": "2026-04-07T20:06:22.3901473Z"
+      }
+    ],
+    "submissionRowInsights": [
+      {
+        "stepName": "note",
+        "avgMs": 1.1543814742230931,
+        "maxMs": 125,
+        "occurrences": 75009,
+        "projectedTotalMs": 86588.99999999999,
+        "projectedTotalMin": 1.4431499999999997,
+        "flag": "ok",
+        "note": "High variance: avg 1.2ms, max 125.0ms"
+      },
+      {
+        "stepName": "UpdatedAdmin",
+        "avgMs": 1.054457949511825,
+        "maxMs": 115,
+        "occurrences": 65243,
+        "projectedTotalMs": 68796,
+        "projectedTotalMin": 1.1466,
+        "flag": "ok",
+        "note": "High variance: avg 1.1ms, max 115.0ms"
+      },
+      {
+        "stepName": "DB-CHECK",
+        "avgMs": 1.278014184397163,
+        "maxMs": 103,
+        "occurrences": 7050,
+        "projectedTotalMs": 9010,
+        "projectedTotalMin": 0.15016666666666667,
+        "flag": "ok",
+        "note": "High variance: avg 1.3ms, max 103.0ms"
+      },
+      {
+        "stepName": "Phones, emails, addresses and custom field",
+        "avgMs": 2.730769230769231,
+        "maxMs": 33,
+        "occurrences": 338,
+        "projectedTotalMs": 923,
+        "projectedTotalMin": 0.015383333333333334,
+        "flag": "ok"
+      },
+      {
+        "stepName": "Legal",
+        "avgMs": 2.225589225589226,
+        "maxMs": 51,
+        "occurrences": 297,
+        "projectedTotalMs": 661.0000000000001,
+        "projectedTotalMin": 0.01101666666666667,
+        "flag": "ok",
+        "note": "High variance: avg 2.2ms, max 51.0ms"
+      },
+      {
+        "stepName": "Dispute",
+        "avgMs": 10.541666666666666,
+        "maxMs": 122,
+        "occurrences": 24,
+        "projectedTotalMs": 253,
+        "projectedTotalMin": 0.004216666666666666,
+        "flag": "slow",
+        "note": "High variance: avg 10.5ms, max 122.0ms"
+      },
+      {
+        "stepName": "Added content",
+        "avgMs": 7.346153846153846,
+        "maxMs": 24,
+        "occurrences": 26,
+        "projectedTotalMs": 191,
+        "projectedTotalMin": 0.003183333333333333,
+        "flag": "ok"
+      },
+      {
+        "stepName": "ADD PRIMARY",
+        "avgMs": 6.090909090909091,
+        "maxMs": 28,
+        "occurrences": 11,
+        "projectedTotalMs": 67,
+        "projectedTotalMin": 0.0011166666666666666,
+        "flag": "ok"
+      },
+      {
+        "stepName": "StatId, agentId, coAgentId",
+        "avgMs": 3.5,
+        "maxMs": 8,
+        "occurrences": 4,
+        "projectedTotalMs": 14,
+        "projectedTotalMin": 0.00023333333333333333,
+        "flag": "ok"
+      },
+      {
+        "stepName": "Account Attributes",
+        "avgMs": 5,
+        "maxMs": 5,
+        "occurrences": 1,
+        "projectedTotalMs": 5,
+        "projectedTotalMin": 0.00008333333333333333,
+        "flag": "ok"
+      },
+      {
+        "stepName": "Deceased",
+        "avgMs": 1,
+        "maxMs": 1,
+        "occurrences": 2,
+        "projectedTotalMs": 2,
+        "projectedTotalMin": 0.000033333333333333335,
+        "flag": "ok"
+      }
+    ],
+    "insights": [
+      "⚠️ Initial DB fetches: 22.3s — fixed cost per import regardless of file size.",
+      "⚠️ Validation \"Fetched cell value and field name\": High variance: avg 11.2ms, max 314.0ms",
+      "⚠️ Validation \"Fetched mapping value and column name\": High variance: avg 11.6ms, max 361.0ms",
+      "⚠️ Validation \"Fields validation\": High variance: avg 15.9ms, max 273.0ms",
+      "⚠️ Submission \"Dispute\": High variance: avg 10.5ms, max 122.0ms",
+      "⚠️ 25 submission bundle(s) had DB fetch >5s.",
+      "❌ Errors: Duplicate trigger"
+    ],
+    "countsSummary": ""
+  },
+  "diagnostics": {
+    "anchorFound": true,
+    "anchorRowCount": 128,
+    "validationFound": true,
+    "submissionFound": true,
+    "noDataReason": null
+  },
+  "plainAnswer": null
+}

@@ -6,6 +6,7 @@
 import express from 'express';
 import https from 'https';
 import path from 'path';
+import fs from 'fs';
 import { TelemetryNormalizer } from './src/telemetry/normalizer';
 import { TimeSeriesBuilder } from './src/telemetry/timeSeriesBuilder';
 import { BaselineCalculator } from './src/telemetry/baselineCalculator';
@@ -29,6 +30,20 @@ import { ImportOrchestrator } from './src/imports/importOrchestrator';
 const app = express();
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
+
+// ── Report storage helper ──────────────────────────────────────────────────
+
+function saveReport(type: string, id: string, data: any) {
+  const reportsDir = path.join(__dirname, 'reports');
+  if (!fs.existsSync(reportsDir)) {
+    fs.mkdirSync(reportsDir, { recursive: true });
+  }
+  const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+  const fileName = `${type}_${id}_${timestamp}.json`;
+  const filePath = path.join(reportsDir, fileName);
+  fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
+  console.log(`Report saved to ${filePath}`);
+}
 
 // ── App Insights REST helper ───────────────────────────────────────────────
 
@@ -353,7 +368,10 @@ app.post('/api/analyze', async (req, res) => {
 
     addStep('Report', { incidentId: report.incidentId });
 
-    res.json({ steps, report, markdown, nlResponse, affectedServices, aiNarrative });
+    const responseData = { steps, report, markdown, nlResponse, affectedServices, aiNarrative };
+    saveReport('incident', report.incidentId, responseData);
+
+    res.json(responseData);
   } catch (err: any) {
     res.status(500).json({ error: err.message ?? 'Internal server error' });
   }
@@ -379,7 +397,10 @@ app.post('/api/import-analyze', async (req, res) => {
       ? generatePlainAnswer(question.trim(), result.primary)
       : null;
 
-    res.json({ ...result, plainAnswer });
+    const responseData = { ...result, plainAnswer };
+    saveReport('import', result.primary.clientFileUploadId, responseData);
+
+    res.json(responseData);
   } catch (err: any) {
     res.status(500).json({ error: err.message ?? 'Internal server error' });
   }

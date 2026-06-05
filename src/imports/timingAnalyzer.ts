@@ -7,7 +7,6 @@ import {
   ParsedImportLogs, PerRowStepStat,
   ValidationBundleStat, ValidationBatchStat,
   SubmissionStageStat, SubmissionBundleStat, SubmissionBatchStat,
-  SlowCheckpoint,
 } from './importLogParser';
 import { FetchDiagnostics } from './importLogFetcher';
 import { THRESHOLDS } from './knownPatterns';
@@ -46,7 +45,6 @@ export interface ImportAnalysis {
   validationBundleStats: ValidationBundleStat[];
   validationBatchStats: ValidationBatchStat[];
   validationRowInsights: PerRowInsight[];   // per-row with projections
-  slowCheckpoints: SlowCheckpoint[];
 
   // ── SUBMISSION ──
   submissionStageStats: SubmissionStageStat[];
@@ -199,7 +197,6 @@ export function analyzeImport(id: string, logs: ParsedImportLogs): ImportAnalysi
     validationBundleStats: logs.validationBundleStats,
     validationBatchStats: logs.validationBatchStats,
     validationRowInsights,
-    slowCheckpoints: logs.slowCheckpoints,
     submissionStageStats: logs.submissionStageStats,
     submissionBundleStats: logs.submissionBundleStats,
     submissionBatchStats: logs.submissionBatchStats,

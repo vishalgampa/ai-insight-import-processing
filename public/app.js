@@ -680,11 +680,6 @@ function renderSingleImport(a) {
       ['stepName', 'avgMs', 'maxMs', 'occurrences', 'projected', 'note']);
   }
 
-  // ── Slow checkpoints ───────────────────────────────────────────────
-  if (a.slowCheckpoints && a.slowCheckpoints.length > 0) {
-    html += slowCheckpointsSection(a.slowCheckpoints);
-  }
-
   return html;
 }
 
@@ -832,62 +827,6 @@ function vlistRender(vid, scrollTop) {
   }).join('');
 }
 
-
-function slowCheckpointsSection(checkpoints) {
-  if (!checkpoints || checkpoints.length === 0) return '';
-
-  // Group by step name for summary
-  const byStep = new Map();
-  for (const c of checkpoints) {
-    if (!byStep.has(c.step)) byStep.set(c.step, []);
-    byStep.get(c.step).push(c);
-  }
-
-  let html = `<div style="background:#1a0f00;border:2px solid var(--yellow);border-radius:12px;padding:16px;margin-bottom:16px">`;
-  html += `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-    <div style="font-size:0.8rem;font-weight:600;color:var(--yellow);text-transform:uppercase">⚠ Slow Checkpoints (&gt;5ms on synchronous ops)</div>
-    <span style="font-size:0.75rem;color:var(--muted)">${checkpoints.length} occurrences across ${byStep.size} step type(s)</span>
-  </div>`;
-
-  // Summary by step
-  html += `<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">`;
-  for (const [step, items] of [...byStep.entries()].sort((a, b) => b[1].length - a[1].length)) {
-    const maxMs = Math.max(...items.map(i => i.ms));
-    const avgMs = items.reduce((s, i) => s + i.ms, 0) / items.length;
-    html += `<div style="background:rgba(234,179,8,0.1);border:1px solid rgba(234,179,8,0.3);border-radius:6px;padding:6px 12px;font-size:0.75rem">
-      <div style="color:var(--yellow);font-weight:500">${esc(step)}</div>
-      <div style="color:var(--muted);margin-top:2px">${items.length}× · avg ${avgMs.toFixed(1)}ms · max ${maxMs.toFixed(1)}ms</div>
-    </div>`;
-  }
-  html += `</div>`;
-
-  // Full list collapsible
-  html += `<details><summary style="cursor:pointer;font-size:0.78rem;color:var(--accent)">Show all ${checkpoints.length} slow entries</summary>`;
-  html += `<div style="overflow-x:auto;margin-top:8px">`;
-  html += `<table style="width:100%;border-collapse:collapse;font-size:0.78rem">
-    <thead><tr style="border-bottom:1px solid var(--border)">
-      <th style="text-align:left;padding:6px 10px;color:var(--muted);font-weight:500">Timestamp (UTC)</th>
-      <th style="text-align:left;padding:6px 10px;color:var(--muted);font-weight:500">Chunk</th>
-      <th style="text-align:left;padding:6px 10px;color:var(--muted);font-weight:500">Step</th>
-      <th style="text-align:right;padding:6px 10px;color:var(--muted);font-weight:500">Duration</th>
-    </tr></thead>
-    <tbody>`;
-  for (const c of checkpoints.slice(0, 200)) {
-    const fc = c.ms > 50 ? 'var(--red)' : 'var(--yellow)';
-    html += `<tr style="border-bottom:1px solid rgba(255,255,255,0.04)">
-      <td style="padding:5px 10px;color:var(--muted);font-family:monospace;white-space:nowrap">${esc(fmtTimestampShort(c.timestamp))}</td>
-      <td style="padding:5px 10px;color:var(--muted)">${c.batch}</td>
-      <td style="padding:5px 10px">${esc(c.step)}</td>
-      <td style="padding:5px 10px;text-align:right;font-family:monospace;font-weight:600;color:${fc}">${c.ms.toFixed(1)}ms</td>
-    </tr>`;
-  }
-  if (checkpoints.length > 200) {
-    html += `<tr><td colspan="4" style="padding:8px 10px;color:var(--muted);font-size:0.75rem;text-align:center">... and ${checkpoints.length - 200} more</td></tr>`;
-  }
-  html += `</tbody></table></div></details>`;
-  html += `</div>`;
-  return html;
-}
 
 function fmtTimestampShort(iso) {
   try {
