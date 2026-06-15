@@ -36,13 +36,41 @@ function errorCard(msg) {
     <strong>Error:</strong> ${esc(msg)}</div>`;
 }
 
-function esc(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+function esc(s) { 
+    if (s == null) return '';
+    const d = document.createElement('div'); 
+    d.textContent = String(s); 
+    return d.innerHTML; 
+}
+
+function fmtTimestampShort(iso) {
+  try {
+    return new Date(iso).toISOString().replace('T', ' ').replace(/\.\d+Z$/, '');
+  } catch { return iso; }
+}
+
+function fmtMs(ms) {
+  if (!ms && ms !== 0) return '—';
+  if (ms < 1000) return Math.round(ms) + 'ms';
+  if (ms < 60000) return (ms / 1000).toFixed(1) + 's';
+  return (ms / 60000).toFixed(1) + 'min';
+}
+
+function sectionTitle(text) {
+  return `<div style="font-size:0.9rem;font-weight:700;color:var(--text);margin-bottom:16px;display:flex;align-items:center;gap:10px">
+    <div style="width:4px;height:16px;background:var(--accent);border-radius:2px"></div>${esc(text)}</div>`;
+}
+
+function metricCard(label, value, color) {
+  return `<div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 18px;min-width:140px">
+    <div style="font-size:0.7rem;color:var(--muted);text-transform:uppercase;margin-bottom:4px">${esc(label)}</div>
+    <div style="font-size:1.2rem;font-weight:700;color:${color}">${esc(value)}</div>
+  </div>`;
+}
 
 function renderResults(data) {
   const r = document.getElementById('results');
   let html = '';
-
-  // Pipeline steps
   const steps = data.steps || [];
   html += '<div class="pipeline">';
   html += sectionTitle('Pipeline Steps');
@@ -52,8 +80,6 @@ function renderResults(data) {
       <span style="color:var(--green)">✓</span> ${esc(s.name)}</div>`;
   }
   html += '</div>';
-
-  // Discovery
   const disc = steps.find(s => s.name === 'Discovery');
   if (disc && disc.tableCounts) {
     html += sectionTitle('Telemetry Discovery');
@@ -63,985 +89,507 @@ function renderResults(data) {
     }
     html += '</div>';
   }
-
   if (data.error) {
-    html += `<div style="background:var(--surface);border:1px solid var(--yellow);border-radius:12px;padding:24px;color:var(--yellow);margin-bottom:24px">
-      ⚠ ${esc(data.error)}</div>`;
+    html += `<div style="background:var(--surface);border:1px solid var(--yellow);border-radius:12px;padding:24px;color:var(--yellow);margin-bottom:24px">⚠ ${esc(data.error)}</div>`;
     r.innerHTML = html;
     return;
   }
-
-  // Failure Dependency Map
-  const corr = steps.find(s => s.name === 'Correlation');
-  if (corr) {
-    html += sectionTitle('Failure Dependency Map');
-    html += `<div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:14px">`;
-    html += metricCard('Correlated Clusters', corr.groups, 'var(--accent)');
-    html += metricCard('Failing Components', corr.nodes, 'var(--text)');
-    html += metricCard('Cause → Effect Links', corr.edges, 'var(--yellow)');
-    html += `</div>`;
-    html += `<p style="color:var(--muted);font-size:0.8rem;margin-bottom:24px">Related failures grouped by time proximity, service dependencies, and shared trace context to map how issues propagate.</p>`;
-  }
-
-  // Root Causes (Grouped)
-  const rc = steps.find(s => s.name === 'RootCauses');
-  const rcItems = rc && rc.groupedRootCauses && rc.groupedRootCauses.length > 0 ? rc.groupedRootCauses : null;
-  if (rcItems) {
-    const totalRaw = rc.count || rcItems.reduce((s, g) => s + g.count, 0);
-    html += sectionTitle(`Root Cause Analysis (${totalRaw} total, ${rcItems.length} unique)`);
-    html += '<div style="margin-bottom:24px">';
-    for (let i = 0; i < rcItems.length; i++) {
-      const g = rcItems[i];
-      const conf = ((g.confidence || 0) * 100).toFixed(0);
-      const confColor = Number(conf) > 80 ? 'var(--green)' : Number(conf) > 50 ? 'var(--yellow)' : 'var(--orange)';
-      const catColor = { deployment: '#ef4444', resource: '#f97316', dependency: '#eab308', code: '#8b5cf6', infrastructure: '#6366f1' }[g.category] || 'var(--muted)';
-
-      html += `<div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:14px">`;
-
-      // Header row with count badge
-      html += `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-        <div style="display:flex;gap:8px;align-items:center">
-          <span style="background:${catColor};color:white;padding:3px 12px;border-radius:20px;font-size:0.75rem;font-weight:600;text-transform:uppercase">${esc(g.category || 'unknown')}</span>
-          ${i === 0 ? '<span style="background:var(--accent);color:white;padding:3px 10px;border-radius:20px;font-size:0.7rem;font-weight:600">PRIMARY</span>' : ''}
-          ${g.count > 1 ? '<span style="background:var(--accent);color:white;padding:3px 10px;border-radius:12px;font-size:0.8rem;font-weight:700">×' + g.count + '</span>' : ''}
-        </div>
-        <div style="text-align:right">
-          <div style="font-size:1.2rem;font-weight:700;color:${confColor}">${conf}%</div>
-          <div style="font-size:0.7rem;color:var(--muted)">confidence</div>
-        </div>
-      </div>`;
-
-      // Explanation
-      html += `<p style="font-size:0.9rem;line-height:1.5;margin-bottom:14px">${esc(g.explanation || '')}</p>`;
-
-      // Problem statement
-      if (g.problem) {
-        html += `<div style="background:#1a1a2e;border:1px solid #ef4444;border-radius:8px;padding:14px;margin-bottom:12px">
-          <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
-            <span style="font-size:1rem">🔴</span>
-            <span style="font-size:0.8rem;font-weight:600;color:#ef4444;text-transform:uppercase">Problem</span>
-          </div>
-          <p style="font-size:0.85rem;line-height:1.5;color:var(--text)">${esc(g.problem)}</p>
-        </div>`;
-      }
-
-      // Suggested fix
-      if (g.fix) {
-        html += `<div style="background:#0a1f1a;border:1px solid #22c55e;border-radius:8px;padding:14px;margin-bottom:14px">
-          <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
-            <span style="font-size:1rem">🟢</span>
-            <span style="font-size:0.8rem;font-weight:600;color:#22c55e;text-transform:uppercase">Suggested Fix</span>
-          </div>
-          <pre style="font-size:0.82rem;line-height:1.6;color:var(--text);white-space:pre-wrap;margin:0;font-family:inherit">${esc(g.fix)}</pre>
-        </div>`;
-      }
-
-      // Metrics
-      html += `<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px">`;
-      html += miniMetric('Failure Spread', g.propagationDepth, 'steps');
-      html += miniMetric('Outgoing Links', g.fanOut, '');
-      html += miniMetric('Services Hit', g.affectedServiceCount, '');
-      html += miniMetric('Errors per 5min', g.errorFrequency, '');
-      if (g.timeToImpact !== null && g.timeToImpact !== undefined) {
-        html += miniMetric('Time to Spread', (g.timeToImpact / 1000).toFixed(1), 'sec');
-      }
-      html += `</div>`;
-
-      // Affected services
-      if (g.affectedServices && g.affectedServices.length > 0) {
-        html += `<div style="margin-bottom:10px"><span style="font-size:0.75rem;color:var(--muted)">Affected: </span>`;
-        for (const svc of g.affectedServices) {
-          html += `<span style="background:var(--bg);padding:2px 8px;border-radius:4px;font-size:0.75rem;margin-right:4px">${esc(svc)}</span>`;
-        }
-        html += `</div>`;
-      }
-
-      // Related exception types
-      if (g.relatedExceptionTypes && g.relatedExceptionTypes.length > 0) {
-        html += `<div style="margin-bottom:10px"><span style="font-size:0.75rem;color:var(--muted)">Related Exceptions: </span>`;
-        for (const ex of g.relatedExceptionTypes.slice(0, 5)) {
-          html += `<span style="background:#1a1a2e;border:1px solid #334155;padding:2px 8px;border-radius:4px;font-size:0.7rem;margin-right:4px;font-family:monospace">${esc(ex)}</span>`;
-        }
-        html += `</div>`;
-      }
-
-      // Evidence breakdown (collapsible)
-      const eb = g.evidenceBreakdown;
-      if (eb) {
-        html += `<details style="margin-top:10px"><summary style="cursor:pointer;color:var(--accent);font-size:0.8rem">Evidence Breakdown</summary>
-          <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px">`;
-        html += evidenceBar('Temporal Priority', eb.temporalPriority);
-        html += evidenceBar('Evidence Strength', eb.evidenceStrength);
-        html += evidenceBar('Exception Uniqueness', eb.exceptionUniqueness);
-        html += evidenceBar('Dependency Position', eb.dependencyPosition);
-        html += evidenceBar('Error Pattern', eb.errorPatternBoost, true);
-        html += evidenceBar('Propagation', eb.propagationBoost, true);
-        html += evidenceBar('Deployment', eb.deploymentBoost, true);
-        html += evidenceBar('Anomaly', eb.anomalyBoost, true);
-        html += `</div></details>`;
-      }
-
-      html += `</div>`;
-    }
-    html += '</div>';
-  } else {
-    html += sectionTitle('Root Cause Analysis');
-    html += '<p style="color:var(--muted);margin-bottom:24px">No root causes identified from available telemetry.</p>';
-  }
-
-  // Issues (merged errors + symptoms)
-  const iss = steps.find(s => s.name === 'Issues');
-  if (iss && iss.issues && iss.issues.length > 0) {
-    const rootCount = iss.rootCauseErrors || 0;
-    const downCount = iss.downstreamErrors || 0;
-    html += sectionTitle(`Issues (${iss.totalErrors} total, ${iss.uniqueGroups} unique)`);
-    html += `<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px">`;
-    html += metricCard('Root Cause Errors', rootCount, 'var(--red)');
-    html += metricCard('Downstream Effects', downCount, 'var(--orange)');
-    html += `</div>`;
-    html += '<div style="margin-bottom:24px">';
-    for (const g of iss.issues) {
-      const sevColor = g.severity === 'critical' ? 'var(--red)' : g.severity === 'error' ? 'var(--orange)' : 'var(--yellow)';
-      const borderColor = g.isDownstream ? 'var(--yellow)' : sevColor;
-      html += `<div style="background:var(--surface);border:1px solid var(--border);border-left:3px solid ${borderColor};border-radius:0 8px 8px 0;padding:12px 16px;margin-bottom:8px">
-        <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:6px">
-          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-            <span style="background:${sevColor};color:white;padding:2px 8px;border-radius:12px;font-size:0.7rem;font-weight:600">${esc(g.severity.toUpperCase())}</span>
-            ${g.isDownstream ? '<span style="background:var(--yellow);color:#000;padding:2px 8px;border-radius:12px;font-size:0.65rem;font-weight:600">DOWNSTREAM</span>' : '<span style="background:var(--red);color:white;padding:2px 8px;border-radius:12px;font-size:0.65rem;font-weight:600">ROOT</span>'}
-            <span style="font-family:monospace;font-size:0.8rem;color:var(--text)">${esc(g.errorType)}</span>
-            <span style="color:var(--muted);font-size:0.75rem">in ${esc(g.service)}</span>
-          </div>
-          <span style="background:var(--accent);color:white;padding:3px 10px;border-radius:12px;font-size:0.8rem;font-weight:700;white-space:nowrap">×${g.count}</span>
-        </div>
-        <p style="font-size:0.8rem;color:var(--muted);margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:90%">${esc(g.sampleMessage)}</p>
-        <div style="font-size:0.7rem;color:var(--muted)">
-          First: ${esc(formatTime(g.firstSeen))} · Last: ${esc(formatTime(g.lastSeen))}
-          ${g.count > 1 ? ' · Span: ' + esc(timeDiff(g.firstSeen, g.lastSeen)) : ''}
-        </div>
-        ${g.isDownstream && g.linkedRootCause ? '<div style="margin-top:6px;font-size:0.75rem;color:var(--yellow);border-top:1px solid var(--border);padding-top:6px">↳ Caused by: ' + esc(g.linkedRootCause) + '</div>' : ''}
-      </div>`;
-    }
-    html += '</div>';
-  }
-
-  // Session & Login Exceptions (highlighted)
-  const sle = steps.find(s => s.name === 'SessionLoginExceptions');
-  if (sle && sle.groups && sle.groups.length > 0) {
-    html += `<div style="background:linear-gradient(135deg, #1a0a2e 0%, #1e1040 100%);border:2px solid #a855f7;border-radius:14px;padding:20px;margin-bottom:24px">`;
-    html += `<div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
-      <span style="font-size:1.3rem">🔐</span>
-      <h2 style="font-size:1rem;font-weight:600;color:#a855f7;margin:0">Session & Login Exceptions (${sle.totalErrors} total, ${sle.uniqueGroups} unique)</h2>
-    </div>`;
-    for (const g of sle.groups) {
-      const sevColor = g.severity === 'critical' ? 'var(--red)' : g.severity === 'error' ? '#a855f7' : 'var(--yellow)';
-      html += `<div style="background:rgba(168,85,247,0.08);border:1px solid rgba(168,85,247,0.3);border-left:3px solid ${sevColor};border-radius:0 8px 8px 0;padding:12px 16px;margin-bottom:8px">
-        <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:6px">
-          <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
-            <span style="background:${sevColor};color:white;padding:2px 8px;border-radius:12px;font-size:0.7rem;font-weight:600">${esc(g.severity.toUpperCase())}</span>
-            <span style="font-family:monospace;font-size:0.8rem;color:var(--text)">${esc(g.errorType)}</span>
-            <span style="color:var(--muted);font-size:0.75rem">in ${esc(g.service)}</span>
-          </div>
-          <span style="background:#a855f7;color:white;padding:3px 10px;border-radius:12px;font-size:0.8rem;font-weight:700;white-space:nowrap">×${g.count}</span>
-        </div>
-        <p style="font-size:0.8rem;color:var(--muted);margin-bottom:4px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:90%">${esc(g.sampleMessage)}</p>
-        <div style="font-size:0.7rem;color:var(--muted)">
-          First: ${esc(formatTime(g.firstSeen))} · Last: ${esc(formatTime(g.lastSeen))}
-          ${g.count > 1 ? ' · Span: ' + esc(timeDiff(g.firstSeen, g.lastSeen)) : ''}
-        </div>
-      </div>`;
-    }
-    html += `</div>`;
-  }
-
-  // Recommendations
-  const rec = steps.find(s => s.name === 'Recommendations');
-  if (rec && rec.recommendations && rec.recommendations.length > 0) {
-    html += sectionTitle('Recommendations');
-    html += '<div style="margin-bottom:24px">';
-    for (let i = 0; i < rec.recommendations.length; i++) {
-      const r_ = rec.recommendations[i];
-      html += `<div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:10px">
-        <div style="display:flex;gap:12px;align-items:start">
-          <span style="background:var(--accent);color:white;min-width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.8rem;font-weight:700">${i + 1}</span>
-          <div>
-            <p style="font-weight:500;margin-bottom:4px">${esc(r_.action || '')}</p>
-            <p style="font-size:0.8rem;color:var(--muted)">${esc(r_.rationale || '')}</p>
-            ${r_.impact ? `<span style="font-size:0.75rem;background:var(--bg);padding:2px 8px;border-radius:4px;margin-top:6px;display:inline-block">Impact: ${esc(r_.impact)} · Effort: ${esc(r_.effort || 'unknown')}</span>` : ''}
-          </div>
-        </div>
-      </div>`;
-    }
-    html += '</div>';
-  }
-
-  // Affected Services
-  if (data.affectedServices && data.affectedServices.length > 0) {
-    html += sectionTitle('Affected Services');
-    html += '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:24px">';
-    for (const svc of data.affectedServices) {
-      html += `<span style="background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:4px 14px;font-size:0.8rem">${esc(svc)}</span>`;
-    }
-    html += '</div>';
-  }
-
-  // AI Narrative (Gemini Flash)
-  if (data.aiNarrative) {
-    html += sectionTitle('AI Narrative (Gemini Flash)');
-    html += `<div style="background:linear-gradient(135deg,#0d1b2a 0%,#0a1f1a 100%);border:2px solid var(--accent);border-radius:12px;padding:20px;margin-bottom:24px">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
-        <span style="font-size:1.1rem">✨</span>
-        <span style="font-size:0.75rem;font-weight:600;color:var(--accent);text-transform:uppercase">Gemini 2.0 Flash Analysis</span>
-      </div>
-      <div style="font-size:0.9rem;line-height:1.7;color:var(--text);white-space:pre-wrap">${esc(data.aiNarrative)}</div>
-    </div>`;
-  }
-
-  // NL Response
-  if (data.nlResponse) {
-    html += sectionTitle('Natural Language Summary');
-    html += `<div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:24px;font-size:0.9rem;line-height:1.6;white-space:pre-wrap">${esc(data.nlResponse)}</div>`;
-  }
-
-  // Markdown Report (collapsible)
-  if (data.markdown) {
-    html += sectionTitle('Full Markdown Report');
-    html += `<details style="margin-bottom:24px"><summary style="cursor:pointer;color:var(--accent);font-size:0.85rem;margin-bottom:8px">Click to expand</summary>
-      <pre style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;overflow-x:auto;font-size:0.8rem;line-height:1.5;white-space:pre-wrap">${esc(data.markdown)}</pre></details>`;
-  }
-
-  html += '</div>';
   r.innerHTML = html;
 }
-
-function sectionTitle(text) {
-  return `<h2 style="font-size:1rem;font-weight:600;margin-bottom:12px;color:var(--text)">${text}</h2>`;
-}
-
-function metricCard(label, value, color) {
-  return `<div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 18px;min-width:120px;text-align:center">
-    <div style="font-size:1.5rem;font-weight:700;color:${color}">${value}</div>
-    <div style="font-size:0.75rem;color:var(--muted);margin-top:2px">${esc(label)}</div>
-  </div>`;
-}
-
-function miniMetric(label, value, unit) {
-  return `<div style="background:var(--bg);border-radius:6px;padding:6px 12px;text-align:center;min-width:80px">
-    <div style="font-size:1rem;font-weight:600;color:var(--text)">${value}<span style="font-size:0.7rem;color:var(--muted);margin-left:2px">${unit}</span></div>
-    <div style="font-size:0.65rem;color:var(--muted)">${esc(label)}</div>
-  </div>`;
-}
-
-function evidenceBar(label, value, isBoost) {
-  const pct = isBoost ? Math.min(100, value * 500) : Math.min(100, value * 100);
-  const color = pct > 60 ? 'var(--green)' : pct > 30 ? 'var(--yellow)' : 'var(--muted)';
-  const displayVal = isBoost ? (value > 0 ? '+' + value.toFixed(3) : '0') : value.toFixed(2);
-  return `<div style="flex:1;min-width:120px;background:var(--bg);border-radius:6px;padding:6px 10px">
-    <div style="display:flex;justify-content:space-between;font-size:0.7rem;margin-bottom:3px">
-      <span style="color:var(--muted)">${esc(label)}</span>
-      <span style="color:${color}">${displayVal}</span>
-    </div>
-    <div style="background:var(--border);border-radius:2px;height:4px;overflow:hidden">
-      <div style="background:${color};height:100%;width:${pct}%;border-radius:2px"></div>
-    </div>
-  </div>`;
-}
-
-
-function formatTime(isoStr) {
-  try {
-    const d = new Date(isoStr);
-    return d.toLocaleString();
-  } catch { return isoStr; }
-}
-
-function timeDiff(start, end) {
-  try {
-    const ms = new Date(end).getTime() - new Date(start).getTime();
-    if (ms < 1000) return ms + 'ms';
-    if (ms < 60000) return (ms / 1000).toFixed(0) + 's';
-    if (ms < 3600000) return (ms / 60000).toFixed(0) + 'min';
-    if (ms < 86400000) return (ms / 3600000).toFixed(1) + 'hr';
-    return (ms / 86400000).toFixed(1) + 'd';
-  } catch { return ''; }
-}
-
-// ── Tab switching ──────────────────────────────────────────────────────────
 
 function switchTab(tab) {
-  document.getElementById('panel-rca').style.display = tab === 'rca' ? '' : 'none';
-  document.getElementById('panel-import').style.display = tab === 'import' ? '' : 'none';
-  document.getElementById('tab-rca').style.background = tab === 'rca' ? 'var(--surface)' : 'var(--bg)';
-  document.getElementById('tab-rca').style.color = tab === 'rca' ? 'var(--text)' : 'var(--muted)';
-  document.getElementById('tab-import').style.background = tab === 'import' ? 'var(--surface)' : 'var(--bg)';
-  document.getElementById('tab-import').style.color = tab === 'import' ? 'var(--text)' : 'var(--muted)';
+  const panels = ['rca', 'import', 'studio', 'history'];
+  panels.forEach(p => {
+    const el = document.getElementById(`panel-${p}`);
+    if (el) el.style.display = p === tab ? '' : 'none';
+    const btn = document.getElementById(`tab-${p}`);
+    if (btn) {
+        btn.style.background = p === tab ? 'var(--surface)' : 'var(--bg)';
+        btn.style.color = p === tab ? 'var(--text)' : 'var(--muted)';
+    }
+  });
+  window.location.hash = tab;
+  if (tab === 'history') fetchHistory();
 }
 
-// ── Import Analyzer ────────────────────────────────────────────────────────
+window.addEventListener('hashchange', () => {
+  const hash = window.location.hash.replace('#', '');
+  if (['rca', 'import', 'studio', 'history'].includes(hash)) {
+    switchTab(hash);
+  }
+});
 
-async function runImportAnalysis() {
-  const btn = document.getElementById('importBtn');
-  const results = document.getElementById('importResults');
+window.addEventListener('load', () => {
+  const hash = window.location.hash.replace('#', '');
+  if (['rca', 'import', 'studio', 'history'].includes(hash)) {
+    switchTab(hash);
+  }
+});
+
+// ── History Studio ────────────────────────────────────────────────────────
+
+async function fetchHistory() {
+    const list = document.getElementById('historyList');
+    list.innerHTML = '<div style="padding:40px; text-align:center"><span class="spinner"></span> Loading history...</div>';
+    try {
+        const res = await fetch('/api/import-history');
+        const data = await res.json();
+        if (data.error) { list.innerHTML = errorCard(data.error); return; }
+        if (data.history.length === 0) {
+            list.innerHTML = '<div style="padding:40px; text-align:center; color:var(--muted)">No run history found.</div>';
+            return;
+        }
+        list.innerHTML = `<table style="width:100%; border-collapse:collapse; font-size:0.85rem">
+            <thead>
+                <tr style="background:rgba(255,255,255,0.02); color:var(--muted); border-bottom:2px solid var(--border)">
+                    <th style="text-align:left; padding:12px">Timestamp (UTC)</th>
+                    <th style="text-align:left; padding:12px">Client File Upload ID</th>
+                    <th style="text-align:right; padding:12px">Rows</th>
+                    <th style="text-align:right; padding:12px">Bucket</th>
+                    <th style="text-align:center; padding:12px">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${data.history.map(h => `
+                    <tr style="border-bottom:1px solid var(--border)">
+                        <td style="padding:12px; color:var(--muted)">${fmtTimestampShort(h.timestamp)}</td>
+                        <td style="padding:12px; font-family:monospace">${h.clientFileUploadId}</td>
+                        <td style="padding:12px; text-align:right">${(h.rowCount || 0).toLocaleString()}</td>
+                        <td style="padding:12px; text-align:right">${h.sizeBucket/1000}k</td>
+                        <td style="padding:12px; text-align:center">
+                            <button class="btn" style="padding:4px 12px; font-size:0.7rem; background:var(--surface); border:1px solid var(--border)" onclick="compareHistoryItem('${h.clientFileUploadId}')">Compare Baseline</button>
+                        </td>
+                    </tr>
+                `).join('')}
+            </tbody>
+        </table>`;
+    } catch (e) { list.innerHTML = errorCard(e.message); }
+}
+
+async function compareHistoryItem(id) {
+    const modal = document.getElementById('baselineModal');
+    const content = document.getElementById('baselineModalContent');
+    modal.style.display = 'block';
+    content.innerHTML = '<div style="text-align:center; padding:40px"><span class="spinner"></span> Comparing against baseline...</div>';
+    try {
+        const res = await fetch('/api/import-compare-baseline', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id })
+        });
+        const data = await res.json();
+        if (data.error) { content.innerHTML = errorCard(data.error); return; }
+        const comp = data.comparison;
+        let deepDiveHtml = '';
+
+        if (comp.validationBundleDiff) {
+            deepDiveHtml += `<h3 style="font-size:0.8rem; color:var(--muted); margin:24px 0 12px; text-transform:uppercase">Validation Deep-Dive (Bundles)</h3>
+            <div style="background:var(--surface); border:1px solid var(--border); border-radius:8px; overflow-x:auto">
+                <table style="width:100%; border-collapse:collapse; font-size:0.75rem">
+                    ${comp.validationBundleDiff.map(b => `<tr><td style="padding:8px 12px">Bundle ${b.index}</td><td style="text-align:right; padding:8px 12px">${fmtMs(b.msB)}</td></tr>`).join('')}
+                </table>
+            </div>`;
+        }
+
+        content.innerHTML = `<h2 style="font-size:1.2rem; margin-bottom:20px">Comparison vs ${comp.idA}</h2>${deepDiveHtml}`;
+    } catch (e) { content.innerHTML = errorCard(e.message); }
+}
+
+function closeBaselineModal() { document.getElementById('baselineModal').style.display = 'none'; }
+
+// ── Comparison Studio ──────────────────────────────────────────────────────
+
+let _studioRawData = [];
+
+async function fetchStudioImports() {
+  const btn = document.getElementById('studioFetchBtn');
   const appId = document.getElementById('appId').value.trim();
   const apiKey = document.getElementById('apiKey').value.trim();
-  const clientFileUploadId = document.getElementById('importClientId').value.trim();
-  const question = document.getElementById('importQuestion').value.trim();
-
-  if (!appId || !apiKey) { alert('Please enter Application ID and API Key above'); return; }
-  if (!clientFileUploadId) { alert('Please enter a Client File Upload ID'); return; }
-
+  const startDate = document.getElementById('studioStart').value;
+  const endDate = document.getElementById('studioEnd').value;
+  if (!appId || !apiKey || !startDate || !endDate) { alert('Missing fields'); return; }
   btn.disabled = true;
-  btn.innerHTML = '<span class="spinner"></span>Fetching logs...';
-  results.innerHTML = '<div style="text-align:center;padding:60px;color:var(--muted)"><span class="spinner" style="width:24px;height:24px;border-width:3px"></span><br><br>Running hop chain: anchor → validation → submission...</div>';
-
   try {
-    const res = await fetch('/api/import-analyze', {
+    const res = await fetch('/api/import-list', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ appId, apiKey, clientFileUploadId, question }),
+      body: JSON.stringify({ appId, apiKey, startDate, endDate }),
     });
     const data = await res.json();
-    if (data.error) { results.innerHTML = errorCard(data.error); return; }
-    renderImportResults(data, question);
-  } catch (e) {
-    results.innerHTML = errorCard(e.message);
-  } finally {
-    btn.disabled = false;
-    btn.innerHTML = 'Analyze Import';
-  }
+    document.getElementById('studioListArea').style.display = 'block';
+    document.getElementById('studioList').innerHTML = data.imports.map(i => `
+        <div style="padding:10px; border-bottom:1px solid var(--border)">
+            <input type="checkbox" value="${i.clientFileUploadId}" checked> ${i.clientFileUploadId}
+        </div>`).join('');
+  } finally { btn.disabled = false; }
 }
 
-function renderImportResults(data, question) {
-  const r = document.getElementById('importResults');
-  // Reset virtual list and table state for this fresh render
-  window._vLists = {};
-  window._tableData = {};
-  let html = '';
-
-  // ── No-data / diagnostic banner ───────────────────────────────────
-  const diag = data.diagnostics;
-  if (diag && diag.noDataReason) {
-    html += `<div style="background:#1a0a0a;border:2px solid var(--red);border-radius:12px;padding:20px;margin-bottom:16px">
-      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
-        <span style="font-size:1.2rem">⚠️</span>
-        <span style="font-size:0.85rem;font-weight:600;color:var(--red)">Could not retrieve import data</span>
-      </div>
-      <div style="font-size:0.85rem;line-height:1.6;color:var(--text)">${esc(diag.noDataReason)}</div>
-      <div style="margin-top:10px;font-size:0.75rem;color:var(--muted)">
-        Anchor logs found: ${diag.anchorFound ? `✓ (${diag.anchorRowCount} rows)` : '✗ none'} &nbsp;·&nbsp;
-        Validation: ${diag.validationFound ? '✓' : '✗'} &nbsp;·&nbsp;
-        Submission: ${diag.submissionFound ? '✓' : '✗'}
-      </div>
-    </div>`;
-    r.innerHTML = html;
-    return;
+async function runStudioAnalysis() {
+  const btn = document.getElementById('studioAnalyzeBtn');
+  const appId = document.getElementById('appId').value.trim();
+  const apiKey = document.getElementById('apiKey').value.trim();
+  const saveReports = document.getElementById('studioSaveReports').checked;
+  const ids = Array.from(document.querySelectorAll('#studioList input:checked')).map(cb => cb.value);
+  if (ids.length === 0) return;
+  btn.disabled = true;
+  document.getElementById('studioProgressArea').style.display = 'block';
+  _studioRawData = [];
+  for (let i = 0; i < ids.length; i++) {
+    document.getElementById('studioProgressText').innerText = `Analyzing ${i+1} of ${ids.length}...`;
+    try {
+      const res = await fetch('/api/import-analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ appId, apiKey, clientFileUploadId: ids[i], saveIndividualReports: saveReports }),
+      });
+      const data = await res.json();
+      if (data.primary) _studioRawData.push(data.primary);
+      const pct = Math.round(((i+1)/ids.length*100));
+      document.getElementById('studioProgressBar').style.width = pct + '%';
+      document.getElementById('studioProgressPercent').innerText = pct + '%';
+    } catch (e) {}
   }
-
-  // ── Plain-English answer (if question was asked) ──────────────────
-  if (data.plainAnswer && question) {
-    html += `<div style="background:linear-gradient(135deg, #0f172a 0%, #1e293b 100%);border:2px solid var(--accent);border-radius:12px;padding:20px;margin-bottom:16px">`;
-    html += `<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
-      <span style="font-size:1.2rem">💬</span>
-      <div style="font-size:0.75rem;font-weight:600;color:var(--accent);text-transform:uppercase">Answer to: "${esc(question)}"</div>
-    </div>`;
-    html += `<div style="font-size:0.9rem;line-height:1.7;color:var(--text);white-space:pre-wrap">${esc(data.plainAnswer)}</div>`;
-    html += `</div>`;
-  }
-
-  if (data.type === 'comparison' && data.comparison) {
-    html += renderComparison(data);
-  } else {
-    html += renderSingleImport(data.primary);
-  }
-
-  r.innerHTML = html;
-  // Attach sort/search listeners after DOM is ready
-  attachTableListeners();
+  btn.disabled = false;
+  document.getElementById('studioDashboard').style.display = 'block';
+  updateStudioDashboard();
 }
 
-function renderSingleImport(a) {
-  if (!a) return errorCard('No analysis data returned');
-  let html = '';
+function updateStudioDashboard() {
+    const container = document.getElementById('studioTable');
+    const chartContainer = document.getElementById('studioCharts');
+    const groupType = document.getElementById('studioGroup').value;
+    const bucketSize = parseInt(document.getElementById('studioBucketSize').value);
 
-  // ── Header: file info ──────────────────────────────────────────────
-  html += `<div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px">`;
-  html += `<div style="display:flex;justify-content:space-between;align-items:start;flex-wrap:wrap;gap:12px">`;
-  html += `<div>
-    <div style="font-size:0.7rem;color:var(--muted);margin-bottom:4px;text-transform:uppercase">Client File Upload ID</div>
-    <div style="font-family:monospace;font-size:0.85rem">${esc(a.clientFileUploadId)}</div>
-  </div>`;
-  if (a.rowCount) {
-    html += `<div style="text-align:right">
-      <div style="font-size:1.8rem;font-weight:700;color:var(--accent)">${a.rowCount.toLocaleString()}</div>
-      <div style="font-size:0.7rem;color:var(--muted)">rows in file</div>
-    </div>`;
-  }
-  html += `</div>`;
-  if (a.countsSummary) {
-    html += `<div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);font-size:0.8rem;color:var(--muted)">${esc(a.countsSummary)}</div>`;
-  }
-  html += `</div>`;
+    if (!_studioRawData || _studioRawData.length === 0) return;
 
-  // ── Step metadata panel ────────────────────────────────────────────
-  if (a.stepMeta) {
-    html += `<div style="margin-bottom:16px">`;
-    html += `<div style="font-size:0.75rem;font-weight:600;color:var(--muted);text-transform:uppercase;margin-bottom:8px">Step IDs & Timestamps</div>`;
-    html += `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px">`;
+    const timeGroups = new Map();
+    const flatGroupsForChart = [];
 
-    const metaSteps = [
-      { label: 'Mapping', data: a.stepMeta.mapping, color: '#6366f1' },
-      { label: 'Validation', data: a.stepMeta.validation, color: '#3b82f6' },
-      { label: 'Submission (Job)', data: a.stepMeta.submission, color: '#22c55e' },
-    ];
+    _studioRawData.forEach(a => {
+        let timeKey = 'All Time';
+        const dateStr = a.stepMeta.validation.startTime || a.stepMeta.mapping.startTime || a.stepMeta.submission.startTime;
+        if (dateStr && groupType !== 'none') {
+            const d = new Date(dateStr);
+            if (groupType === 'day') timeKey = d.toISOString().split('T')[0];
+            else if (groupType === 'week') {
+                const first = d.getDate() - d.getDay();
+                const sunday = new Date(d.setDate(first));
+                timeKey = 'Week of ' + sunday.toISOString().split('T')[0];
+            }
+            else if (groupType === 'month') timeKey = d.toISOString().substring(0, 7);
+        }
 
-    for (const s of metaSteps) {
-      const d = s.data;
-      const hasData = d.pod || d.operationId || d.startTime;
-      if (!hasData) continue;
-      html += `<div style="background:var(--surface);border:1px solid var(--border);border-left:3px solid ${s.color};border-radius:0 8px 8px 0;padding:12px">`;
-      html += `<div style="font-size:0.75rem;font-weight:600;color:${s.color};margin-bottom:8px">${esc(s.label)}</div>`;
-      if (d.operationId) html += metaRow('Operation ID', d.operationId, true);
-      if (d.pod) html += metaRow('Pod', d.pod, true);
-      if (d.startTime) html += metaRow('Start', fmtTimestamp(d.startTime));
-      if (d.endTime) html += metaRow('End', fmtTimestamp(d.endTime));
-      if (d.startTime && d.endTime) {
-        const dur = new Date(d.endTime).getTime() - new Date(d.startTime).getTime();
-        html += metaRow('Duration', fmtMs(dur));
-      }
-      html += `</div>`;
-    }
-    html += `</div></div>`;
-  }
+        const bucket = Math.floor((a.rowCount || 0) / bucketSize) * bucketSize;
+        const bucketKey = `${bucket/1000}k Bucket`;
 
-  // ── AI Insights ────────────────────────────────────────────────────
-  if (a.insights && a.insights.length > 0) {
-    html += `<div style="background:#0d1b2a;border:1px solid var(--accent);border-radius:12px;padding:16px;margin-bottom:16px">`;
-    html += `<div style="font-size:0.75rem;font-weight:600;color:var(--accent);margin-bottom:10px;text-transform:uppercase">AI Insights</div>`;
-    for (const ins of a.insights) {
-      const color = ins.startsWith('❌') ? 'var(--red)' : ins.startsWith('⚠️') ? 'var(--yellow)' : 'var(--green)';
-      html += `<div style="font-size:0.85rem;line-height:1.5;margin-bottom:8px;padding:8px 12px;background:rgba(255,255,255,0.03);border-radius:6px;color:${color}">${esc(ins)}</div>`;
-    }
-    html += `</div>`;
-  }
-
-  // ── Step timing: clean list, no progress bars ──────────────────────
-  if (a.stepContributions && a.stepContributions.length > 0) {
-    html += `<div style="font-size:0.75rem;font-weight:600;color:var(--muted);text-transform:uppercase;margin-bottom:8px">Step Timing Breakdown</div>`;
-    html += `<div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:16px">`;
-    html += `<table style="width:100%;border-collapse:collapse;font-size:0.82rem">
-      <thead>
-        <tr style="border-bottom:1px solid var(--border);background:rgba(255,255,255,0.02)">
-          <th style="text-align:left;padding:10px 14px;color:var(--muted);font-weight:500">Step</th>
-          <th style="text-align:right;padding:10px 14px;color:var(--muted);font-weight:500">Duration</th>
-          <th style="text-align:right;padding:10px 14px;color:var(--muted);font-weight:500">% of Total</th>
-          <th style="text-align:left;padding:10px 14px;color:var(--muted);font-weight:500">Note</th>
-        </tr>
-      </thead>
-      <tbody>`;
-    for (const s of a.stepContributions) {
-      const fc = s.flag === 'critical' ? 'var(--red)' : s.flag === 'slow' ? 'var(--yellow)' : 'var(--text)';
-      const badge = s.flag !== 'ok' ? `<span style="font-size:0.65rem;background:${fc};color:#000;padding:1px 6px;border-radius:4px;margin-left:6px;font-weight:600">${s.flag.toUpperCase()}</span>` : '';
-      html += `<tr style="border-bottom:1px solid var(--border)">
-        <td style="padding:10px 14px">${esc(s.stepName)}${badge}</td>
-        <td style="padding:10px 14px;text-align:right;font-weight:600;color:${fc};font-family:monospace">${fmtMs(s.durationMs)}</td>
-        <td style="padding:10px 14px;text-align:right;color:var(--muted)">${s.percentOfTotal}%</td>
-        <td style="padding:10px 14px;font-size:0.75rem;color:var(--yellow)">${s.note ? esc(s.note) : ''}</td>
-      </tr>`;
-    }
-    html += `</tbody></table></div>`;
-  }
-
-  // ── VALIDATION — Bundle stats (1× per 5000-row chunk) ─────────────
-  if (a.validationBundleStats && a.validationBundleStats.length > 0) {
-    html += sectionLabel('Validation — Bundle Stats (1× per chunk)');
-    html += sortableTable('val-bundle', a.validationBundleStats.map(b => ({
-      chunk: b.chunkIndex,
-      rows: b.rowCount ?? '—',
-      existingUsersMs: b.existingUsersMs ?? 0,
-      redisBatchSizeMs: b.redisBatchSizeMs ?? 0,
-      flag: 'ok',
-    })), ['Chunk', 'Rows', 'Fetched existing users (ms)', 'Fetched batch size from redis (ms)'],
-      ['chunk', 'rows', 'existingUsersMs', 'redisBatchSizeMs']);
-  }
-
-  // ── VALIDATION — Batch stats (1× per 500-row batch) ───────────────
-  if (a.validationBatchStats && a.validationBatchStats.length > 0) {
-    html += sectionLabel('Validation — Batch Stats (BulkInsert, 1× per 500-row batch)');
-    html += sortableTable('val-batch', a.validationBatchStats.map(b => ({
-      range: `${b.startRow}–${b.endRow}`,
-      bulkInsertSec: b.bulkInsertMs != null ? +(b.bulkInsertMs / 1000).toFixed(2) : 0,
-      timestamp: fmtTimestampShort(b.timestamp),
-      flag: b.bulkInsertMs > 3000 ? 'critical' : b.bulkInsertMs > 1000 ? 'slow' : 'ok',
-    })), ['Row Range', 'BulkInsert Duration (s)', 'Timestamp (UTC)'],
-      ['range', 'bulkInsertSec', 'timestamp']);
-  }
-
-  // ── VALIDATION — Row stats (per-row, conditional) ─────────────────
-  if (a.validationRowInsights && a.validationRowInsights.length > 0) {
-    html += sectionLabel('Validation — Per-Row Step Analysis (conditional, fires when >0ms)');
-    html += sortableTable('val-perrow', a.validationRowInsights.map(p => ({
-      stepName: p.stepName, avgMs: p.avgMs, maxMs: p.maxMs, occurrences: p.occurrences,
-      projected: p.projectedTotalMin > 0 ? p.projectedTotalMin.toFixed(1) + ' min' : '—',
-      flag: p.flag, note: p.note || '',
-    })), ['Step', 'Avg/row (ms)', 'Max/row (ms)', 'Count', 'Projected', 'Note'],
-      ['stepName', 'avgMs', 'maxMs', 'occurrences', 'projected', 'note']);
-  }
-
-  // ── SUBMISSION — Stage stats (1× per job) ─────────────────────────
-  if (a.submissionStageStats && a.submissionStageStats.length > 0) {
-    html += sectionLabel('Submission — Stage Stats (1× per job)');
-    html += `<div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:16px">`;
-    html += `<table style="width:100%;border-collapse:collapse;font-size:0.8rem">
-      <thead style="position:sticky;top:0;z-index:1;background:#1e293b">
-        <tr style="border-bottom:2px solid var(--border)">
-          <th style="text-align:left;padding:8px 12px;color:var(--muted);font-weight:500">Step</th>
-          <th style="text-align:right;padding:8px 12px;color:var(--muted);font-weight:500">Duration (ms)</th>
-          <th style="text-align:right;padding:8px 12px;color:var(--muted);font-weight:500">Extra</th>
-        </tr>
-      </thead><tbody>`;
-    for (const s of a.submissionStageStats) {
-      const fc = (s.valueMs ?? 0) > 5000 ? 'var(--red)' : (s.valueMs ?? 0) > 2000 ? 'var(--yellow)' : 'var(--text)';
-      html += `<tr style="border-bottom:1px solid rgba(255,255,255,0.04)">
-        <td style="padding:7px 12px">${esc(s.stepName)}</td>
-        <td style="padding:7px 12px;text-align:right;font-family:monospace;color:${fc}">${s.valueMs != null ? fmtMs(s.valueMs) : '—'}</td>
-        <td style="padding:7px 12px;text-align:right;color:var(--muted);font-size:0.75rem">${s.extra ? esc(s.extra) : ''}</td>
-      </tr>`;
-    }
-    html += `</tbody></table></div>`;
-  }
-
-  // ── SUBMISSION — Bundle stats (1× per 5000-row chunk) ─────────────
-  if (a.submissionBundleStats && a.submissionBundleStats.length > 0) {
-    html += sectionLabel('Submission — Bundle Stats (1× per 5000-row chunk)');
-    html += sortableTable('sub-bundle', a.submissionBundleStats.map(b => ({
-      bundle: b.bundleIdx,
-      rows: b.startRow != null && b.endRow != null ? `${b.startRow}–${b.endRow}` : '—',
-      bundleDbFetchSec: b.bundleDbFetchMs != null ? +(b.bundleDbFetchMs / 1000).toFixed(2) : 0,
-      attrCount: b.attributeCount ?? '—',
-      accounts: b.accountIds ?? '—',
-      linked: b.linkedAccountIds ?? '—',
-      flag: (b.bundleDbFetchMs ?? 0) > 5000 ? 'critical' : (b.bundleDbFetchMs ?? 0) > 2000 ? 'slow' : 'ok',
-    })), ['Bundle', 'Row Range', 'Bundle DB Fetch (s)', 'Attr Count', 'Accounts', 'Linked Accts'],
-      ['bundle', 'rows', 'bundleDbFetchSec', 'attrCount', 'accounts', 'linked']);
-  }
-
-  // ── SUBMISSION — Batch stats (1× per 500-row batch) ───────────────
-  if (a.submissionBatchStats && a.submissionBatchStats.length > 0) {
-    html += sectionLabel('Submission — Batch Stats (1× per 500-row batch, grouped by bundle)');
-
-    // Group batches by bundleIdx
-    const batchesByBundle = new Map();
-    for (const b of a.submissionBatchStats) {
-      if (!batchesByBundle.has(b.bundleIdx)) batchesByBundle.set(b.bundleIdx, []);
-      batchesByBundle.get(b.bundleIdx).push(b);
-    }
-
-    for (const [bundleIdx, batches] of [...batchesByBundle.entries()].sort((a, b) => a[0] - b[0])) {
-      const totalBulkMs = batches.reduce((s, b) => s + (b.bulkProcessingMs ?? 0), 0);
-      const totalLoopMs = batches.reduce((s, b) => s + (b.loopProcessingMs ?? 0), 0);
-      const slowCount = batches.filter(b => (b.bulkProcessingMs ?? 0) > 5000).length;
-      const totalLoopSec = (totalLoopMs / 1000).toFixed(2) + 's';
-      const totalBulkSec = (totalBulkMs / 1000).toFixed(2) + 's';
-
-      html += `<details style="margin-bottom:10px">
-        <summary style="cursor:pointer;padding:10px 14px;background:var(--surface);border:1px solid var(--border);border-radius:8px;list-style:none;display:flex;justify-content:space-between;align-items:center;font-size:0.82rem">
-          <span style="font-weight:500">Bundle starting at row <span style="font-family:monospace;color:var(--accent)">${bundleIdx.toLocaleString()}</span></span>
-          <div style="display:flex;gap:14px;align-items:center">
-            ${slowCount > 0 ? `<span style="font-size:0.7rem;background:var(--yellow);color:#000;padding:1px 7px;border-radius:4px;font-weight:600">${slowCount} slow</span>` : ''}
-            <span style="font-size:0.75rem;color:var(--muted)">${batches.length} batches</span>
-            <span style="font-size:0.75rem;color:var(--muted)">Loop total: <span style="font-family:monospace">${totalLoopSec}</span></span>
-            <span style="font-size:0.75rem;color:var(--muted)">Bulk total: <span style="font-family:monospace;color:var(--accent)">${totalBulkSec}</span></span>
-          </div>
-        </summary>
-        <div style="border:1px solid var(--border);border-top:none;border-radius:0 0 8px 8px;overflow:hidden">`;
-
-      const tblId = `sub-batch-${bundleIdx}`;
-      html += sortableTable(tblId, batches.map(b => ({
-        batchStart: b.batchIdx,
-        endRow: b.endRow ?? '—',
-        loopSec: b.loopProcessingMs != null ? +(b.loopProcessingMs / 1000).toFixed(2) : 0,
-        bulkSec: b.bulkProcessingMs != null ? +(b.bulkProcessingMs / 1000).toFixed(2) : 0,
-        start: b.startTime ? fmtTimestampShort(b.startTime) : '—',
-        flag: (b.bulkProcessingMs ?? 0) > 5000 ? 'critical' : (b.bulkProcessingMs ?? 0) > 2000 ? 'slow' : 'ok',
-      })), ['Batch Start Row', 'End Row', 'Loop Processing (s)', 'Bulk Processing (s)', 'Start (UTC)'],
-        ['batchStart', 'endRow', 'loopSec', 'bulkSec', 'start']);
-
-      html += `</div></details>`;
-    }
-  }
-
-  // ── SUBMISSION — Row stats (per-row, unconditional) ────────────────
-  if (a.submissionRowInsights && a.submissionRowInsights.length > 0) {
-    html += sectionLabel('Submission — Per-Row Step Analysis (fires on every row)');
-    html += sortableTable('sub-perrow', a.submissionRowInsights.map(s => ({
-      stepName: s.stepName, avgMs: s.avgMs, maxMs: s.maxMs, occurrences: s.occurrences,
-      projected: s.projectedTotalMin > 0 ? s.projectedTotalMin.toFixed(1) + ' min' : '—',
-      flag: s.flag, note: s.note || '',
-    })), ['Step', 'Avg/row (ms)', 'Max/row (ms)', 'Count', 'Projected', 'Note'],
-      ['stepName', 'avgMs', 'maxMs', 'occurrences', 'projected', 'note']);
-  }
-
-  return html;
-}
-
-function sectionLabel(text) {
-  return `<div style="font-size:0.72rem;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;margin-top:16px">${esc(text)}</div>`;
-}
-
-// ── Virtual scroll for raw bundle tables ──────────────────────────────────
-// Renders only visible rows. ROW_H = row height in px.
-const VROW_H = 30;
-const VLIST_H = 320; // viewport height
-
-window._vLists = {}; // id → { allRows, filteredRows, filter, scrollTop }
-
-function rawBundlesSection(title, bundles) {
-  let html = `<details style="margin-bottom:16px">`;
-  html += `<summary style="cursor:pointer;font-size:0.75rem;font-weight:600;color:var(--accent);text-transform:uppercase;padding:10px 14px;background:var(--surface);border:1px solid var(--border);border-radius:8px;list-style:none;display:flex;justify-content:space-between;align-items:center">
-    <span>${esc(title)}</span>
-    <span style="color:var(--muted);font-weight:400">${bundles.length} bundle(s) — click to expand</span>
-  </summary>`;
-  html += `<div style="border:1px solid var(--border);border-top:none;border-radius:0 0 8px 8px;overflow:hidden">`;
-
-  for (const bundle of bundles) {
-    const slowCount = bundle.timings.filter(t => t.ms > 5).length;
-    const totalEntries = bundle.timings.length;
-    const vid = `vlist-${title.replace(/\W/g, '')}-${bundle.label.replace(/\W/g, '')}`;
-
-    // Store data keyed by vid
-    window._vLists[vid] = {
-      allRows: bundle.timings,
-      filteredRows: bundle.timings,
-      filter: '',
-      scrollTop: 0,
-    };
-
-    html += `<details style="border-bottom:1px solid var(--border)">`;
-    html += `<summary style="cursor:pointer;padding:10px 14px;background:rgba(255,255,255,0.02);display:flex;justify-content:space-between;align-items:center;font-size:0.82rem;list-style:none" onclick="setTimeout(()=>vlistInit('${vid}'),0)">
-      <span style="font-weight:500">${esc(bundle.label)}</span>
-      <div style="display:flex;gap:12px;align-items:center">
-        ${slowCount > 0 ? `<span style="font-size:0.7rem;background:var(--yellow);color:#000;padding:1px 7px;border-radius:4px;font-weight:600">${slowCount} slow</span>` : ''}
-        <span style="font-family:monospace;color:var(--accent)">${fmtMs(bundle.totalMs)}</span>
-        <span style="color:var(--muted);font-size:0.75rem">${totalEntries} entries</span>
-      </div>
-    </summary>`;
-
-    html += `<div style="border-top:1px solid var(--border)">
-      <!-- search + count bar -->
-      <div style="display:flex;gap:8px;padding:8px 12px;align-items:center;background:rgba(0,0,0,0.15)">
-        <input type="text" placeholder="Search…" oninput="vlistFilter('${vid}',this.value)"
-          style="flex:1;padding:5px 8px;background:var(--bg);border:1px solid var(--border);border-radius:5px;color:var(--text);font-size:0.75rem">
-        <span style="font-size:0.7rem;color:var(--muted);white-space:nowrap" id="${vid}-count">${totalEntries} rows</span>
-      </div>
-      <!-- sticky header -->
-      <table style="width:100%;border-collapse:collapse;font-size:0.78rem">
-        <thead style="background:#1e293b">
-          <tr style="border-bottom:2px solid var(--border)">
-            <th style="text-align:left;padding:6px 12px;color:var(--muted);font-weight:500;width:160px">Timestamp (UTC)</th>
-            <th style="text-align:left;padding:6px 12px;color:var(--muted);font-weight:500">Step</th>
-            <th style="text-align:right;padding:6px 12px;color:var(--muted);font-weight:500;width:80px">Duration</th>
-          </tr>
-        </thead>
-      </table>
-      <!-- virtual scroll viewport -->
-      <div id="${vid}-vp" style="height:${VLIST_H}px;overflow-y:auto;position:relative" onscroll="vlistScroll('${vid}',this.scrollTop)">
-        <!-- total height spacer -->
-        <div id="${vid}-spacer" style="height:${totalEntries * VROW_H}px;position:relative">
-          <!-- rendered rows injected here -->
-          <table id="${vid}-tbl" style="width:100%;border-collapse:collapse;font-size:0.78rem;position:absolute;top:0;left:0;right:0">
-            <colgroup><col style="width:160px"><col><col style="width:80px"></colgroup>
-            <tbody id="${vid}-tbody"></tbody>
-          </table>
-        </div>
-      </div>
-    </div></details>`;
-  }
-
-  html += `</div></details>`;
-  return html;
-}
-
-function vlistInit(vid) {
-  const state = window._vLists[vid];
-  if (!state || document.getElementById(vid + '-tbody').dataset.init) return;
-  document.getElementById(vid + '-tbody').dataset.init = '1';
-  vlistRender(vid, 0);
-}
-
-function vlistFilter(vid, val) {
-  const state = window._vLists[vid];
-  if (!state) return;
-  state.filter = val.toLowerCase();
-  state.filteredRows = val
-    ? state.allRows.filter(t =>
-      t.step.toLowerCase().includes(state.filter) ||
-      fmtTimestampShort(t.timestamp).includes(state.filter) ||
-      String(t.ms).includes(state.filter))
-    : state.allRows;
-  // Update spacer height and count
-  const spacer = document.getElementById(vid + '-spacer');
-  if (spacer) spacer.style.height = (state.filteredRows.length * VROW_H) + 'px';
-  const countEl = document.getElementById(vid + '-count');
-  if (countEl) countEl.textContent = `${state.filteredRows.length} / ${state.allRows.length} rows`;
-  // Reset scroll and re-render
-  const vp = document.getElementById(vid + '-vp');
-  if (vp) vp.scrollTop = 0;
-  vlistRender(vid, 0);
-}
-
-function vlistScroll(vid, scrollTop) {
-  window._vLists[vid].scrollTop = scrollTop;
-  vlistRender(vid, scrollTop);
-}
-
-function vlistRender(vid, scrollTop) {
-  const state = window._vLists[vid];
-  if (!state) return;
-  const rows = state.filteredRows;
-  const total = rows.length;
-  if (total === 0) {
-    const tbody = document.getElementById(vid + '-tbody');
-    if (tbody) tbody.innerHTML = `<tr><td colspan="3" style="padding:12px;color:var(--muted);text-align:center;font-size:0.75rem">No results</td></tr>`;
-    const tbl = document.getElementById(vid + '-tbl');
-    if (tbl) tbl.style.top = '0px';
-    return;
-  }
-
-  // Which rows are visible?
-  const startIdx = Math.max(0, Math.floor(scrollTop / VROW_H) - 3);       // 3-row overscan
-  const endIdx = Math.min(total - 1, Math.ceil((scrollTop + VLIST_H) / VROW_H) + 3);
-
-  const tbl = document.getElementById(vid + '-tbl');
-  const tbody = document.getElementById(vid + '-tbody');
-  if (!tbl || !tbody) return;
-
-  // Position the rendered table at the start of the visible window
-  tbl.style.top = (startIdx * VROW_H) + 'px';
-
-  tbody.innerHTML = rows.slice(startIdx, endIdx + 1).map(t => {
-    const fc = t.ms > 50 ? 'var(--red)' : t.ms > 5 ? 'var(--yellow)' : 'var(--text)';
-    return `<tr style="height:${VROW_H}px;border-bottom:1px solid rgba(255,255,255,0.04)">
-      <td style="padding:0 12px;color:var(--muted);font-family:monospace;white-space:nowrap;font-size:0.73rem;vertical-align:middle">${esc(fmtTimestampShort(t.timestamp))}</td>
-      <td style="padding:0 12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:middle" title="${esc(t.step)}">${esc(t.step)}</td>
-      <td style="padding:0 12px;text-align:right;font-family:monospace;font-weight:${t.ms > 5 ? '600' : '400'};color:${fc};vertical-align:middle">${t.ms.toFixed(1)}ms</td>
-    </tr>`;
-  }).join('');
-}
-
-
-function fmtTimestampShort(iso) {
-  try {
-    return new Date(iso).toISOString().replace('T', ' ').replace(/\.\d+Z$/, '');
-  } catch { return iso; }
-}
-
-// ── Sortable + searchable + virtualized table ──────────────────────────────
-// Each table gets a unique id. Data stored in window._tableData[id].
-// Renders max 200 rows in DOM; search filters in-memory.
-
-window._tableData = {};
-
-function sortableTable(id, rows, headers, keys) {
-  window._tableData[id] = { rows, headers, keys, sortKey: null, sortDir: 1, filter: '' };
-  return `<div class="stbl-wrap" data-id="${id}" style="margin-bottom:16px">
-    <div style="display:flex;gap:8px;margin-bottom:6px;align-items:center">
-      <input type="text" placeholder="Search…" oninput="filterTable('${id}',this.value)"
-        style="flex:1;padding:6px 10px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--text);font-size:0.78rem">
-      <span style="font-size:0.72rem;color:var(--muted)" id="stbl-count-${id}">${rows.length} rows</span>
-    </div>
-    <div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;max-height:360px;overflow-y:auto">
-      <table style="width:100%;border-collapse:collapse;font-size:0.8rem" id="stbl-${id}">
-        <thead id="stbl-head-${id}" style="position:sticky;top:0;z-index:1;background:#1e293b"></thead>
-        <tbody id="stbl-body-${id}"></tbody>
-      </table>
-    </div>
-  </div>`;
-}
-
-function renderTableData(id) {
-  const d = window._tableData[id];
-  if (!d) return;
-  const { rows, headers, keys, sortKey, sortDir, filter } = d;
-
-  // Filter
-  let visible = filter
-    ? rows.filter(r => Object.values(r).some(v => String(v).toLowerCase().includes(filter.toLowerCase())))
-    : rows;
-
-  // Sort
-  if (sortKey) {
-    visible = [...visible].sort((a, b) => {
-      const av = a[sortKey], bv = b[sortKey];
-      const an = parseFloat(av), bn = parseFloat(bv);
-      if (!isNaN(an) && !isNaN(bn)) return (an - bn) * sortDir;
-      return String(av).localeCompare(String(bv)) * sortDir;
+        if (!timeGroups.has(timeKey)) timeGroups.set(timeKey, new Map());
+        const bucketMap = timeGroups.get(timeKey);
+        if (!bucketMap.has(bucketKey)) bucketMap.set(bucketKey, []);
+        bucketMap.get(bucketKey).push(a);
     });
-  }
 
-  // Update count
-  const countEl = document.getElementById(`stbl-count-${id}`);
-  if (countEl) countEl.textContent = `${visible.length} / ${rows.length} rows`;
+    const sortedTimeKeys = Array.from(timeGroups.keys()).sort((a,b) => a.localeCompare(b));
+    sortedTimeKeys.forEach(tk => {
+        const bucketMap = timeGroups.get(tk);
+        Array.from(bucketMap.entries()).sort((a,b) => a[0].localeCompare(b[0])).forEach(([bk, items]) => {
+            const avg = items.reduce((s, i) => s + i.totalEstimatedMs, 0) / items.length;
+            flatGroupsForChart.push({ label: groupType === 'none' ? bk : `${tk}<br>${bk}`, avg });
+        });
+    });
 
-  // Render header — sticky, same table as body so columns always align
-  const head = document.getElementById(`stbl-head-${id}`);
-  if (head) {
-    head.innerHTML = `<tr style="border-bottom:2px solid var(--border)">` +
-      headers.map((h, i) => {
-        const k = keys[i];
-        const active = sortKey === k;
-        const arrow = active ? (sortDir === 1 ? ' ↑' : ' ↓') : '';
-        return `<th onclick="sortTable('${id}','${k}')" style="text-align:${i === 0 ? 'left' : 'right'};padding:8px 12px;color:${active ? 'var(--accent)' : 'var(--muted)'};font-weight:500;cursor:pointer;white-space:nowrap;user-select:none">${esc(h)}${arrow}</th>`;
-      }).join('') + `</tr>`;
-  }
+    // Render Bar Chart
+    let chartHtml = `
+        <div style="grid-column: span 2; background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:20px">
+            <h3 style="font-size:0.8rem; margin-bottom:20px; color:var(--muted); text-transform:uppercase; letter-spacing:1px">Avg Total Duration</h3>
+            <div style="display:flex; align-items:flex-end; gap:20px; height:240px; padding-bottom:50px; overflow-x:auto; padding-left:10px">
+    `;
+    const maxAvg = Math.max(...flatGroupsForChart.map(g => g.avg), 1);
+    flatGroupsForChart.forEach(g => {
+        const h = Math.max(2, (g.avg / maxAvg) * 100);
+        chartHtml += `
+            <div style="flex:0 0 auto; display:flex; flex-direction:column; justify-content:flex-end; align-items:center; width:80px; height:100%; position:relative">
+                <div style="font-size:0.65rem; color:var(--text); margin-bottom:6px; font-weight:700">${fmtMs(g.avg)}</div>
+                <div style="width:44px; background:linear-gradient(to top, var(--accent), #60a5fa); border-radius:6px 6px 0 0; height:${h}%" title="Avg: ${fmtMs(g.avg)}"></div>
+                <div style="position:absolute; bottom:-40px; width:100px; text-align:center; font-size:0.6rem; color:var(--muted); line-height:1.3">${g.label}</div>
+            </div>
+        `;
+    });
+    chartHtml += '</div></div>';
+    chartContainer.innerHTML = chartHtml;
 
-  // Render all visible rows (no cap — virtualisation via CSS scroll)
-  const body = document.getElementById(`stbl-body-${id}`);
-  if (!body) return;
-  const fc = r => r.flag === 'critical' ? 'var(--red)' : r.flag === 'slow' ? 'var(--yellow)' : 'var(--text)';
-  body.innerHTML = visible.map(r =>
-    `<tr style="border-bottom:1px solid rgba(255,255,255,0.04)">` +
-    keys.map((k, i) => {
-      const val = r[k];
-      const isNum = typeof val === 'number';
-      const display = isNum
-        ? (k.endsWith('Sec') ? val.toFixed(2) + 's' : (k === 'avgMs' || k === 'maxMs' || k.endsWith('Ms') ? val.toFixed(2) + 'ms' : val))
-        : (val ?? '—');
-      const color = i === 0 ? fc(r) : (k === 'avgMs' || k === 'maxMs' || k.endsWith('Ms') || k.endsWith('Sec') ? fc(r) : 'var(--text)');
-      return `<td style="padding:7px 12px;text-align:${i === 0 ? 'left' : 'right'};color:${color};overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${esc(String(val ?? ''))}">${esc(String(display))}</td>`;
-    }).join('') + `</tr>`
-  ).join('');
-}
+    const stripRow = (name) => name.replace(/^Row\s+\d+\s*:?\s*/i, '').trim();
 
-function sortTable(id, key) {
-  const d = window._tableData[id];
-  if (!d) return;
-  d.sortDir = d.sortKey === key ? d.sortDir * -1 : 1;
-  d.sortKey = key;
-  renderTableData(id);
-}
+    let html = '';
+    for (const tk of sortedTimeKeys) {
+        if (groupType !== 'none') {
+            html += `<h2 style="margin: 40px 0 20px; font-size:1.4rem; border-left:4px solid var(--accent); padding-left:16px">${tk}</h2>`;
+        }
+        
+        const bucketMap = timeGroups.get(tk);
+        const sortedBuckets = Array.from(bucketMap.entries()).sort((a,b) => a[0].localeCompare(b[0]));
+        
+        for (const [bk, items] of sortedBuckets) {
+            const avgTotal = items.reduce((s, i) => s + i.totalEstimatedMs, 0) / items.length;
+            const rowId = `details-${tk.replace(/[^a-z0-9]/gi, '-')}-${bk.replace(/[^a-z0-9]/gi, '-')}`;
+            
+            // Aggregators
+            const vGlobal = { mapping: 0, db: 0, blob: 0, chunks: 0, count: 0 };
+            const vBundles = new Map(), vBatches = new Map(), vRows = new Map();
+            const sGlobal = new Map(), sBundles = new Map(), sBatches = new Map(), sRows = new Map();
 
-function filterTable(id, val) {
-  const d = window._tableData[id];
-  if (!d) return;
-  d.filter = val;
-  renderTableData(id);
-}
+            items.forEach(i => {
+                const findStep = (name) => {
+                    const s = i.stepContributions.find(c => c.stepName === name);
+                    return s ? s.durationMs : 0;
+                };
 
-function attachTableListeners() {
-  // Render all tables that were registered during this render pass
-  for (const id of Object.keys(window._tableData)) {
-    renderTableData(id);
-  }
-}
+                vGlobal.mapping += findStep('Mapping');
+                vGlobal.db += findStep('Validation: Initial DB Fetches');
+                vGlobal.blob += findStep('Validation: BLOB Download');
+                vGlobal.chunks += findStep('Validation: All Chunks');
+                vGlobal.count++;
+                
+                (i.validationBundleStats || []).forEach((b, idx) => {
+                    if (!vBundles.has(idx)) vBundles.set(idx, { ms: 0, rows: 0, count: 0 });
+                    const vb = vBundles.get(idx); vb.ms += (b.totalMs || 0); vb.rows += (b.rowCount || 0); vb.count++;
+                });
 
-function stepStatsTable(rows) {
-  let html = `<div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:16px">`;
-  html += `<table style="width:100%;border-collapse:collapse;font-size:0.82rem">
-    <thead>
-      <tr style="border-bottom:1px solid var(--border);background:rgba(255,255,255,0.02)">
-        <th style="text-align:left;padding:10px 14px;color:var(--muted);font-weight:500">Step</th>
-        <th style="text-align:right;padding:10px 14px;color:var(--muted);font-weight:500">Avg</th>
-        <th style="text-align:right;padding:10px 14px;color:var(--muted);font-weight:500">Max</th>
-        <th style="text-align:right;padding:10px 14px;color:var(--muted);font-weight:500">Count</th>
-        <th style="text-align:right;padding:10px 14px;color:var(--muted);font-weight:500">Projected</th>
-        <th style="text-align:left;padding:10px 14px;color:var(--muted);font-weight:500">Note</th>
-      </tr>
-    </thead>
-    <tbody>`;
-  for (const r of rows) {
-    const fc = r.flag === 'critical' ? 'var(--red)' : r.flag === 'slow' ? 'var(--yellow)' : 'var(--text)';
-    html += `<tr style="border-bottom:1px solid var(--border)">
-      <td style="padding:10px 14px;color:${fc}">${esc(r.stepName)}</td>
-      <td style="padding:10px 14px;text-align:right;font-family:monospace">${r.avgMs.toFixed(1)}ms</td>
-      <td style="padding:10px 14px;text-align:right;font-family:monospace">${r.maxMs.toFixed(1)}ms</td>
-      <td style="padding:10px 14px;text-align:right;color:var(--muted)">${r.occurrences}</td>
-      <td style="padding:10px 14px;text-align:right;font-weight:${r.extra?.flag !== 'ok' ? '600' : '400'};color:${r.extra?.flag === 'critical' ? 'var(--red)' : r.extra?.flag === 'slow' ? 'var(--yellow)' : 'var(--muted)'}">
-        ${r.extra ? esc(r.extra.value) : '—'}
-      </td>
-      <td style="padding:10px 14px;font-size:0.75rem;color:var(--yellow)">${r.note ? esc(r.note) : ''}</td>
-    </tr>`;
-  }
-  html += `</tbody></table></div>`;
-  return html;
-}
+                (i.validationBatchStats || []).forEach((b, idx) => {
+                    if (!vBatches.has(idx)) vBatches.set(idx, { ms: 0, count: 0, s: b.startRow, e: b.endRow, bIdx: 0 });
+                    const vb = vBatches.get(idx); vb.ms += (b.bulkInsertMs || 0); vb.count++;
+                });
 
-function metaRow(label, value, mono = false) {
-  return `<div style="display:flex;justify-content:space-between;gap:8px;margin-bottom:4px;font-size:0.75rem">
-    <span style="color:var(--muted);white-space:nowrap">${esc(label)}</span>
-    <span style="${mono ? 'font-family:monospace;' : ''}color:var(--text);text-align:right;word-break:break-all">${esc(value)}</span>
-  </div>`;
-}
+                (i.validationRowInsights || []).forEach(r => {
+                    const name = stripRow(r.stepName);
+                    if (!vRows.has(name)) vRows.set(name, { ms: 0, c: 0, p: 0 });
+                    const vr = vRows.get(name); vr.ms += r.avgMs; vr.c++; vr.p += r.projectedTotalMs;
+                });
 
-function fmtTimestamp(iso) {
-  // Always show in UTC
-  try {
-    const d = new Date(iso);
-    return d.toISOString().replace('T', ' ').replace(/\.\d+Z$/, '') + ' UTC';
-  } catch { return iso; }
-}
+                (i.submissionStageStats || []).forEach(s => {
+                    if (!sGlobal.has(s.stepName)) sGlobal.set(s.stepName, { ms: 0, c: 0 });
+                    const sg = sGlobal.get(s.stepName); sg.ms += (s.valueMs || 0); sg.c++;
+                });
 
-function renderComparison(data) {
-  let html = '';
-  const c = data.comparison;
+                (i.submissionBundleStats || []).forEach((b, idx) => {
+                    const bKey = b.bundleIdx;
+                    if (!sBundles.has(bKey)) sBundles.set(bKey, { fetch: 0, accounts: 0, linked: 0, custom: 0, count: 0 });
+                    const sb = sBundles.get(bKey); sb.fetch += (b.bundleDbFetchMs || 0); sb.accounts += (b.accountIds || 0); sb.linked += (b.linkedAccountIds || 0); sb.custom += (b.customFields || 0); sb.count++;
+                });
 
-  html += `<div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px">`;
-  html += `<div style="font-size:0.8rem;font-weight:600;color:var(--accent);margin-bottom:12px;text-transform:uppercase">Comparison</div>`;
-  html += `<div style="display:flex;gap:24px;flex-wrap:wrap">`;
-  html += `<div><div style="font-size:0.7rem;color:var(--muted)">Import A</div><div style="font-family:monospace;font-size:0.8rem">${esc(c.idA)}</div>${c.rowCountA ? `<div style="font-size:0.75rem;color:var(--muted)">${c.rowCountA.toLocaleString()} rows</div>` : ''}</div>`;
-  html += `<div style="color:var(--muted);align-self:center;font-size:1.2rem">vs</div>`;
-  html += `<div><div style="font-size:0.7rem;color:var(--muted)">Import B</div><div style="font-family:monospace;font-size:0.8rem">${esc(c.idB)}</div>${c.rowCountB ? `<div style="font-size:0.75rem;color:var(--muted)">${c.rowCountB.toLocaleString()} rows</div>` : ''}</div>`;
-  html += `</div></div>`;
+                (i.submissionBatchStats || []).forEach((b, idx) => {
+                    const bKey = `${b.bundleIdx}:${b.batchIdx}`;
+                    if (!sBatches.has(bKey)) sBatches.set(bKey, { bulk: 0, loop: 0, total: 0, count: 0, s: b.startRow, e: b.endRow, bIdx: b.bundleIdx });
+                    const sb = sBatches.get(bKey); sb.bulk += (b.bulkProcessingMs || 0); sb.loop += (b.loopProcessingMs || 0); sb.total += (b.totalProcessingMs || 0); sb.count++;
+                });
 
-  // Comparison insights
-  if (c.insights && c.insights.length > 0) {
-    html += `<div style="background:#1a1a2e;border:1px solid var(--accent);border-radius:12px;padding:16px;margin-bottom:16px">`;
-    html += `<div style="font-size:0.8rem;font-weight:600;color:var(--accent);margin-bottom:10px;text-transform:uppercase">Comparison Insights</div>`;
-    for (const ins of c.insights) {
-      html += `<div style="font-size:0.85rem;line-height:1.5;margin-bottom:6px;color:var(--yellow)">${esc(ins)}</div>`;
+                (i.submissionRowInsights || []).forEach(r => {
+                    const name = stripRow(r.stepName);
+                    if (!sRows.has(name)) sRows.set(name, { ms: 0, c: 0, p: 0 });
+                    const sr = sRows.get(name); sr.ms += r.avgMs; sr.c++; sr.p += r.projectedTotalMs;
+                });
+            });
+
+            const renderTable = (title, headers, rowsHtml) => `
+                <h5 style="font-size:0.7rem; color:var(--muted); margin:16px 0 8px; text-transform:uppercase; letter-spacing:0.5px">${title}</h5>
+                <div style="background:rgba(0,0,0,0.2); border:1px solid var(--border); border-radius:8px; overflow:hidden; margin-bottom:20px">
+                    <table style="width:100%; border-collapse:collapse; font-size:0.75rem">
+                        <tr style="background:rgba(255,255,255,0.03); color:var(--muted); border-bottom:1px solid var(--border)">
+                            ${headers.map(h => `<th style="text-align:${h.a||'left'}; padding:10px 14px; font-weight:600">${h.l}</th>`).join('')}
+                        </tr>
+                        ${rowsHtml}
+                    </table>
+                </div>`;
+
+            html += `<div style="background:var(--surface); margin-bottom:16px; border:1px solid var(--border); border-radius:12px; overflow:hidden; box-shadow:0 4px 6px rgba(0,0,0,0.1)">
+                <div style="display:flex; justify-content:space-between; align-items:center; padding:20px 24px; background:linear-gradient(to right, rgba(255,255,255,0.02), transparent)">
+                    <div>
+                        <div style="font-size:1.1rem; font-weight:800; color:var(--accent)">${bk}</div>
+                        <div style="font-size:0.85rem; color:var(--muted); margin-top:4px">${items.length} imports • Avg: <span style="color:var(--text); font-weight:600">${fmtMs(avgTotal)}</span></div>
+                    </div>
+                    <button class="btn" style="padding:8px 20px; font-size:0.8rem; background:var(--bg); border:1px solid var(--border); border-radius:6px" onclick="toggleRow('${rowId}')">Deep-Dive Analysis</button>
+                </div>
+                
+                <div id="${rowId}" style="display:none; padding:24px; border-top:1px solid var(--border); background:rgba(0,0,0,0.05)">
+                    
+                    <div style="margin-bottom:32px">
+                        <h4 style="font-size:0.9rem; color:var(--accent); margin-bottom:16px; border-bottom:1px solid var(--accent); padding-bottom:6px; display:inline-block">VALIDATION ANALYSIS</h4>
+                        
+                        ${renderTable('Global Validation Stats', [{l:'Step'},{l:'Avg Duration',a:'right'}], `
+                            <tr style="border-bottom:1px solid var(--border)"><td style="padding:10px 14px">Mapping Stage</td><td style="text-align:right; padding:10px 14px; font-family:monospace">${fmtMs(vGlobal.mapping/vGlobal.count)}</td></tr>
+                            <tr style="border-bottom:1px solid var(--border)"><td style="padding:10px 14px">Initial DB Fetches</td><td style="text-align:right; padding:10px 14px; font-family:monospace">${fmtMs(vGlobal.db/vGlobal.count)}</td></tr>
+                            <tr style="border-bottom:1px solid var(--border)"><td style="padding:10px 14px">BLOB Download</td><td style="text-align:right; padding:10px 14px; font-family:monospace">${fmtMs(vGlobal.blob/vGlobal.count)}</td></tr>
+                            <tr style="border-bottom:1px solid var(--border)"><td style="padding:10px 14px">Total Chunk Processing</td><td style="text-align:right; padding:10px 14px; font-family:monospace">${fmtMs(vGlobal.chunks/vGlobal.count)}</td></tr>
+                        `)}
+
+                        ${renderTable('Bundle Logs', [{l:'Bundle'},{l:'Avg Rows',a:'right'},{l:'Avg Global Work',a:'right'}], 
+                            Array.from(vBundles.entries()).map(([idx, v]) => `
+                            <tr style="border-bottom:1px solid var(--border)">
+                                <td style="padding:10px 14px">Bundle ${idx}</td>
+                                <td style="text-align:right; padding:10px 14px; color:var(--muted)">${Math.round(v.rows/v.count).toLocaleString()}</td>
+                                <td style="text-align:right; padding:10px 14px; font-family:monospace">${fmtMs(v.ms/v.count)}</td>
+                            </tr>`).join(''))}
+                            
+                        ${renderTable('Batch Logs (Bulk Insert)', [{l:'Bundle'},{l:'Range'},{l:'Avg Duration',a:'right'}], 
+                            Array.from(vBatches.entries()).map(([idx, v]) => `
+                            <tr style="border-bottom:1px solid var(--border)">
+                                <td style="padding:10px 14px">Bundle ${v.bIdx}</td>
+                                <td style="padding:10px 14px; color:var(--muted)">Rows ${v.s} - ${v.e}</td>
+                                <td style="text-align:right; padding:10px 14px; font-family:monospace">${fmtMs(v.ms/v.count)}</td>
+                            </tr>`).join(''))}
+                            
+                        ${renderTable('Per-Row Rules (Aggregated)', [{l:'Rule Name'},{l:'Avg Ms/Row',a:'right'},{l:'Projected Total',a:'right'}], 
+                            Array.from(vRows.entries()).sort((a,b) => b[1].p - a[1].p).map(([name, v]) => `
+                            <tr style="border-bottom:1px solid var(--border)">
+                                <td style="padding:10px 14px">${esc(name)}</td>
+                                <td style="text-align:right; padding:10px 14px; font-family:monospace">${(v.ms/v.c).toFixed(2)}ms</td>
+                                <td style="text-align:right; padding:10px 14px; color:var(--orange); font-weight:600">${fmtMs(v.p/v.c)}</td>
+                            </tr>`).join(''))}
+                    </div>
+                    
+                    <div style="margin-bottom:32px">
+                        <h4 style="font-size:0.9rem; color:var(--accent); margin-bottom:16px; border-bottom:1px solid var(--accent); padding-bottom:6px; display:inline-block">SUBMISSION ANALYSIS</h4>
+                        
+                        ${renderTable('Global Submission Stats', [{l:'Step'},{l:'Avg Duration',a:'right'}], 
+                            Array.from(sGlobal.entries()).map(([name, v]) => `
+                            <tr style="border-bottom:1px solid var(--border)">
+                                <td style="padding:10px 14px">${esc(name)}</td>
+                                <td style="text-align:right; padding:10px 14px; font-family:monospace">${fmtMs(v.ms/v.c)}</td>
+                            </tr>`).join(''))}
+
+                        ${renderTable('Bundle Logs (DB Fetch)', [{l:'Bundle'},{l:'Avg Accounts',a:'right'},{l:'Avg Fetch',a:'right'}], 
+                            Array.from(sBundles.entries()).map(([idx, v]) => `
+                            <tr style="border-bottom:1px solid var(--border)">
+                                <td style="padding:10px 14px">Bundle ${idx}</td>
+                                <td style="text-align:right; padding:10px 14px; color:var(--muted)">${Math.round(v.accounts/v.count)}</td>
+                                <td style="text-align:right; padding:10px 14px; font-family:monospace">${fmtMs(v.fetch/v.count)}</td>
+                            </tr>`).join(''))}
+                            
+                        ${renderTable('Batch Logs', [{l:'Bundle'},{l:'Range'},{l:'Loop',a:'right'},{l:'Bulk',a:'right'},{l:'Total',a:'right'}], 
+                            Array.from(sBatches.entries()).map(([idx, v]) => `
+                            <tr style="border-bottom:1px solid var(--border)">
+                                <td style="padding:10px 14px">Bundle ${v.bIdx}</td>
+                                <td style="padding:10px 14px; color:var(--muted)">Rows ${v.s} - ${v.e}</td>
+                                <td style="text-align:right; padding:10px 14px; font-family:monospace">${fmtMs(v.loop/v.count)}</td>
+                                <td style="text-align:right; padding:10px 14px; font-family:monospace">${fmtMs(v.bulk/v.count)}</td>
+                                <td style="text-align:right; padding:10px 14px; font-family:monospace; font-weight:700; color:var(--accent)">${fmtMs(v.total/v.count)}</td>
+                            </tr>`).join(''))}
+                            
+                        ${renderTable('Per-Row Steps (Aggregated)', [{l:'Step Name'},{l:'Avg Ms/Row',a:'right'},{l:'Projected Total',a:'right'}], 
+                            Array.from(sRows.entries()).sort((a,b) => b[1].p - a[1].p).map(([name, v]) => `
+                            <tr style="border-bottom:1px solid var(--border)">
+                                <td style="padding:10px 14px">${esc(name)}</td>
+                                <td style="text-align:right; padding:10px 14px; font-family:monospace">${(v.ms/v.c).toFixed(2)}ms</td>
+                                <td style="text-align:right; padding:10px 14px; color:var(--orange); font-weight:600">${fmtMs(v.p/v.c)}</td>
+                            </tr>`).join(''))}
+                    </div>
+                    
+                    <div>
+                        <h4 style="font-size:0.9rem; color:var(--muted); margin-bottom:16px; border-bottom:1px solid var(--border); padding-bottom:6px">SOURCE IMPORTS</h4>
+                        <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap:12px">
+                            ${items.map(i => `
+                                <div style="display:flex; justify-content:space-between; align-items:center; background:var(--bg); padding:12px 16px; border-radius:8px; border:1px solid var(--border)">
+                                    <div style="overflow:hidden">
+                                        <div style="font-size:0.75rem; font-family:monospace; white-space:nowrap; overflow:hidden; text-overflow:ellipsis">${i.clientFileUploadId}</div>
+                                        <div style="font-size:0.65rem; color:var(--accent); margin-top:4px">${fmtMs(i.totalEstimatedMs)}</div>
+                                    </div>
+                                    <a href="/reports/import_${i.clientFileUploadId}.html" target="_blank" class="btn" style="padding:4px 12px; font-size:0.7rem; background:var(--surface); border:1px solid var(--border); white-space:nowrap">View Report</a>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>`;
+        }
     }
-    html += `</div>`;
-  }
-
-  // Step diff table
-  if (c.stepDiff && c.stepDiff.length > 0) {
-    html += sectionTitle('Step-by-Step Comparison');
-    html += `<div style="overflow-x:auto;margin-bottom:16px">`;
-    html += `<table style="width:100%;border-collapse:collapse;font-size:0.8rem">
-      <thead>
-        <tr style="border-bottom:1px solid var(--border);color:var(--muted)">
-          <th style="text-align:left;padding:8px 12px">Step</th>
-          <th style="text-align:right;padding:8px 12px">Import A</th>
-          <th style="text-align:right;padding:8px 12px">Import B</th>
-          <th style="text-align:right;padding:8px 12px">Delta</th>
-          <th style="text-align:right;padding:8px 12px">Change</th>
-        </tr>
-      </thead>
-      <tbody>`;
-    for (const s of c.stepDiff) {
-      const flagColor = s.flag === 'slower' ? 'var(--red)' : s.flag === 'faster' ? 'var(--green)' : 'var(--muted)';
-      const deltaSign = s.deltaMs > 0 ? '+' : '';
-      html += `<tr style="border-bottom:1px solid var(--border)">
-        <td style="padding:8px 12px">${esc(s.stepName)}</td>
-        <td style="padding:8px 12px;text-align:right">${fmtMs(s.msA)}</td>
-        <td style="padding:8px 12px;text-align:right">${fmtMs(s.msB)}</td>
-        <td style="padding:8px 12px;text-align:right;color:${flagColor};font-weight:600">${deltaSign}${fmtMs(s.deltaMs)}</td>
-        <td style="padding:8px 12px;text-align:right;color:${flagColor}">${deltaSign}${s.deltaPercent}%</td>
-      </tr>`;
-    }
-    html += `</tbody></table></div>`;
-  }
-
-  // Individual analyses
-  html += `<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">`;
-  html += `<div><div style="font-size:0.75rem;color:var(--muted);margin-bottom:8px">IMPORT A DETAILS</div>${renderSingleImport(data.primary)}</div>`;
-  html += `<div><div style="font-size:0.75rem;color:var(--muted);margin-bottom:8px">IMPORT B DETAILS</div>${renderSingleImport(data.secondary)}</div>`;
-  html += `</div>`;
-
-  return html;
+    container.innerHTML = html;
 }
 
-function fmtMs(ms) {
-  if (!ms && ms !== 0) return '—';
-  if (ms < 1000) return Math.round(ms) + 'ms';
-  if (ms < 60000) return (ms / 1000).toFixed(1) + 's';
-  return (ms / 60000).toFixed(1) + 'min';
+function toggleRow(id) {
+    const el = document.getElementById(id);
+    el.style.display = el.style.display === 'none' ? 'block' : 'none';
+}
+
+function runImportAnalysis() {
+    const id = document.getElementById('importClientId').value.trim();
+    const appId = document.getElementById('appId').value.trim();
+    const apiKey = document.getElementById('apiKey').value.trim();
+    const results = document.getElementById('importResults');
+    
+    if (!id || !appId || !apiKey) { alert('Missing fields'); return; }
+    
+    results.innerHTML = '<div style="padding:40px; text-align:center"><span class="spinner"></span> Analyzing import pipeline...</div>';
+
+    fetch('/api/import-analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ appId, apiKey, clientFileUploadId: id })
+    }).then(r => r.json()).then(data => {
+        if (data.error) {
+            results.innerHTML = errorCard(data.error);
+            return;
+        }
+        
+        if (data.type === 'comparison') {
+            let html = `
+                <div style="background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:24px; margin-bottom:24px">
+                    <h2 style="font-size:1.1rem; color:var(--accent); margin-bottom:20px">Comparison: ${data.primary.clientFileUploadId} vs ${data.secondary.clientFileUploadId}</h2>
+                    
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:24px">
+                        <div style="background:var(--bg); padding:16px; border-radius:8px; border:1px solid var(--border)">
+                            <div style="font-size:0.75rem; color:var(--muted); margin-bottom:8px">Primary (${data.primary.rowCount} rows)</div>
+                            <div style="font-size:1.1rem; font-weight:700">${fmtMs(data.primary.totalEstimatedMs)}</div>
+                            <a href="/reports/import_${data.primary.clientFileUploadId}.html" target="_blank" style="font-size:0.75rem; color:var(--accent); text-decoration:none; margin-top:8px; display:inline-block">View Report</a>
+                        </div>
+                        <div style="background:var(--bg); padding:16px; border-radius:8px; border:1px solid var(--border)">
+                            <div style="font-size:0.75rem; color:var(--muted); margin-bottom:8px">Secondary (${data.secondary.rowCount} rows)</div>
+                            <div style="font-size:1.1rem; font-weight:700">${fmtMs(data.secondary.totalEstimatedMs)}</div>
+                            <a href="/reports/import_${data.secondary.clientFileUploadId}.html" target="_blank" style="font-size:0.75rem; color:var(--accent); text-decoration:none; margin-top:8px; display:inline-block">View Report</a>
+                        </div>
+                    </div>
+
+                    ${sectionTitle('Performance Delta')}
+                    <div style="background:var(--bg); border:1px solid var(--border); border-radius:8px; overflow:hidden">
+                        <table style="width:100%; border-collapse:collapse; font-size:0.8rem">
+                            <tr style="background:rgba(255,255,255,0.03); color:var(--muted)">
+                                <th style="text-align:left; padding:10px 14px">Step Name</th>
+                                <th style="text-align:right; padding:10px 14px">Delta</th>
+                                <th style="text-align:right; padding:10px 14px">%</th>
+                            </tr>
+                            ${data.comparison.stepDiff.map(s => `
+                                <tr style="border-bottom:1px solid var(--border)">
+                                    <td style="padding:10px 14px">${esc(s.stepName)}</td>
+                                    <td style="text-align:right; padding:10px 14px; font-family:monospace; color:${s.flag === 'slower' ? 'var(--red)' : s.flag === 'faster' ? 'var(--green)' : 'var(--text)'}">${s.deltaMs > 0 ? '+' : ''}${fmtMs(s.deltaMs)}</td>
+                                    <td style="text-align:right; padding:10px 14px; font-family:monospace; color:${s.flag === 'slower' ? 'var(--red)' : s.flag === 'faster' ? 'var(--green)' : 'var(--text)'}">${s.deltaPercent > 0 ? '+' : ''}${s.deltaPercent}%</td>
+                                </tr>
+                            `).join('')}
+                        </table>
+                    </div>
+
+                    <div style="margin-top:24px">
+                        ${sectionTitle('Comparison Insights')}
+                        <ul style="padding-left:20px; font-size:0.85rem; color:var(--muted)">
+                            ${data.comparison.insights.map(i => `<li style="margin-bottom:6px">${esc(i)}</li>`).join('')}
+                        </ul>
+                    </div>
+                </div>
+            `;
+            results.innerHTML = html;
+            return;
+        }
+
+        let html = `
+            <div style="background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:24px; margin-bottom:24px">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px">
+                    <h2 style="font-size:1.1rem; color:var(--accent)">Analysis Complete: ${id}</h2>
+                    <a href="/reports/import_${id}.html" target="_blank" class="btn" style="text-decoration:none">View HTML Report</a>
+                </div>
+                <div style="font-size:0.85rem; color:var(--muted); margin-bottom:12px">Raw JSON Response:</div>
+                <pre style="font-size:0.7rem; background:var(--bg); padding:16px; border-radius:8px; overflow:auto; max-height:400px">${JSON.stringify(data, null, 2)}</pre>
+            </div>
+        `;
+        results.innerHTML = html;
+    }).catch(e => {
+        results.innerHTML = errorCard(e.message);
+    });
 }

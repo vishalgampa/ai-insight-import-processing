@@ -3,82 +3,245 @@
  * Usage: npx ts-node server.ts
  * Then open http://localhost:3000
  */
-import express from 'express';
-import https from 'https';
-import path from 'path';
-import fs from 'fs';
-import { TelemetryNormalizer } from './src/telemetry/normalizer';
-import { TimeSeriesBuilder } from './src/telemetry/timeSeriesBuilder';
-import { BaselineCalculator } from './src/telemetry/baselineCalculator';
-import { AnomalyDetector } from './src/analysis/anomalyDetector';
-import { SeverityRanker } from './src/analysis/severityRanker';
-import { TemporalCorrelator } from './src/correlation/temporalCorrelator';
-import { CausalGraphBuilder } from './src/correlation/causalGraphBuilder';
-import { CausalAnalyzer } from './src/rootcause/causalAnalyzer';
-import { CascadeAnalyzer } from './src/symptoms/cascadeAnalyzer';
-import { RecommendationGenerator } from './src/ai/recommendationGenerator';
-import { LLMClient } from './src/ai/llmClient';
-import { PromptBuilder } from './src/ai/promptBuilder';
-import { ReasoningEngine } from './src/ai/reasoningEngine';
-import { ReportFormatter } from './src/report/reportFormatter';
-import { TimelineBuilder } from './src/report/timelineBuilder';
-import { MarkdownRenderer } from './src/report/markdownRenderer';
-import { formatResponse } from './src/query/responseFormatter';
-import { parseQuery } from './src/query/queryParser';
-import { ImportOrchestrator } from './src/imports/importOrchestrator';
+import express from "express";
+import https from "https";
+import path from "path";
+import fs from "fs";
+import { TelemetryNormalizer } from "./src/telemetry/normalizer";
+import { TimeSeriesBuilder } from "./src/telemetry/timeSeriesBuilder";
+import { BaselineCalculator } from "./src/telemetry/baselineCalculator";
+import { AnomalyDetector } from "./src/analysis/anomalyDetector";
+import { SeverityRanker } from "./src/analysis/severityRanker";
+import { TemporalCorrelator } from "./src/correlation/temporalCorrelator";
+import { CausalGraphBuilder } from "./src/correlation/causalGraphBuilder";
+import { CausalAnalyzer } from "./src/rootcause/causalAnalyzer";
+import { CascadeAnalyzer } from "./src/symptoms/cascadeAnalyzer";
+import { RecommendationGenerator } from "./src/ai/recommendationGenerator";
+import { LLMClient } from "./src/ai/llmClient";
+import { PromptBuilder } from "./src/ai/promptBuilder";
+import { ReasoningEngine } from "./src/ai/reasoningEngine";
+import { ReportFormatter } from "./src/report/reportFormatter";
+import { TimelineBuilder } from "./src/report/timelineBuilder";
+import { MarkdownRenderer } from "./src/report/markdownRenderer";
+import { formatResponse } from "./src/query/responseFormatter";
+import { parseQuery } from "./src/query/queryParser";
+import { ImportOrchestrator } from "./src/imports/importOrchestrator";
+import { SQLiteReportRepository } from "./src/persistence/SQLiteReportRepository";
+import { ImportMonitor } from "./src/scheduler/importMonitor";
+import { compareAgainstBaseline } from "./src/imports/timingAnalyzer";
 
 const app = express();
 app.use(express.json());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, "public")));
+app.use("/reports", express.static(path.join(__dirname, "reports")));
+
+const reportsDir = path.join(__dirname, "reports");
+if (!fs.existsSync(reportsDir)) {
+  fs.mkdirSync(reportsDir, { recursive: true });
+}
+
+// ── Persistence & Scheduler Initialization ─────────────────────────────────
+
+const reportRepo = new SQLiteReportRepository(
+  path.join(__dirname, "reports.db"),
+);
 
 // ── Report storage helper ──────────────────────────────────────────────────
 
 function saveReport(type: string, id: string, data: any) {
-  const reportsDir = path.join(__dirname, 'reports');
+  const reportsDir = path.join(__dirname, "reports");
   if (!fs.existsSync(reportsDir)) {
     fs.mkdirSync(reportsDir, { recursive: true });
   }
-  const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-  const fileName = `${type}_${id}_${timestamp}.json`;
-  const filePath = path.join(reportsDir, fileName);
-  fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
-  console.log(`Report saved to ${filePath}`);
+
+  // JSON
+  const jsonFileName = `${type}_${id}.json`;
+  const jsonPath = path.join(reportsDir, jsonFileName);
+  fs.writeFileSync(jsonPath, JSON.stringify(data, null, 2));
+  console.log(`Report JSON saved to ${jsonPath}`);
+
+  // HTML (only for imports)
+  if (type === "import") {
+    const htmlFileName = `${type}_${id}.html`;
+    const htmlPath = path.join(reportsDir, htmlFileName);
+    // Use the primary analysis if available
+    const analysis = data.primary || data;
+    if (analysis.clientFileUploadId) {
+      const htmlContent = renderImportToHtml(analysis);
+      fs.writeFileSync(htmlPath, htmlContent);
+      console.log(`Report HTML saved to ${htmlPath}`);
+    }
+  }
+}
+
+function renderImportToHtml(analysis: any): string {
+  // Use the same template as in ImportMonitor
+  return `
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Import Report - ${analysis.clientFileUploadId}</title>
+    <style>
+        body { font-family: sans-serif; line-height: 1.5; color: #333; max-width: 900px; margin: 40px auto; padding: 20px; }
+        h1 { color: #0056b3; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin: 20px 0; }
+        .stat-card { background: #f8f9fa; padding: 15px; border-radius: 8px; border-left: 4px solid #0056b3; }
+        .stat-value { font-size: 1.2rem; font-weight: bold; margin-top: 5px; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th, td { text-align: left; padding: 12px; border-bottom: 1px solid #ddd; }
+        th { background: #f2f2f2; }
+        .flag-slow { color: #856404; background: #fff3cd; padding: 2px 6px; border-radius: 4px; }
+        .flag-critical { color: #721c24; background: #f8d7da; padding: 2px 6px; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <h1>Import Analysis Report</h1>
+    <div class="stat-grid">
+        <div class="stat-card">
+            <div>Client File Upload ID</div>
+            <div class="stat-value">${analysis.clientFileUploadId}</div>
+        </div>
+        <div class="stat-card">
+            <div>Row Count</div>
+            <div class="stat-value">${analysis.rowCount?.toLocaleString() ?? "Unknown"}</div>
+        </div>
+        <div class="stat-card">
+            <div>Total Estimated Duration</div>
+            <div class="stat-value">${(analysis.totalEstimatedMs / 1000).toFixed(1)}s</div>
+        </div>
+    </div>
+
+    <h2>High-Level Step Breakdown</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Step Name</th>
+                <th>Duration (s)</th>
+                <th>% of Total</th>
+                <th>Note</th>
+            </tr>
+        </thead>
+        <tbody>
+            ${(analysis.stepContributions || [])
+              .map(
+                (s: any) => `
+                <tr>
+                    <td>${s.stepName}</td>
+                    <td>${(s.durationMs / 1000).toFixed(2)}s</td>
+                    <td>${s.percentOfTotal}%</td>
+                    <td><span class="flag-${s.flag}">${s.note ?? ""}</span></td>
+                </tr>
+            `,
+              )
+              .join("")}
+        </tbody>
+    </table>
+
+    ${analysis.validationRowInsights?.length ? `
+    <h2>Validation Row-Level Insights (Projected)</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Rule Name</th>
+                <th>Avg Ms</th>
+                <th>Occurrences</th>
+                <th>Projected Total</th>
+                <th>Note</th>
+            </tr>
+        </thead>
+        <tbody>
+            ${analysis.validationRowInsights.map((r: any) => `
+                <tr>
+                    <td>${r.stepName}</td>
+                    <td>${r.avgMs.toFixed(1)}ms</td>
+                    <td>${r.occurrences.toLocaleString()}</td>
+                    <td>${(r.projectedTotalMs / 1000 / 60).toFixed(1)} min</td>
+                    <td><span class="flag-${r.flag}">${r.note ?? ""}</span></td>
+                </tr>
+            `).join('')}
+        </tbody>
+    </table>
+    ` : ''}
+
+    ${analysis.submissionRowInsights?.length ? `
+    <h2>Submission Row-Level Insights (Projected)</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Step Name</th>
+                <th>Avg Ms</th>
+                <th>Occurrences</th>
+                <th>Projected Total</th>
+                <th>Note</th>
+            </tr>
+        </thead>
+        <tbody>
+            ${analysis.submissionRowInsights.map((r: any) => `
+                <tr>
+                    <td>${r.stepName}</td>
+                    <td>${r.avgMs.toFixed(1)}ms</td>
+                    <td>${r.occurrences.toLocaleString()}</td>
+                    <td>${(r.projectedTotalMs / 1000 / 60).toFixed(1)} min</td>
+                    <td><span class="flag-${r.flag}">${r.note ?? ""}</span></td>
+                </tr>
+            `).join('')}
+        </tbody>
+    </table>
+    ` : ''}
+
+    <h2>Insights</h2>
+    <ul>
+        ${(analysis.insights || []).map((i: string) => `<li>${i}</li>`).join("")}
+    </ul>
+</body>
+</html>
+    `;
 }
 
 // ── App Insights REST helper ───────────────────────────────────────────────
 
-function queryAppInsights(appId: string, apiKey: string, kustoQuery: string, timespan: string): Promise<any[]> {
+function queryAppInsights(
+  appId: string,
+  apiKey: string,
+  kustoQuery: string,
+  timespan: string,
+): Promise<any[]> {
   return new Promise((resolve, reject) => {
     const body = JSON.stringify({ query: kustoQuery, timespan });
     const options: https.RequestOptions = {
-      hostname: 'api.applicationinsights.io',
+      hostname: "api.applicationinsights.io",
       path: `/v1/apps/${appId}/query`,
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': apiKey,
-        'Content-Length': Buffer.byteLength(body),
+        "Content-Type": "application/json",
+        "x-api-key": apiKey,
+        "Content-Length": Buffer.byteLength(body),
       },
     };
     const req = https.request(options, (res) => {
-      let data = '';
-      res.on('data', (c) => (data += c));
-      res.on('end', () => {
-        if (res.statusCode !== 200) return reject(new Error(`HTTP ${res.statusCode}: ${data}`));
+      let data = "";
+      res.on("data", (c) => (data += c));
+      res.on("end", () => {
+        if (res.statusCode !== 200)
+          return reject(new Error(`HTTP ${res.statusCode}: ${data}`));
         try {
           const json = JSON.parse(data);
           const table = json.tables?.[0];
           if (!table) return resolve([]);
           const cols = table.columns.map((c: any) => c.name);
-          resolve(table.rows.map((row: any[]) => {
-            const rec: Record<string, unknown> = {};
-            cols.forEach((col: string, i: number) => (rec[col] = row[i]));
-            return rec;
-          }));
-        } catch (e) { reject(e); }
+          resolve(
+            table.rows.map((row: any[]) => {
+              const rec: Record<string, unknown> = {};
+              cols.forEach((col: string, i: number) => (rec[col] = row[i]));
+              return rec;
+            }),
+          );
+        } catch (e) {
+          reject(e);
+        }
       });
     });
-    req.on('error', reject);
+    req.on("error", reject);
     req.write(body);
     req.end();
   });
@@ -88,52 +251,90 @@ function queryAppInsights(appId: string, apiKey: string, kustoQuery: string, tim
 
 function mapException(row: Record<string, unknown>) {
   return {
-    timestamp: String(row['timestamp'] ?? ''), serviceName: String(row['cloud_RoleName'] ?? 'unknown'),
-    eventType: 'exception' as const, exceptionType: String(row['type'] ?? row['problemId'] ?? ''),
-    message: String(row['outerMessage'] ?? row['message'] ?? ''), stackTrace: String(row['details'] ?? ''),
-    severity: Number(row['severityLevel'] ?? 2) >= 4 ? 'critical' as const : Number(row['severityLevel'] ?? 2) >= 3 ? 'error' as const : 'warning' as const,
+    timestamp: String(row["timestamp"] ?? ""),
+    serviceName: String(row["cloud_RoleName"] ?? "unknown"),
+    eventType: "exception" as const,
+    exceptionType: String(row["type"] ?? row["problemId"] ?? ""),
+    message: String(row["outerMessage"] ?? row["message"] ?? ""),
+    stackTrace: String(row["details"] ?? ""),
+    severity:
+      Number(row["severityLevel"] ?? 2) >= 4
+        ? ("critical" as const)
+        : Number(row["severityLevel"] ?? 2) >= 3
+          ? ("error" as const)
+          : ("warning" as const),
     properties: {},
   };
 }
 function mapRequest(row: Record<string, unknown>) {
   return {
-    timestamp: String(row['timestamp'] ?? ''), serviceName: String(row['cloud_RoleName'] ?? 'unknown'),
-    eventType: 'request' as const, operationName: String(row['name'] ?? ''),
-    duration: Number(row['duration'] ?? 0), responseCode: Number(row['resultCode'] ?? 0),
-    success: row['success'] === true || row['success'] === 'True', properties: {},
+    timestamp: String(row["timestamp"] ?? ""),
+    serviceName: String(row["cloud_RoleName"] ?? "unknown"),
+    eventType: "request" as const,
+    operationName: String(row["name"] ?? ""),
+    duration: Number(row["duration"] ?? 0),
+    responseCode: Number(row["resultCode"] ?? 0),
+    success: row["success"] === true || row["success"] === "True",
+    properties: {},
   };
 }
 function mapDependency(row: Record<string, unknown>) {
   return {
-    timestamp: String(row['timestamp'] ?? ''), serviceName: String(row['cloud_RoleName'] ?? 'unknown'),
-    eventType: 'dependency' as const, dependencyName: String(row['name'] ?? row['target'] ?? ''),
-    dependencyType: String(row['type'] ?? ''), duration: Number(row['duration'] ?? 0),
-    success: row['success'] === true || row['success'] === 'True', properties: {},
+    timestamp: String(row["timestamp"] ?? ""),
+    serviceName: String(row["cloud_RoleName"] ?? "unknown"),
+    eventType: "dependency" as const,
+    dependencyName: String(row["name"] ?? row["target"] ?? ""),
+    dependencyType: String(row["type"] ?? ""),
+    duration: Number(row["duration"] ?? 0),
+    success: row["success"] === true || row["success"] === "True",
+    properties: {},
   };
 }
 function mapTrace(row: Record<string, unknown>) {
-  const sev = Number(row['severityLevel'] ?? 1);
+  const sev = Number(row["severityLevel"] ?? 1);
   const isError = sev >= 3;
   return {
-    timestamp: String(row['timestamp'] ?? ''), serviceName: String(row['cloud_RoleName'] ?? row['appName'] ?? 'unknown'),
-    eventType: isError ? 'exception' as const : 'request' as const,
-    exceptionType: isError ? String(row['message'] ?? '').substring(0, 80) : undefined,
-    message: String(row['message'] ?? ''), stackTrace: '',
-    severity: sev >= 4 ? 'critical' as const : sev >= 3 ? 'error' as const : 'warning' as const,
-    operationName: String(row['operation_Name'] ?? row['message'] ?? '').substring(0, 100),
-    duration: 0, responseCode: isError ? 500 : 200, success: !isError, properties: {},
+    timestamp: String(row["timestamp"] ?? ""),
+    serviceName: String(row["cloud_RoleName"] ?? row["appName"] ?? "unknown"),
+    eventType: isError ? ("exception" as const) : ("request" as const),
+    exceptionType: isError
+      ? String(row["message"] ?? "").substring(0, 80)
+      : undefined,
+    message: String(row["message"] ?? ""),
+    stackTrace: "",
+    severity:
+      sev >= 4
+        ? ("critical" as const)
+        : sev >= 3
+          ? ("error" as const)
+          : ("warning" as const),
+    operationName: String(
+      row["operation_Name"] ?? row["message"] ?? "",
+    ).substring(0, 100),
+    duration: 0,
+    responseCode: isError ? 500 : 200,
+    success: !isError,
+    properties: {},
   };
 }
 
 // ── API endpoint ───────────────────────────────────────────────────────────
 
-app.post('/api/analyze', async (req, res) => {
+app.post("/api/analyze", async (req, res) => {
   try {
-    const { appId, apiKey, geminiApiKey, timespan = 'P7D', query: userQuery = 'What caused the recent issues?' } = req.body;
-    if (!appId || !apiKey) return res.status(400).json({ error: 'appId and apiKey are required' });
+    const {
+      appId,
+      apiKey,
+      geminiApiKey,
+      timespan = "P7D",
+      query: userQuery = "What caused the recent issues?",
+    } = req.body;
+    if (!appId || !apiKey)
+      return res.status(400).json({ error: "appId and apiKey are required" });
 
     const steps: any[] = [];
-    const addStep = (name: string, detail: any) => steps.push({ name, ...detail });
+    const addStep = (name: string, detail: any) =>
+      steps.push({ name, ...detail });
 
     // 1. Discover tables
     let tableCounts: Record<string, number> = {};
@@ -144,95 +345,172 @@ app.post('/api/analyze', async (req, res) => {
         let d = dependencies | count | extend table='dependencies';
         let t = traces | count | extend table='traces';
         union e, r, d, t`;
-      const counts = await queryAppInsights(appId, apiKey, countQuery, timespan);
-      for (const row of counts) tableCounts[String(row['table'])] = Number(row['Count'] ?? 0);
+      const counts = await queryAppInsights(
+        appId,
+        apiKey,
+        countQuery,
+        timespan,
+      );
+      for (const row of counts)
+        tableCounts[String(row["table"])] = Number(row["Count"] ?? 0);
     } catch {}
-    addStep('Discovery', { tableCounts });
+    addStep("Discovery", { tableCounts });
 
     // 2. Fetch data
     const [exRows, reqRows, depRows, trRows] = await Promise.all([
-      queryAppInsights(appId, apiKey, 'exceptions | order by timestamp desc | take 500', timespan).catch(() => []),
-      queryAppInsights(appId, apiKey, 'requests | order by timestamp desc | take 500', timespan).catch(() => []),
-      queryAppInsights(appId, apiKey, 'dependencies | order by timestamp desc | take 500', timespan).catch(() => []),
-      queryAppInsights(appId, apiKey, 'traces | where severityLevel >= 2 | order by timestamp desc | take 500', timespan).catch(() => []),
+      queryAppInsights(
+        appId,
+        apiKey,
+        "exceptions | order by timestamp desc | take 500",
+        timespan,
+      ).catch(() => []),
+      queryAppInsights(
+        appId,
+        apiKey,
+        "requests | order by timestamp desc | take 500",
+        timespan,
+      ).catch(() => []),
+      queryAppInsights(
+        appId,
+        apiKey,
+        "dependencies | order by timestamp desc | take 500",
+        timespan,
+      ).catch(() => []),
+      queryAppInsights(
+        appId,
+        apiKey,
+        "traces | where severityLevel >= 2 | order by timestamp desc | take 500",
+        timespan,
+      ).catch(() => []),
     ]);
 
     const exceptions = exRows.map(mapException);
     const requests = reqRows.map(mapRequest);
     const dependencies = depRows.map(mapDependency);
     const traces = trRows.map(mapTrace);
-    const traceExceptions = traces.filter(t => t.eventType === 'exception');
-    const traceRequests = traces.filter(t => t.eventType === 'request');
+    const traceExceptions = traces.filter((t) => t.eventType === "exception");
+    const traceRequests = traces.filter((t) => t.eventType === "request");
 
-    addStep('Fetch', {
-      exceptions: exceptions.length, requests: requests.length,
-      dependencies: dependencies.length, traces: trRows.length,
-      traceErrors: traceExceptions.length, traceInfo: traceRequests.length,
+    addStep("Fetch", {
+      exceptions: exceptions.length,
+      requests: requests.length,
+      dependencies: dependencies.length,
+      traces: trRows.length,
+      traceErrors: traceExceptions.length,
+      traceInfo: traceRequests.length,
     });
 
     const allExceptions = [...exceptions, ...traceExceptions];
     const allRequests = [...requests, ...traceRequests];
 
-    if (allExceptions.length === 0 && allRequests.length === 0 && dependencies.length === 0) {
-      return res.json({ steps, error: 'No telemetry data found for the given time range.' });
+    if (
+      allExceptions.length === 0 &&
+      allRequests.length === 0 &&
+      dependencies.length === 0
+    ) {
+      return res.json({
+        steps,
+        error: "No telemetry data found for the given time range.",
+      });
     }
 
     // 3. Normalize
     const normalizer = new TelemetryNormalizer();
-    const telemetry = normalizer.normalize({ exceptions: allExceptions, requests: allRequests, dependencies, deployments: [] });
-    addStep('Normalize', { totalEvents: telemetry.events.length });
+    const telemetry = normalizer.normalize({
+      exceptions: allExceptions,
+      requests: allRequests,
+      dependencies,
+      deployments: [],
+    });
+    addStep("Normalize", { totalEvents: telemetry.events.length });
 
     // 4. Baseline & anomalies
     const tsBuilder = new TimeSeriesBuilder();
-    const timeSeries = tsBuilder.buildTimeSeries(telemetry.events, '5m');
-    const baseline = new BaselineCalculator().calculateBaseline('errorRate', timeSeries, 'mean');
-    const anomalies = new AnomalyDetector().detectAnomalies(timeSeries, baseline, 2);
+    const timeSeries = tsBuilder.buildTimeSeries(telemetry.events, "5m");
+    const baseline = new BaselineCalculator().calculateBaseline(
+      "errorRate",
+      timeSeries,
+      "mean",
+    );
+    const anomalies = new AnomalyDetector().detectAnomalies(
+      timeSeries,
+      baseline,
+      2,
+    );
     const ranked = new SeverityRanker().rankAnomaliesBySeverity(anomalies);
-    addStep('Anomalies', { baseline: { mean: baseline.mean, stdDev: baseline.standardDeviation }, count: ranked.length, anomalies: ranked.slice(0, 10) });
+    addStep("Anomalies", {
+      baseline: { mean: baseline.mean, stdDev: baseline.standardDeviation },
+      count: ranked.length,
+      anomalies: ranked.slice(0, 10),
+    });
 
     // 5. Correlation
     const groups = new TemporalCorrelator().correlateTemporal(telemetry.events);
     const causalGraph = new CausalGraphBuilder().buildCausalGraph(groups);
-    addStep('Correlation', { groups: groups.length, nodes: causalGraph.nodes.length, edges: causalGraph.edges.length });
+    addStep("Correlation", {
+      groups: groups.length,
+      nodes: causalGraph.nodes.length,
+      edges: causalGraph.edges.length,
+    });
 
     // 6. Root causes (enhanced detailed analysis)
     const analyzer = new CausalAnalyzer();
-    const detailedAnalyses = analyzer.identifyRootCausesDetailed(causalGraph, ranked, []);
+    const detailedAnalyses = analyzer.identifyRootCausesDetailed(
+      causalGraph,
+      ranked,
+      [],
+    );
     const rootCauses = detailedAnalyses.map((a) => a.rootCause);
 
     // Group root causes by category + service
     const rcGroupMap = new Map<string, typeof detailedAnalyses>();
     for (const a of detailedAnalyses) {
-      const svc = a.affectedServices?.[0] || a.rootCause.explanation?.match(/service[:\s]+(\S+)/i)?.[1] || 'unknown';
+      const svc =
+        a.affectedServices?.[0] ||
+        a.rootCause.explanation?.match(/service[:\s]+(\S+)/i)?.[1] ||
+        "unknown";
       const key = `${a.rootCause.category}||${svc}`;
       if (!rcGroupMap.has(key)) rcGroupMap.set(key, []);
       rcGroupMap.get(key)!.push(a);
     }
-    const groupedRootCauses = [...rcGroupMap.entries()].map(([key, items]) => {
-      const best = items.reduce((a, b) => a.rootCause.confidence > b.rootCause.confidence ? a : b);
-      const allServices = [...new Set(items.flatMap(i => i.affectedServices || []))];
-      const allExTypes = [...new Set(items.flatMap(i => i.relatedExceptionTypes || []))];
-      const category = best.rootCause.category;
-      const { problem, fix } = generateProblemAndFix(category, allExTypes, allServices, best);
-      return {
-        count: items.length,
-        category,
-        confidence: best.rootCause.confidence,
-        explanation: best.rootCause.explanation,
-        problem,
-        fix,
-        propagationDepth: Math.max(...items.map(i => i.propagationDepth)),
-        fanOut: Math.max(...items.map(i => i.fanOut)),
-        affectedServiceCount: allServices.length,
-        affectedServices: allServices,
-        errorFrequency: items.reduce((s, i) => s + i.errorFrequency, 0),
-        relatedExceptionTypes: allExTypes.slice(0, 8),
-        timeToImpact: best.timeToImpact,
-        evidenceBreakdown: best.evidenceBreakdown,
-      };
-    }).sort((a, b) => b.confidence - a.confidence);
+    const groupedRootCauses = [...rcGroupMap.entries()]
+      .map(([key, items]) => {
+        const best = items.reduce((a, b) =>
+          a.rootCause.confidence > b.rootCause.confidence ? a : b,
+        );
+        const allServices = [
+          ...new Set(items.flatMap((i) => i.affectedServices || [])),
+        ];
+        const allExTypes = [
+          ...new Set(items.flatMap((i) => i.relatedExceptionTypes || [])),
+        ];
+        const category = best.rootCause.category;
+        const { problem, fix } = generateProblemAndFix(
+          category,
+          allExTypes,
+          allServices,
+          best,
+        );
+        return {
+          count: items.length,
+          category,
+          confidence: best.rootCause.confidence,
+          explanation: best.rootCause.explanation,
+          problem,
+          fix,
+          propagationDepth: Math.max(...items.map((i) => i.propagationDepth)),
+          fanOut: Math.max(...items.map((i) => i.fanOut)),
+          affectedServiceCount: allServices.length,
+          affectedServices: allServices,
+          errorFrequency: items.reduce((s, i) => s + i.errorFrequency, 0),
+          relatedExceptionTypes: allExTypes.slice(0, 8),
+          timeToImpact: best.timeToImpact,
+          evidenceBreakdown: best.evidenceBreakdown,
+        };
+      })
+      .sort((a, b) => b.confidence - a.confidence);
 
-    addStep('RootCauses', {
+    addStep("RootCauses", {
       count: rootCauses.length,
       rootCauses,
       groupedRootCauses,
@@ -253,13 +531,16 @@ app.post('/api/analyze', async (req, res) => {
     });
 
     // 7. Merged Issues — combine error groups with symptom context, deduplicated
-    const rawSymptoms = new CascadeAnalyzer().identifySymptoms(causalGraph, rootCauses);
+    const rawSymptoms = new CascadeAnalyzer().identifySymptoms(
+      causalGraph,
+      rootCauses,
+    );
     const errorGroups = groupErrors(telemetry.events);
 
     // Build a lookup: serviceName -> linked root cause IDs from symptoms
     const symptomRcMap = new Map<string, Set<string>>();
     for (const sym of rawSymptoms) {
-      const svc = (sym as any).event?.serviceName || '';
+      const svc = (sym as any).event?.serviceName || "";
       if (!symptomRcMap.has(svc)) symptomRcMap.set(svc, new Set());
       symptomRcMap.get(svc)!.add(sym.linkedRootCause);
     }
@@ -270,44 +551,56 @@ app.post('/api/analyze', async (req, res) => {
       const isDownstream = linkedRcIds.size > 0;
       // Find the matching root cause explanation for linked issues
       const linkedRc = isDownstream
-        ? rootCauses.find(rc => linkedRcIds.has(rc.id))
+        ? rootCauses.find((rc) => linkedRcIds.has(rc.id))
         : null;
       return {
         ...eg,
         isDownstream,
-        linkedRootCause: linkedRc ? linkedRc.explanation?.substring(0, 120) : null,
+        linkedRootCause: linkedRc
+          ? linkedRc.explanation?.substring(0, 120)
+          : null,
         linkedRootCauseCategory: linkedRc?.category || null,
       };
     });
 
-    addStep('Issues', {
+    addStep("Issues", {
       totalErrors: issues.reduce((s, g) => s + g.count, 0),
       uniqueGroups: issues.length,
-      rootCauseErrors: issues.filter(i => !i.isDownstream).length,
-      downstreamErrors: issues.filter(i => i.isDownstream).length,
+      rootCauseErrors: issues.filter((i) => !i.isDownstream).length,
+      downstreamErrors: issues.filter((i) => i.isDownstream).length,
       issues,
     });
 
     // 7b. Session & Login Exceptions — highlight errors from SessionController / Login methods
-    const sessionLoginKeywords = ['session', 'login', 'signin', 'sign_in', 'authenticate', 'sessioncontroller', 'logon'];
+    const sessionLoginKeywords = [
+      "session",
+      "login",
+      "signin",
+      "sign_in",
+      "authenticate",
+      "sessioncontroller",
+      "logon",
+    ];
     const sessionLoginExceptions: any[] = [];
     for (const e of telemetry.events) {
-      if (e.eventType !== 'exception') continue;
+      if (e.eventType !== "exception") continue;
       const searchText = [
-        (e as any).exceptionType || '',
-        (e as any).message || '',
-        (e as any).operationName || '',
-        e.serviceName || '',
-        (e as any).stackTrace || '',
-      ].join(' ').toLowerCase();
-      if (sessionLoginKeywords.some(kw => searchText.includes(kw))) {
+        (e as any).exceptionType || "",
+        (e as any).message || "",
+        (e as any).operationName || "",
+        e.serviceName || "",
+        (e as any).stackTrace || "",
+      ]
+        .join(" ")
+        .toLowerCase();
+      if (sessionLoginKeywords.some((kw) => searchText.includes(kw))) {
         sessionLoginExceptions.push(e);
       }
     }
     // Group them the same way as regular errors
     const sessionLoginGroups = groupErrors(sessionLoginExceptions);
     if (sessionLoginGroups.length > 0) {
-      addStep('SessionLoginExceptions', {
+      addStep("SessionLoginExceptions", {
         totalErrors: sessionLoginGroups.reduce((s, g) => s + g.count, 0),
         uniqueGroups: sessionLoginGroups.length,
         groups: sessionLoginGroups,
@@ -315,40 +608,65 @@ app.post('/api/analyze', async (req, res) => {
     }
 
     // 8. Recommendations (deduplicated)
-    const affectedServices = [...new Set(telemetry.events.map(e => e.serviceName))];
-    const recs = new RecommendationGenerator().generateRecommendations(rootCauses, { affectedServices });
-    const prioritized = new RecommendationGenerator().prioritizeRecommendations(recs);
+    const affectedServices = [
+      ...new Set(telemetry.events.map((e) => e.serviceName)),
+    ];
+    const recs = new RecommendationGenerator().generateRecommendations(
+      rootCauses,
+      { affectedServices },
+    );
+    const prioritized = new RecommendationGenerator().prioritizeRecommendations(
+      recs,
+    );
     // Deduplicate recommendations by normalized action text
     const seenActions = new Set<string>();
-    const dedupedRecs = prioritized.filter((r) => {
-      const key = (r.action || '').toLowerCase().replace(/\s+/g, ' ').trim();
-      if (seenActions.has(key)) return false;
-      seenActions.add(key);
-      return true;
-    }).map((r, i) => ({ ...r, priority: i + 1 }));
-    addStep('Recommendations', { count: dedupedRecs.length, recommendations: dedupedRecs });
+    const dedupedRecs = prioritized
+      .filter((r) => {
+        const key = (r.action || "").toLowerCase().replace(/\s+/g, " ").trim();
+        if (seenActions.has(key)) return false;
+        seenActions.add(key);
+        return true;
+      })
+      .map((r, i) => ({ ...r, priority: i + 1 }));
+    addStep("Recommendations", {
+      count: dedupedRecs.length,
+      recommendations: dedupedRecs,
+    });
 
     // 10. AI narrative (Gemini Flash) — optional, only runs if geminiApiKey is provided
     let aiNarrative: string | null = null;
     if (geminiApiKey) {
       try {
-        const llmClient = new LLMClient({ apiKey: geminiApiKey, provider: 'gemini', model: 'gemini-2.0-flash' });
-        const reasoningEngine = new ReasoningEngine(llmClient, new PromptBuilder());
+        const llmClient = new LLMClient({
+          apiKey: geminiApiKey,
+          provider: "gemini",
+          model: "gemini-2.0-flash",
+        });
+        const reasoningEngine = new ReasoningEngine(
+          llmClient,
+          new PromptBuilder(),
+        );
         const now2 = new Date();
         const start2 = new Date(now2.getTime() - parseDuration(timespan));
         const aiAnalysis = await reasoningEngine.analyzeIncident({
           timeRange: { start: start2, end: now2 },
           affectedServices,
-          severity: ranked.length > 0 ? ranked[0].severity : 'medium',
+          severity: ranked.length > 0 ? ranked[0].severity : "medium",
           anomalies: ranked,
           correlations: groups,
           rootCauseCandidates: rootCauses,
           symptoms: rawSymptoms,
         });
         aiNarrative = aiAnalysis.explanation;
-        addStep('AIInsights', { model: 'gemini-2.0-flash', narrative: aiNarrative });
+        addStep("AIInsights", {
+          model: "gemini-2.0-flash",
+          narrative: aiNarrative,
+        });
       } catch (aiErr: any) {
-        addStep('AIInsights', { model: 'gemini-2.0-flash', error: aiErr.message });
+        addStep("AIInsights", {
+          model: "gemini-2.0-flash",
+          error: aiErr.message,
+        });
       }
     }
 
@@ -356,58 +674,188 @@ app.post('/api/analyze', async (req, res) => {
     const now = new Date();
     const start = new Date(now.getTime() - parseDuration(timespan));
     const report = new ReportFormatter(new TimelineBuilder()).generateReport({
-      incidentId: `INC-${now.toISOString().slice(0, 10).replace(/-/g, '')}`,
-      summary: aiNarrative ?? (rootCauses.length > 0 ? rootCauses[0].explanation : 'No clear root cause identified.'),
-      timeRange: { start, end: now }, affectedServices, events: telemetry.events,
-      rootCauses, symptoms: rawSymptoms, recommendations: dedupedRecs, evidence: [],
+      incidentId: `INC-${now.toISOString().slice(0, 10).replace(/-/g, "")}`,
+      summary:
+        aiNarrative ??
+        (rootCauses.length > 0
+          ? rootCauses[0].explanation
+          : "No clear root cause identified."),
+      timeRange: { start, end: now },
+      affectedServices,
+      events: telemetry.events,
+      rootCauses,
+      symptoms: rawSymptoms,
+      recommendations: dedupedRecs,
+      evidence: [],
     });
 
     const markdown = new MarkdownRenderer().renderAsMarkdown(report);
     const parsed = parseQuery(userQuery);
     const nlResponse = formatResponse(report, parsed);
 
-    addStep('Report', { incidentId: report.incidentId });
+    addStep("Report", { incidentId: report.incidentId });
 
-    const responseData = { steps, report, markdown, nlResponse, affectedServices, aiNarrative };
-    saveReport('incident', report.incidentId, responseData);
+    const responseData = {
+      steps,
+      report,
+      markdown,
+      nlResponse,
+      affectedServices,
+      aiNarrative,
+    };
+    saveReport("incident", report.incidentId, responseData);
 
     res.json(responseData);
   } catch (err: any) {
-    res.status(500).json({ error: err.message ?? 'Internal server error' });
+    res.status(500).json({ error: err.message ?? "Internal server error" });
   }
 });
 
 // ── Import Pipeline Analyzer endpoint ─────────────────────────────────────
 
-app.post('/api/import-analyze', async (req, res) => {
+app.post("/api/import-analyze", async (req, res) => {
+  const start = Date.now();
   try {
-    const { appId, apiKey, question, clientFileUploadId } = req.body;
-    if (!appId || !apiKey) return res.status(400).json({ error: 'appId and apiKey are required' });
-
-    // Accept either clientFileUploadId directly or extract from question
+    const {
+      appId,
+      apiKey,
+      question,
+      clientFileUploadId,
+      saveIndividualReports = true,
+    } = req.body;
     const idToUse = clientFileUploadId || question;
-    if (!idToUse) return res.status(400).json({ error: 'clientFileUploadId is required' });
+    console.log(`[API] Analysis Request: ${idToUse}`);
 
-    const queryFn = (kql: string) => queryAppInsights(appId, apiKey, kql.trim(), 'P90D');
+    if (!appId || !apiKey)
+      return res.status(400).json({ error: "appId and apiKey are required" });
+    if (!idToUse)
+      return res.status(400).json({ error: "clientFileUploadId is required" });
+
+    const queryFn = (kql: string) =>
+      queryAppInsights(appId, apiKey, kql.trim(), "P90D");
     const orchestrator = new ImportOrchestrator(queryFn);
     const result = await orchestrator.answer(idToUse);
 
-    // Generate plain-English answer to the question
-    const plainAnswer = question && question.trim()
-      ? generatePlainAnswer(question.trim(), result.primary)
-      : null;
+    // ... rest of logic
+    const plainAnswer =
+      question && question.trim()
+        ? generatePlainAnswer(question.trim(), result.primary)
+        : null;
 
     const responseData = { ...result, plainAnswer };
-    saveReport('import', result.primary.clientFileUploadId, responseData);
 
+    if (saveIndividualReports) {
+      saveReport("import", result.primary.clientFileUploadId, responseData);
+      const bucket = Math.floor((result.primary.rowCount ?? 0) / 5000) * 5000;
+      await reportRepo.saveReport({
+        clientFileUploadId: result.primary.clientFileUploadId,
+        rowCount: result.primary.rowCount,
+        sizeBucket: bucket,
+        timestamp: new Date().toISOString(),
+        analysisJson: JSON.stringify(result.primary),
+      });
+    }
+
+    const duration = ((Date.now() - start) / 1000).toFixed(1);
+    console.log(`[API] Analysis Complete: ${idToUse} in ${duration}s`);
     res.json(responseData);
   } catch (err: any) {
-    res.status(500).json({ error: err.message ?? 'Internal server error' });
+    console.error(`[API] Analysis Failed: ${err.message}`);
+    res.status(500).json({ error: err.message ?? "Internal server error" });
+  }
+});
+
+// ── Manual Comparison Studio Endpoints ────────────────────────────────────
+
+/** Fetch list of imports for a date range */
+app.post("/api/import-list", async (req, res) => {
+  try {
+    const { appId, apiKey, startDate, endDate } = req.body;
+    if (!appId || !apiKey)
+      return res.status(400).json({ error: "appId and apiKey are required" });
+
+    const t1 = new Date(startDate).toISOString();
+    const t2 = new Date(
+      new Date(endDate).setHours(23, 59, 59, 999),
+    ).toISOString();
+
+    const kql = `
+      traces
+      | where timestamp between (datetime('${t1}') .. datetime('${t2}'))
+      | where message contains 'ValidateGenericUpdateContent' and message contains 'started'
+      | project timestamp, message
+      | order by timestamp desc
+    `;
+    const rows = await queryAppInsights(appId, apiKey, kql, "P90D");
+
+    const uuidRegex =
+      /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi;
+    const imports = rows
+      .map((r) => {
+        const match = r.message.match(uuidRegex);
+        return {
+          timestamp: r.timestamp,
+          clientFileUploadId: match ? match[0].toLowerCase() : "unknown",
+          message: r.message,
+        };
+      })
+      .filter((i) => i.clientFileUploadId !== "unknown");
+
+    res.json({ imports });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message ?? "Internal server error" });
+  }
+});
+
+/** Fetch full run history from SQLite */
+app.get("/api/import-history", async (req, res) => {
+  try {
+    const limit = parseInt(req.query.limit as string) || 100;
+    const history = await reportRepo.getAllHistory(limit);
+    res.json({ history });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message ?? "Internal server error" });
+  }
+});
+
+/** Fetch bucket baseline with source file list */
+app.get("/api/import-baseline", async (req, res) => {
+  try {
+    const bucket = parseInt(req.query.bucket as string);
+    if (isNaN(bucket))
+      return res.status(400).json({ error: "bucket parameter is required" });
+
+    const baseline = await reportRepo.getBucketAverages(bucket, 30); // 30 day baseline
+    res.json({ baseline });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message ?? "Internal server error" });
+  }
+});
+
+/** Generate a comparison against baseline for a specific ID */
+app.post("/api/import-compare-baseline", async (req, res) => {
+  try {
+    const { id } = req.body;
+    const report = await reportRepo.getReportByUploadId(id);
+    if (!report) return res.status(404).json({ error: "Report not found" });
+
+    const analysis = JSON.parse(report.analysisJson);
+    const baseline = await reportRepo.getBucketAverages(report.sizeBucket, 30);
+
+    if (!baseline)
+      return res
+        .status(404)
+        .json({ error: "No baseline data for this size bucket" });
+
+    const comparison = compareAgainstBaseline(analysis, baseline);
+    res.json({ comparison });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message ?? "Internal server error" });
   }
 });
 
 function generatePlainAnswer(question: string, analysis: any): string {
-  if (!analysis) return 'No data available to answer this question.';
+  if (!analysis) return "No data available to answer this question.";
   const q = question.toLowerCase();
   const lines: string[] = [];
   const id = analysis.clientFileUploadId;
@@ -417,68 +865,93 @@ function generatePlainAnswer(question: string, analysis: any): string {
   const counts = analysis.countsSummary;
 
   // Time per step
-  if (q.includes('time') || q.includes('how long') || q.includes('duration') || q.includes('took') || q.includes('each step')) {
+  if (
+    q.includes("time") ||
+    q.includes("how long") ||
+    q.includes("duration") ||
+    q.includes("took") ||
+    q.includes("each step")
+  ) {
     lines.push(`For import ${id}:`);
     if (steps.length > 0) {
       for (const s of steps) {
-        const flag = s.flag !== 'ok' ? ` ⚠ (${s.flag})` : '';
+        const flag = s.flag !== "ok" ? ` ⚠ (${s.flag})` : "";
         lines.push(`  • ${s.stepName}: ${fmtMsServer(s.durationMs)}${flag}`);
       }
       if (totalMs > 0) lines.push(`  Total estimated: ${fmtMsServer(totalMs)}`);
     } else {
-      lines.push('  No step timing data found.');
+      lines.push("  No step timing data found.");
     }
   }
 
   // Slow steps
-  if (q.includes('slow') || q.includes('too much') || q.includes('bottleneck') || q.includes('issue') || q.includes('problem')) {
-    const slow = steps.filter((s: any) => s.flag !== 'ok');
+  if (
+    q.includes("slow") ||
+    q.includes("too much") ||
+    q.includes("bottleneck") ||
+    q.includes("issue") ||
+    q.includes("problem")
+  ) {
+    const slow = steps.filter((s: any) => s.flag !== "ok");
     if (slow.length > 0) {
       lines.push(`Slow steps detected:`);
       for (const s of slow) {
-        lines.push(`  • ${s.stepName} took ${fmtMsServer(s.durationMs)} — ${s.note ?? s.flag}`);
+        lines.push(
+          `  • ${s.stepName} took ${fmtMsServer(s.durationMs)} — ${s.note ?? s.flag}`,
+        );
       }
     } else {
-      lines.push('No unusually slow steps detected.');
+      lines.push("No unusually slow steps detected.");
     }
     const insights = analysis.insights ?? [];
     for (const ins of insights) {
-      if (ins.startsWith('⚠️') || ins.startsWith('❌')) lines.push(ins);
+      if (ins.startsWith("⚠️") || ins.startsWith("❌")) lines.push(ins);
     }
   }
 
   // Data count
-  if (q.includes('count') || q.includes('how many') || q.includes('data') || q.includes('rows') || q.includes('records')) {
+  if (
+    q.includes("count") ||
+    q.includes("how many") ||
+    q.includes("data") ||
+    q.includes("rows") ||
+    q.includes("records")
+  ) {
     lines.push(`Data counts: ${counts}`);
     if (rows) lines.push(`File had ${rows.toLocaleString()} rows.`);
   }
 
   // Errors
-  if (q.includes('error') || q.includes('fail') || q.includes('exception')) {
-    const errInsights = (analysis.insights ?? []).filter((i: string) => i.startsWith('❌'));
+  if (q.includes("error") || q.includes("fail") || q.includes("exception")) {
+    const errInsights = (analysis.insights ?? []).filter((i: string) =>
+      i.startsWith("❌"),
+    );
     if (errInsights.length > 0) {
       for (const e of errInsights) lines.push(e);
     } else {
-      lines.push('No errors found for this import.');
+      lines.push("No errors found for this import.");
     }
   }
 
   // Comparison — handled separately in comparison mode, but catch the question
-  if (q.includes('compar') || q.includes('vs') || q.includes('difference')) {
-    lines.push('To compare two imports, include both UUIDs in the Client File Upload ID field (comma-separated or space-separated).');
+  if (q.includes("compar") || q.includes("vs") || q.includes("difference")) {
+    lines.push(
+      "To compare two imports, include both UUIDs in the Client File Upload ID field (comma-separated or space-separated).",
+    );
   }
 
   if (lines.length === 0) {
     // Generic fallback — summarise what we know
     lines.push(`Import ${id}:`);
     if (rows) lines.push(`  • ${rows.toLocaleString()} rows in file`);
-    if (totalMs > 0) lines.push(`  • Total processing time: ${fmtMsServer(totalMs)}`);
+    if (totalMs > 0)
+      lines.push(`  • Total processing time: ${fmtMsServer(totalMs)}`);
     lines.push(`  • ${counts}`);
     const insights = analysis.insights ?? [];
     for (const ins of insights.slice(0, 3)) lines.push(`  • ${ins}`);
   }
 
-  return lines.join('\n');
+  return lines.join("\n");
 }
 
 function fmtMsServer(ms: number): string {
@@ -491,118 +964,152 @@ function generateProblemAndFix(
   category: string,
   exceptionTypes: string[],
   affectedServices: string[],
-  analysis: { rootCause: any; propagationDepth: number; errorFrequency: number; fanOut: number },
+  analysis: {
+    rootCause: any;
+    propagationDepth: number;
+    errorFrequency: number;
+    fanOut: number;
+  },
 ): { problem: string; fix: string } {
-  const svcList = affectedServices.length > 0 ? affectedServices.slice(0, 3).join(', ') : 'unknown service';
-  const exList = exceptionTypes.length > 0 ? exceptionTypes.slice(0, 2).join(', ') : '';
+  const svcList =
+    affectedServices.length > 0
+      ? affectedServices.slice(0, 3).join(", ")
+      : "unknown service";
+  const exList =
+    exceptionTypes.length > 0 ? exceptionTypes.slice(0, 2).join(", ") : "";
   const event = analysis.rootCause.event;
-  const msg = (event?.message || event?.exceptionType || '').substring(0, 120);
+  const msg = (event?.message || event?.exceptionType || "").substring(0, 120);
 
   // Detect specific patterns from exception messages
-  const msgLower = (msg + ' ' + exList).toLowerCase();
-  const hasTimeout = msgLower.includes('timeout') || msgLower.includes('timed out');
-  const hasConnection = msgLower.includes('connection') || msgLower.includes('refused') || msgLower.includes('econnrefused');
-  const hasMemory = msgLower.includes('memory') || msgLower.includes('heap') || msgLower.includes('oom');
-  const hasCpu = msgLower.includes('cpu') || msgLower.includes('throttl');
-  const hasPool = msgLower.includes('pool') || msgLower.includes('exhausted');
-  const hasNull = msgLower.includes('null') || msgLower.includes('undefined') || msgLower.includes('cannot read');
-  const hasAuth = msgLower.includes('auth') || msgLower.includes('401') || msgLower.includes('403') || msgLower.includes('forbidden');
-  const has404 = msgLower.includes('404') || msgLower.includes('not found');
-  const has500 = msgLower.includes('500') || msgLower.includes('internal server');
-  const hasDb = msgLower.includes('sql') || msgLower.includes('database') || msgLower.includes('deadlock') || msgLower.includes('query');
-  const hasDisk = msgLower.includes('disk') || msgLower.includes('storage') || msgLower.includes('no space');
+  const msgLower = (msg + " " + exList).toLowerCase();
+  const hasTimeout =
+    msgLower.includes("timeout") || msgLower.includes("timed out");
+  const hasConnection =
+    msgLower.includes("connection") ||
+    msgLower.includes("refused") ||
+    msgLower.includes("econnrefused");
+  const hasMemory =
+    msgLower.includes("memory") ||
+    msgLower.includes("heap") ||
+    msgLower.includes("oom");
+  const hasCpu = msgLower.includes("cpu") || msgLower.includes("throttl");
+  const hasPool = msgLower.includes("pool") || msgLower.includes("exhausted");
+  const hasNull =
+    msgLower.includes("null") ||
+    msgLower.includes("undefined") ||
+    msgLower.includes("cannot read");
+  const hasAuth =
+    msgLower.includes("auth") ||
+    msgLower.includes("401") ||
+    msgLower.includes("403") ||
+    msgLower.includes("forbidden");
+  const has404 = msgLower.includes("404") || msgLower.includes("not found");
+  const has500 =
+    msgLower.includes("500") || msgLower.includes("internal server");
+  const hasDb =
+    msgLower.includes("sql") ||
+    msgLower.includes("database") ||
+    msgLower.includes("deadlock") ||
+    msgLower.includes("query");
+  const hasDisk =
+    msgLower.includes("disk") ||
+    msgLower.includes("storage") ||
+    msgLower.includes("no space");
 
   // Build problem + fix based on category and detected patterns
   switch (category) {
-    case 'deployment': {
-      const problem = `A recent deployment introduced failures in ${svcList}.${msg ? ` Error: "${msg}".` : ''} The issue appeared shortly after the deployment and cascaded to ${analysis.propagationDepth} downstream service(s).`;
+    case "deployment": {
+      const problem = `A recent deployment introduced failures in ${svcList}.${msg ? ` Error: "${msg}".` : ""} The issue appeared shortly after the deployment and cascaded to ${analysis.propagationDepth} downstream service(s).`;
       const fix = `1. Roll back the most recent deployment to the last known good version.\n2. Review the deployment diff for breaking changes, configuration mismatches, or missing environment variables.\n3. Add pre-deployment smoke tests and canary deployment strategy to catch regressions early.\n4. Verify all dependent service contracts are still compatible.`;
       return { problem, fix };
     }
-    case 'dependency': {
+    case "dependency": {
       let problem = `An external dependency failure is impacting ${svcList}.`;
-      let fix = '';
+      let fix = "";
       if (hasTimeout) {
-        problem += ` Requests to the dependency are timing out, causing cascading delays.${msg ? ` Error: "${msg}".` : ''}`;
+        problem += ` Requests to the dependency are timing out, causing cascading delays.${msg ? ` Error: "${msg}".` : ""}`;
         fix = `1. Increase timeout thresholds or add adaptive timeouts based on P99 latency.\n2. Implement circuit breaker pattern to fail fast when the dependency is unhealthy.\n3. Add retry with exponential backoff for transient failures.\n4. Consider adding a fallback/cache layer for degraded mode operation.`;
       } else if (hasConnection) {
-        problem += ` The service cannot establish connections to the dependency.${msg ? ` Error: "${msg}".` : ''}`;
+        problem += ` The service cannot establish connections to the dependency.${msg ? ` Error: "${msg}".` : ""}`;
         fix = `1. Verify the dependency endpoint is reachable (DNS, firewall, network policies).\n2. Check if the dependency service is running and healthy.\n3. Review connection pool settings — pool may be exhausted.\n4. Add health checks and automatic failover to a secondary endpoint if available.`;
       } else if (hasDb) {
-        problem += ` Database operations are failing or degraded.${msg ? ` Error: "${msg}".` : ''}`;
+        problem += ` Database operations are failing or degraded.${msg ? ` Error: "${msg}".` : ""}`;
         fix = `1. Check database server health, connection limits, and active locks/deadlocks.\n2. Review slow query logs and optimize problematic queries.\n3. Increase connection pool size if connections are being exhausted.\n4. Consider read replicas or caching to reduce database load.`;
       } else {
-        problem += `${msg ? ` Error: "${msg}".` : ''} ${exList ? `Related exceptions: ${exList}.` : ''}`;
+        problem += `${msg ? ` Error: "${msg}".` : ""} ${exList ? `Related exceptions: ${exList}.` : ""}`;
         fix = `1. Check the health and availability of the external dependency.\n2. Implement circuit breaker and retry patterns with exponential backoff.\n3. Add fallback behavior for when the dependency is unavailable.\n4. Set up monitoring and alerts on dependency response times and error rates.`;
       }
       return { problem, fix };
     }
-    case 'resource': {
+    case "resource": {
       let problem = `Resource exhaustion detected in ${svcList}.`;
-      let fix = '';
+      let fix = "";
       if (hasMemory) {
-        problem += ` The service is running out of memory, likely due to a memory leak or excessive allocation.${msg ? ` Error: "${msg}".` : ''}`;
+        problem += ` The service is running out of memory, likely due to a memory leak or excessive allocation.${msg ? ` Error: "${msg}".` : ""}`;
         fix = `1. Capture a heap dump and analyze for memory leaks (large retained objects, growing collections).\n2. Increase memory limits as a short-term mitigation.\n3. Review recent code changes for unbounded caches, event listener leaks, or large payload processing.\n4. Add memory usage monitoring with alerts at 80% threshold.`;
       } else if (hasCpu) {
-        problem += ` CPU utilization is critically high, causing request processing delays.${msg ? ` Error: "${msg}".` : ''}`;
+        problem += ` CPU utilization is critically high, causing request processing delays.${msg ? ` Error: "${msg}".` : ""}`;
         fix = `1. Profile the application to identify CPU-intensive operations (hot loops, inefficient algorithms).\n2. Scale horizontally by adding more instances.\n3. Offload heavy computation to background workers or async queues.\n4. Review and optimize any regex patterns, serialization, or cryptographic operations.`;
       } else if (hasPool) {
-        problem += ` Connection or thread pool is exhausted — no resources available to handle new requests.${msg ? ` Error: "${msg}".` : ''}`;
+        problem += ` Connection or thread pool is exhausted — no resources available to handle new requests.${msg ? ` Error: "${msg}".` : ""}`;
         fix = `1. Increase pool size limits and review pool configuration.\n2. Investigate why connections/threads are not being released (long-running queries, missing close/dispose calls).\n3. Add connection pool monitoring and set up alerts.\n4. Implement request queuing with backpressure to prevent pool starvation.`;
       } else if (hasDisk) {
-        problem += ` Disk space or storage is running low.${msg ? ` Error: "${msg}".` : ''}`;
+        problem += ` Disk space or storage is running low.${msg ? ` Error: "${msg}".` : ""}`;
         fix = `1. Free up disk space by cleaning logs, temp files, and old artifacts.\n2. Increase storage allocation or enable auto-scaling for storage.\n3. Implement log rotation and retention policies.\n4. Move large data to object storage (S3, Blob Storage).`;
       } else if (hasTimeout) {
-        problem += ` Operations are timing out due to resource contention.${msg ? ` Error: "${msg}".` : ''}`;
+        problem += ` Operations are timing out due to resource contention.${msg ? ` Error: "${msg}".` : ""}`;
         fix = `1. Identify the bottleneck resource (CPU, memory, I/O, network).\n2. Scale the service vertically or horizontally.\n3. Optimize slow operations and add caching where appropriate.\n4. Implement request prioritization and load shedding.`;
       } else {
-        problem += `${msg ? ` Error: "${msg}".` : ''} The service is under resource pressure affecting reliability.`;
+        problem += `${msg ? ` Error: "${msg}".` : ""} The service is under resource pressure affecting reliability.`;
         fix = `1. Review resource utilization metrics (CPU, memory, disk, network).\n2. Scale the affected service(s) to handle current load.\n3. Identify and optimize resource-intensive operations.\n4. Set up auto-scaling policies based on resource utilization thresholds.`;
       }
       return { problem, fix };
     }
-    case 'code': {
+    case "code": {
       let problem = `A code-level error is occurring in ${svcList}.`;
-      let fix = '';
+      let fix = "";
       if (hasNull) {
-        problem += ` Null reference or undefined value errors indicate missing data validation.${msg ? ` Error: "${msg}".` : ''}`;
+        problem += ` Null reference or undefined value errors indicate missing data validation.${msg ? ` Error: "${msg}".` : ""}`;
         fix = `1. Add null checks and input validation at service boundaries.\n2. Review the call stack to identify which data path returns null/undefined unexpectedly.\n3. Add defensive coding patterns (optional chaining, default values).\n4. Write unit tests covering edge cases with missing or malformed data.`;
       } else if (hasAuth) {
-        problem += ` Authentication or authorization failures are blocking requests.${msg ? ` Error: "${msg}".` : ''}`;
+        problem += ` Authentication or authorization failures are blocking requests.${msg ? ` Error: "${msg}".` : ""}`;
         fix = `1. Verify API keys, tokens, and credentials are valid and not expired.\n2. Check if permissions/roles have been changed recently.\n3. Review auth middleware configuration and token refresh logic.\n4. Ensure secrets are properly configured in all environments.`;
       } else if (has404) {
-        problem += ` Requests are hitting endpoints or resources that don't exist.${msg ? ` Error: "${msg}".` : ''}`;
+        problem += ` Requests are hitting endpoints or resources that don't exist.${msg ? ` Error: "${msg}".` : ""}`;
         fix = `1. Verify API routes and endpoint URLs are correct.\n2. Check if a recent deployment removed or renamed endpoints.\n3. Review client-side code for hardcoded URLs that may be outdated.\n4. Add proper 404 handling with helpful error messages.`;
       } else if (has500) {
-        problem += ` Internal server errors indicate unhandled exceptions in the application.${msg ? ` Error: "${msg}".` : ''}`;
+        problem += ` Internal server errors indicate unhandled exceptions in the application.${msg ? ` Error: "${msg}".` : ""}`;
         fix = `1. Review application logs for the full stack trace of the unhandled exception.\n2. Add proper error handling and try-catch blocks around the failing code path.\n3. Implement global error handling middleware.\n4. Add structured logging to capture context around failures.`;
       } else {
-        problem += `${msg ? ` Error: "${msg}".` : ''}${exList ? ` Exception types: ${exList}.` : ''} Error frequency: ${analysis.errorFrequency}/5min.`;
+        problem += `${msg ? ` Error: "${msg}".` : ""}${exList ? ` Exception types: ${exList}.` : ""} Error frequency: ${analysis.errorFrequency}/5min.`;
         fix = `1. Review the stack trace and application logs to pinpoint the failing code path.\n2. Add error handling and input validation around the affected code.\n3. Write regression tests to cover the failure scenario.\n4. Consider adding structured logging for better debugging context.`;
       }
       return { problem, fix };
     }
-    case 'infrastructure': {
+    case "infrastructure": {
       let problem = `Infrastructure-level issues detected affecting ${svcList}.`;
-      let fix = '';
+      let fix = "";
       if (hasConnection) {
-        problem += ` Network connectivity problems are preventing service communication.${msg ? ` Error: "${msg}".` : ''}`;
+        problem += ` Network connectivity problems are preventing service communication.${msg ? ` Error: "${msg}".` : ""}`;
         fix = `1. Check network connectivity, DNS resolution, and firewall rules.\n2. Verify load balancer health checks and routing configuration.\n3. Review recent infrastructure changes (network policies, security groups).\n4. Implement service mesh or DNS-based failover for resilience.`;
       } else {
-        problem += `${msg ? ` Error: "${msg}".` : ''} The issue may be related to networking, DNS, load balancing, or platform-level failures.`;
+        problem += `${msg ? ` Error: "${msg}".` : ""} The issue may be related to networking, DNS, load balancing, or platform-level failures.`;
         fix = `1. Check infrastructure health dashboards for the affected region/cluster.\n2. Review recent infrastructure changes or maintenance windows.\n3. Verify DNS resolution, load balancer configuration, and network policies.\n4. Consider multi-region deployment for higher availability.`;
       }
       return { problem, fix };
     }
     default: {
-      const problem = `An issue was detected in ${svcList}.${msg ? ` Error: "${msg}".` : ''}`;
+      const problem = `An issue was detected in ${svcList}.${msg ? ` Error: "${msg}".` : ""}`;
       const fix = `1. Review application and infrastructure logs for the affected service(s).\n2. Check recent changes (deployments, config updates, infrastructure modifications).\n3. Monitor the error rate to determine if the issue is ongoing or transient.\n4. Escalate to the owning team with the collected evidence.`;
       return { problem, fix };
     }
   }
 }
 
-function groupByKey<T>(items: T[], keyFn: (item: T) => string): Array<{ key: string; items: T[] }> {
+function groupByKey<T>(
+  items: T[],
+  keyFn: (item: T) => string,
+): Array<{ key: string; items: T[] }> {
   const map = new Map<string, T[]>();
   for (const item of items) {
     const key = keyFn(item);
@@ -623,31 +1130,52 @@ interface ErrorGroup {
 }
 
 function groupErrors(events: any[]): ErrorGroup[] {
-  const map = new Map<string, { count: number; messages: string[]; severity: string; timestamps: Date[]; originalType: string; service: string }>();
+  const map = new Map<
+    string,
+    {
+      count: number;
+      messages: string[];
+      severity: string;
+      timestamps: Date[];
+      originalType: string;
+      service: string;
+    }
+  >();
   for (const e of events) {
-    if (e.eventType !== 'exception') continue;
-    const exType = (e as any).exceptionType || (e as any).message?.substring(0, 60) || 'Unknown';
-    const svc = e.serviceName || 'unknown';
+    if (e.eventType !== "exception") continue;
+    const exType =
+      (e as any).exceptionType ||
+      (e as any).message?.substring(0, 60) ||
+      "Unknown";
+    const svc = e.serviceName || "unknown";
     // Normalize key: strip timestamps, UUIDs, hex IDs, and long numbers so errors
     // that differ only by dynamic values get clubbed together
     const normalizedType = exType
-      .replace(/\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}[.\dZ]*/g, '<ts>')
-      .replace(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi, '<uuid>')
-      .replace(/0x[0-9a-f]+/gi, '<hex>')
-      .replace(/\b\d{10,}\b/g, '<id>')
+      .replace(/\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}[.\dZ]*/g, "<ts>")
+      .replace(
+        /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/gi,
+        "<uuid>",
+      )
+      .replace(/0x[0-9a-f]+/gi, "<hex>")
+      .replace(/\b\d{10,}\b/g, "<id>")
       .trim();
     const key = `${normalizedType}||${svc}`;
     const existing = map.get(key);
     if (existing) {
       existing.count++;
-      if (existing.messages.length < 3) existing.messages.push((e as any).message || '');
-      existing.timestamps.push(e.timestamp instanceof Date ? e.timestamp : new Date(e.timestamp));
+      if (existing.messages.length < 3)
+        existing.messages.push((e as any).message || "");
+      existing.timestamps.push(
+        e.timestamp instanceof Date ? e.timestamp : new Date(e.timestamp),
+      );
     } else {
       map.set(key, {
         count: 1,
-        messages: [(e as any).message || ''],
-        severity: (e as any).severity || 'error',
-        timestamps: [e.timestamp instanceof Date ? e.timestamp : new Date(e.timestamp)],
+        messages: [(e as any).message || ""],
+        severity: (e as any).severity || "error",
+        timestamps: [
+          e.timestamp instanceof Date ? e.timestamp : new Date(e.timestamp),
+        ],
         originalType: exType,
         service: svc,
       });
@@ -672,9 +1200,28 @@ function groupErrors(events: any[]): ErrorGroup[] {
 function parseDuration(iso: string): number {
   const match = iso.match(/P(?:(\d+)D)?(?:T(?:(\d+)H)?(?:(\d+)M)?)?/);
   if (!match) return 24 * 60 * 60 * 1000;
-  const days = Number(match[1] || 0), hours = Number(match[2] || 0), mins = Number(match[3] || 0);
+  const days = Number(match[1] || 0),
+    hours = Number(match[2] || 0),
+    mins = Number(match[3] || 0);
   return (days * 86400 + hours * 3600 + mins * 60) * 1000;
 }
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`RCA Assistant running at http://localhost:${PORT}`));
+const PORT = process.env.PORT || 3001;
+app.listen(PORT, () => {
+  console.log(`RCA Assistant running at http://localhost:${PORT}`);
+
+  // Start the background monitor if credentials are provided in env
+  const appId = process.env.AZURE_APP_ID;
+  const apiKey = process.env.AZURE_API_KEY;
+  if (appId && apiKey) {
+    const queryFn = (kql: string) =>
+      queryAppInsights(appId, apiKey, kql.trim(), "P90D");
+    const orchestrator = new ImportOrchestrator(queryFn);
+    const monitor = new ImportMonitor(orchestrator, reportRepo, queryFn);
+    monitor.start();
+  } else {
+    console.warn(
+      "[ImportMonitor] Background monitoring disabled: AZURE_APP_ID and AZURE_API_KEY not found in environment.",
+    );
+  }
+});

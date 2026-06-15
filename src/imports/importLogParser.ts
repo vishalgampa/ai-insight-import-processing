@@ -35,10 +35,11 @@ export interface DataCounts {
 // ── Validation structured output ──────────────────────────────────────────
 
 export interface ValidationBundleStat {
-  chunkIndex: number;
+  bundleIdx: number;
   rowCount: number | null;
   existingUsersMs: number | null;
   redisBatchSizeMs: number | null;
+  totalMs: number | null;
 }
 
 export interface ValidationBatchStat {
@@ -75,6 +76,7 @@ export interface SubmissionBatchStat {
   endRow: number | null;    // derived: (batchIdx + 1) * batchSize - 1
   loopProcessingMs: number | null;
   bulkProcessingMs: number | null;
+  totalProcessingMs: number | null;
   startTime: string | null;
   endTime: string | null;
 }
@@ -231,7 +233,7 @@ export function parseImportLogs(
 
   const ensureBundle = (idx: number) => {
     if (!bundleMap.has(idx))
-      bundleMap.set(idx, { chunkIndex: idx, rowCount: null, existingUsersMs: null, redisBatchSizeMs: null });
+      bundleMap.set(idx, { bundleIdx: idx, rowCount: null, existingUsersMs: null, redisBatchSizeMs: null, totalMs: null });
     return bundleMap.get(idx)!;
   };
 
@@ -278,7 +280,14 @@ export function parseImportLogs(
     }
   }
 
-  result.validationBundleStats = [...bundleMap.values()].sort((a, b) => a.chunkIndex - b.chunkIndex);
+  // Calculate totalMs per bundle
+  for (const b of bundleMap.values()) {
+    if (b.existingUsersMs !== null || b.redisBatchSizeMs !== null) {
+      b.totalMs = (b.existingUsersMs ?? 0) + (b.redisBatchSizeMs ?? 0);
+    }
+  }
+
+  result.validationBundleStats = [...bundleMap.values()].sort((a, b) => a.bundleIdx - b.bundleIdx);
 
   // ── VALIDATION — Batch logs ───────────────────────────────────────────
   // "BulkInsert for rows {start} to {end} took {ms} ms" — 1× per 500-row batch
@@ -456,6 +465,7 @@ export function parseImportLogs(
         endRow: null,    // resolved after batch size is known
         loopProcessingMs: null,
         bulkProcessingMs: null,
+        totalProcessingMs: null,
         startTime: null,
         endTime: null,
       });
@@ -485,6 +495,13 @@ export function parseImportLogs(
     }
   }
 
+  // Calculate totalProcessingMs per batch
+  for (const batch of subBatchMap.values()) {
+    if (batch.loopProcessingMs !== null || batch.bulkProcessingMs !== null) {
+      batch.totalProcessingMs = (batch.loopProcessingMs ?? 0) + (batch.bulkProcessingMs ?? 0);
+    }
+  }
+
   // Resolve batch size and endRow for each batch
   // Sort by (bundleIdx asc, batchIdx asc) for consistent ordering
   const sortedBatches = [...subBatchMap.values()].sort((a, b) =>
@@ -505,7 +522,9 @@ export function parseImportLogs(
   }
 
   for (const batch of sortedBatches) {
-    batch.endRow = batch.batchIdx + batchSize - 1;
+    const bSize = result.bundleSize || 5000;
+    batch.startRow = batch.bundleIdx * bSize + batch.batchIdx;
+    batch.endRow = batch.startRow + batchSize - 1;
   }
 
   result.submissionBatchStats = sortedBatches;

@@ -30,6 +30,7 @@ export interface ImportAnalysis {
   clientFileUploadId: string;
   rowCount: number | null;
   totalEstimatedMs: number;
+  bundleSize: number | null;
   diagnostics: FetchDiagnostics;
 
   stepMeta: {
@@ -56,6 +57,8 @@ export interface ImportAnalysis {
   countsSummary: string;
 }
 
+import { BucketAverages } from '../persistence/IReportRepository';
+
 export interface ComparisonResult {
   idA: string;
   idB: string;
@@ -70,6 +73,85 @@ export interface ComparisonResult {
     flag: 'faster' | 'slower' | 'same';
   }[];
   insights: string[];
+  // Structured Nested Diffs for "Deep-Dive"
+  validationBundleDiff?: { index: number, msA: number, msB: number, deltaMs: number }[];
+  submissionBatchDiff?: { index: number, msA: number, msB: number, deltaMs: number, bulkMsA: number, bulkMsB: number }[];
+  rowInsightDiff?: { stepName: string, avgMsA: number, avgMsB: number, deltaMs: number }[];
+  
+  sourceReports?: { id: string, rowCount: number | null, timestamp: string }[];
+}
+
+export function compareAgainstBaseline(current: ImportAnalysis, baseline: BucketAverages): ComparisonResult {
+  const currentMap = new Map<string, number>();
+  for (const s of current.stepContributions) {
+    currentMap.set(s.stepName, s.durationMs);
+  }
+
+  const baselineMap = new Map<string, number>();
+  for (const stepName in baseline.stepAverages) {
+    baselineMap.set(stepName, baseline.stepAverages[stepName]);
+  }
+
+  const keys = [...new Set([...currentMap.keys(), ...baselineMap.keys()])];
+  const stepDiff = keys.map(k => {
+    const msBaseline = baselineMap.get(k) ?? 0, msCurrent = currentMap.get(k) ?? 0;
+    const delta = msCurrent - msBaseline, pct = msBaseline > 0 ? (delta / msBaseline) * 100 : 0;
+    return { 
+      stepName: k, 
+      msA: msBaseline, 
+      msB: msCurrent, 
+      deltaMs: delta, 
+      deltaPercent: Math.round(pct),
+      flag: (Math.abs(pct) < 15 ? 'same' : delta > 0 ? 'slower' : 'faster') as 'faster'|'slower'|'same' 
+    };
+  }).sort((a, b) => Math.abs(b.deltaMs) - Math.abs(a.deltaMs));
+
+  const insights: string[] = [];
+  for (const s of stepDiff.filter(s => s.flag === 'slower' && s.deltaMs > 1000).slice(0, 3))
+    insights.push(`"${s.stepName}" is ${(s.deltaMs/1000).toFixed(1)}s slower than baseline (+${s.deltaPercent}%)`);
+  
+  if (insights.length === 0) insights.push('Performance is consistent with size-bucket averages.');
+
+  // ── Deep-Dive Structured Diffs (Mirroring Single Run) ──
+  
+  // 1. Validation Bundles
+  const validationBundleDiff = current.validationBundleStats.map(b => ({
+    index: b.bundleIdx,
+    msA: baseline.validationBundleAverages[b.bundleIdx] ?? 0,
+    msB: b.totalMs ?? 0,
+    deltaMs: (b.totalMs ?? 0) - (baseline.validationBundleAverages[b.bundleIdx] ?? 0)
+  }));
+
+  // 2. Submission Batches (Total & Bulk)
+  const submissionBatchDiff = current.submissionBatchStats.map(b => ({
+    index: b.batchIdx,
+    msA: baseline.submissionBatchAverages[b.batchIdx]?.total ?? 0,
+    msB: b.totalProcessingMs ?? 0,
+    deltaMs: (b.totalProcessingMs ?? 0) - (baseline.submissionBatchAverages[b.batchIdx]?.total ?? 0),
+    bulkMsA: baseline.submissionBatchAverages[b.batchIdx]?.bulk ?? 0,
+    bulkMsB: b.bulkProcessingMs ?? 0
+  }));
+
+  // 3. Row-Level Rules
+  const rowInsightDiff = current.validationRowInsights.map(r => ({
+    stepName: r.stepName,
+    avgMsA: baseline.rowInsightAverages[r.stepName] ?? 0,
+    avgMsB: r.avgMs,
+    deltaMs: r.avgMs - (baseline.rowInsightAverages[r.stepName] ?? 0)
+  }));
+
+  return { 
+    idA: `Bucket ${baseline.sizeBucket/1000}k Average (${baseline.count} files)`, 
+    idB: current.clientFileUploadId, 
+    rowCountA: null, 
+    rowCountB: current.rowCount, 
+    stepDiff, 
+    insights,
+    validationBundleDiff,
+    submissionBatchDiff,
+    rowInsightDiff,
+    sourceReports: baseline.sourceReports
+  };
 }
 
 function toInsight(stat: PerRowStepStat, rowCount: number | null, useOccurrences = false): PerRowInsight {
@@ -108,6 +190,19 @@ export function analyzeImport(id: string, logs: ParsedImportLogs): ImportAnalysi
     steps.push({ name: 'Validation: BLOB Download', ms: logs.blobDownloadMs });
   if (logs.chunksCompletedMs !== null)
     steps.push({ name: 'Validation: All Chunks', ms: logs.chunksCompletedMs });
+  
+  // Aggregate nested stats for baseline comparison
+  if (logs.validationBatchStats.length > 0) {
+    const avgBulk = logs.validationBatchStats.reduce((s, b) => s + (b.bulkInsertMs ?? 0), 0) / logs.validationBatchStats.length;
+    steps.push({ name: 'Validation: BulkInsert (avg/batch)', ms: avgBulk });
+  }
+  if (logs.submissionBatchStats.length > 0) {
+    const avgSubBulk = logs.submissionBatchStats.reduce((s, b) => s + (b.bulkProcessingMs ?? 0), 0) / logs.submissionBatchStats.length;
+    const avgSubLoop = logs.submissionBatchStats.reduce((s, b) => s + (b.loopProcessingMs ?? 0), 0) / logs.submissionBatchStats.length;
+    steps.push({ name: 'Submission: Bulk Processing (avg/batch)', ms: avgSubBulk });
+    steps.push({ name: 'Submission: Loop Processing (avg/batch)', ms: avgSubLoop });
+  }
+
   for (const b of logs.validationBatchStats)
     steps.push({ name: `Validation BulkInsert rows ${b.startRow}-${b.endRow}`, ms: b.bulkInsertMs });
   for (const s of logs.submissionStageStats)
@@ -115,7 +210,7 @@ export function analyzeImport(id: string, logs: ParsedImportLogs): ImportAnalysi
   for (const b of logs.submissionBundleStats)
     if (b.bundleDbFetchMs !== null) steps.push({ name: `Submission Bundle ${b.bundleIdx} DB fetch`, ms: b.bundleDbFetchMs });
   for (const b of logs.submissionBatchStats)
-    if (b.bulkProcessingMs !== null) steps.push({ name: `Submission Batch ${b.batchIdx} Bulk Processing`, ms: b.bulkProcessingMs });
+    if (b.totalProcessingMs !== null) steps.push({ name: `Submission Batch ${b.batchIdx} Total Processing`, ms: b.totalProcessingMs });
 
   const totalMs = steps.reduce((s, x) => s + x.ms, 0);
   const stepContributions: StepContribution[] = steps.map(s => {
@@ -172,15 +267,16 @@ export function analyzeImport(id: string, logs: ParsedImportLogs): ImportAnalysi
   const parts: string[] = [];
   if (c.totalRows) parts.push(`${c.totalRows.toLocaleString()} rows in file`);
   if (c.mappedContentCount) parts.push(`${c.mappedContentCount.toLocaleString()} mapped records`);
-  if (c.accountIds != null) parts.push(`${c.accountIds} accounts`);
-  if (c.linkedAccountIds != null) parts.push(`${c.linkedAccountIds} linked accounts`);
-  if (c.customFields != null) parts.push(`${c.customFields} custom fields`);
-  if (c.bankruptcyRecords != null) parts.push(`${c.bankruptcyRecords} bankruptcy records`);
+  if (c.accountIds != null) parts.push(`${c.accountIds.toLocaleString()} accounts`);
+  if (c.linkedAccountIds != null) parts.push(`${c.linkedAccountIds.toLocaleString()} linked accounts`);
+  if (c.customFields != null) parts.push(`${c.customFields.toLocaleString()} custom fields`);
+  if (c.bankruptcyRecords != null) parts.push(`${c.bankruptcyRecords.toLocaleString()} bankruptcy records`);
 
   return {
     clientFileUploadId: id,
     rowCount,
     totalEstimatedMs: totalMs,
+    bundleSize: logs.bundleSize,
     diagnostics: {
       anchorFound: !!(logs.validationMeta.pod || logs.submissionMeta.pod || logs.k8sTriggerMeta.pod),
       anchorRowCount: 0,
@@ -202,7 +298,7 @@ export function analyzeImport(id: string, logs: ParsedImportLogs): ImportAnalysi
     submissionBatchStats: logs.submissionBatchStats,
     submissionRowInsights,
     insights,
-    countsSummary:  '', // parts.join(' | ') incorrect
+    countsSummary:  parts.join(' | '),
   };
 }
 

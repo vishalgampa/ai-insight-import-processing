@@ -694,11 +694,18 @@ export class ImportLogFetcher {
       if (msg.includes('SaveApprovedRecords') && msg.includes('started')) {
         info.saveStartTime = ts;
         info.savePod = row.cloud_RoleInstance;
-        const rowMatch = msg.match(/Number of rows in excel:\s*(\d+)/i);
-        if (rowMatch) info.rowCount = parseInt(rowMatch[1], 10);
       }
       if (msg.includes('SaveApprovedRecords') && msg.includes('ended')) {
         info.saveEndTime = ts;
+      }
+
+      // ── FIXED: Extract row count from ANY row that has the pattern ──
+      if (info.rowCount === null) {
+        const rowMatch = msg.match(/Number of rows in excel:\s*(\d+)/i);
+        if (rowMatch) {
+            info.rowCount = parseInt(rowMatch[1], 10);
+            console.log(`[ImportFetcher] Found row count ${info.rowCount} for ${clientFileUploadId}`);
+        }
       }
     }
 
