@@ -182,7 +182,7 @@ export class ImportLogFetcher {
     const valOpId = anchor.validateOperationId;
     if (valOpId) {
       validationRows = await this.fetchValidationByOpId(valOpId);
-      validationAggRows = await this.fetchValidationAggByOpId(valOpId);
+      validationAggRows = await this.fetchValidationAgg(valOpId);
     } else if (anchor.validateStartTime && anchor.validatePod) {
       const t1 = fmtDt(addMinutes(anchor.validateStartTime, -1));
       const t2 = fmtDt(addMinutes(anchor.validateStartTime, 60));
@@ -202,7 +202,7 @@ export class ImportLogFetcher {
         validationMeta.operationId = opId;
         validationMeta.pod = startLogs[0].cloud_RoleInstance;
         validationRows = await this.fetchValidationByOpId(opId);
-        validationAggRows = await this.fetchValidationAggByOpId(opId);
+        validationAggRows = await this.fetchValidationAgg(opId);
       } else {
         // Last resort: pod + time window
         validationRows = await this.query(`
@@ -215,6 +215,12 @@ export class ImportLogFetcher {
           | project timestamp, message, operation_Id, cloud_RoleInstance
           | order by timestamp asc
         `).catch(() => []);
+        validationAggRows = await this.fetchValidationAgg(
+          null,
+          anchor.validatePod,
+          anchor.validateStartTime,
+          anchor.validateEndTime
+        );
       }
     }
 
@@ -424,20 +430,34 @@ export class ImportLogFetcher {
     );
 
     // ── Step 6: raw drill-down data ───────────────────────────────────
-    const validationPerRowRaw = validationMeta.operationId
-      ? await this.fetchValidationPerRowRaw(validationMeta.operationId)
-      : [];
+    const validationPerRowRaw = await this.fetchValidationPerRowRaw(
+      validationMeta.operationId,
+      validationMeta.pod || anchor.validatePod,
+      validationMeta.startTime || anchor.validateStartTime,
+      validationMeta.endTime || anchor.validateEndTime
+    );
 
-    const validationGlobalFetches = validationMeta.operationId
-      ? await this.fetchValidationGlobalFetches(validationMeta.operationId)
-      : [];
+    const validationGlobalFetches = await this.fetchValidationGlobalFetches(
+      validationMeta.operationId,
+      validationMeta.pod || anchor.validatePod,
+      validationMeta.startTime || anchor.validateStartTime,
+      validationMeta.endTime || anchor.validateEndTime
+    );
 
-    const [submissionRawAll, submissionAggRows] = submissionMeta.operationId
-      ? await Promise.all([
-          this.fetchSubmissionRaw(submissionMeta.operationId),
-          this.fetchSubmissionAgg(submissionMeta.operationId),
-        ])
-      : [[], []];
+    const [submissionRawAll, submissionAggRows] = await Promise.all([
+      this.fetchSubmissionRaw(
+        submissionMeta.operationId,
+        submissionMeta.pod || anchor.savePod,
+        submissionMeta.startTime || anchor.saveStartTime,
+        submissionMeta.endTime || anchor.saveEndTime
+      ),
+      this.fetchSubmissionAgg(
+        submissionMeta.operationId,
+        submissionMeta.pod || anchor.savePod,
+        submissionMeta.startTime || anchor.saveStartTime,
+        submissionMeta.endTime || anchor.saveEndTime
+      ),
+    ]);
 
     // Finalise diagnostics
     diagnostics.validationFound = validationRows.length > 0;
@@ -576,31 +596,54 @@ export class ImportLogFetcher {
     `).catch(() => []);
   }
 
-  private async fetchValidationAggByOpId(opId: string): Promise<RawRow[]> {
-    // Exclude known one-time global fetches that are NOT per-row:
-    // "Fetched batch size from redis", "Fetched existing users"
-    // These run once per chunk, not once per row — including them skews avg/count
+  private async fetchValidationAgg(
+    opId: string | null,
+    pod?: string | null,
+    startTime?: Date | null,
+    endTime?: Date | null
+  ): Promise<RawRow[]> {
+    const filter = opId 
+      ? `operation_Id == '${opId}'`
+      : (startTime && pod)
+        ? `timestamp between (datetime('${fmtDt(startTime)}') .. datetime('${fmtDt(addMinutes(endTime || startTime, 5))}')) and cloud_RoleInstance contains '${pod.split('.')[0]}'`
+        : null;
+    if (!filter) return [];
+
     return this.query(`
       traces
-      | where operation_Id == '${opId}'
+      | where ${filter}
       | where message contains 'UploadGenericUpdateAccountDataWithValidations:'
       | where message !contains 'BulkInsert for rows'
       | where message !contains 'Fetched batch size from redis'
       | where message !contains 'Fetched existing users'
+      | extend raw_step = extract(@'UploadGenericUpdateAccountDataWithValidations: (.+?) (in|took|for)', 1, message)
+      | extend clean_step = replace_regex(raw_step, @'(?i)^Row\\s+\\d+\\s*:?\\s*', '')
       | summarize
           avg_ms = avg(todouble(extract(@'(\\d+(?:\\.\\d+)?)\\s*ms', 1, message))),
           max_ms = max(todouble(extract(@'(\\d+(?:\\.\\d+)?)\\s*ms', 1, message))),
           count_ = count()
-          by step = extract(@'UploadGenericUpdateAccountDataWithValidations: (.+?) (in|took|for)', 1, message)
+          by step = clean_step
       | order by max_ms desc
     `).catch(() => []);
   }
 
   /** Fetch one-time global fetches separately (not per-row, run once per chunk) */
-  async fetchValidationGlobalFetches(opId: string): Promise<RawRow[]> {
+  async fetchValidationGlobalFetches(
+    opId: string | null,
+    pod?: string | null,
+    startTime?: Date | null,
+    endTime?: Date | null
+  ): Promise<RawRow[]> {
+    const filter = opId 
+      ? `operation_Id == '${opId}'`
+      : (startTime && pod)
+        ? `timestamp between (datetime('${fmtDt(startTime)}') .. datetime('${fmtDt(addMinutes(endTime || startTime, 5))}')) and cloud_RoleInstance contains '${pod.split('.')[0]}'`
+        : null;
+    if (!filter) return [];
+
     return this.query(`
       traces
-      | where operation_Id == '${opId}'
+      | where ${filter}
       | where message contains 'UploadGenericUpdateAccountDataWithValidations:'
       | where message contains 'Fetched batch size from redis'
              or message contains 'Fetched existing users'
@@ -610,10 +653,22 @@ export class ImportLogFetcher {
   }
 
   /** Fetch ALL per-row checkpoint logs for slow-row detection (includes Batch/Row lines) */
-  async fetchValidationPerRowRaw(opId: string): Promise<RawRow[]> {
+  async fetchValidationPerRowRaw(
+    opId: string | null,
+    pod?: string | null,
+    startTime?: Date | null,
+    endTime?: Date | null
+  ): Promise<RawRow[]> {
+    const filter = opId 
+      ? `operation_Id == '${opId}'`
+      : (startTime && pod)
+        ? `timestamp between (datetime('${fmtDt(startTime)}') .. datetime('${fmtDt(addMinutes(endTime || startTime, 5))}')) and cloud_RoleInstance contains '${pod.split('.')[0]}'`
+        : null;
+    if (!filter) return [];
+
     return this.query(`
       traces
-      | where operation_Id == '${opId}'
+      | where ${filter}
       | where message contains 'UploadGenericUpdateAccountDataWithValidations:'
       | project timestamp, message, operation_Id, cloud_RoleInstance
       | order by timestamp asc
@@ -621,10 +676,22 @@ export class ImportLogFetcher {
   }
 
   /** Fetch ALL submission batch/bundle raw rows for drill-down */
-  async fetchSubmissionRaw(opId: string): Promise<RawRow[]> {
+  async fetchSubmissionRaw(
+    opId: string | null,
+    pod?: string | null,
+    startTime?: Date | null,
+    endTime?: Date | null
+  ): Promise<RawRow[]> {
+    const filter = opId 
+      ? `operation_Id == '${opId}'`
+      : (startTime && pod)
+        ? `timestamp between (datetime('${fmtDt(startTime)}') .. datetime('${fmtDt(addMinutes(endTime || startTime, 5))}')) and cloud_RoleInstance contains '${pod.split('.')[0]}'`
+        : null;
+    if (!filter) return [];
+
     return this.query(`
       traces
-      | where operation_Id == '${opId}'
+      | where ${filter}
       | where message contains 'ImportGenericUpdateApprovedContent'
       | project timestamp, message, operation_Id, cloud_RoleInstance
       | order by timestamp asc
@@ -632,14 +699,26 @@ export class ImportLogFetcher {
   }
 
   /** Aggregated per-row stats for submission — covers Checkpoint, MpStatusFetch, BKY logs */
-  async fetchSubmissionAgg(opId: string): Promise<RawRow[]> {
+  async fetchSubmissionAgg(
+    opId: string | null,
+    pod?: string | null,
+    startTime?: Date | null,
+    endTime?: Date | null
+  ): Promise<RawRow[]> {
+    const filter = opId 
+      ? `operation_Id == '${opId}'`
+      : (startTime && pod)
+        ? `timestamp between (datetime('${fmtDt(startTime)}') .. datetime('${fmtDt(addMinutes(endTime || startTime, 5))}')) and cloud_RoleInstance contains '${pod.split('.')[0]}'`
+        : null;
+    if (!filter) return [];
+
     // Covers all row-level log patterns from the submission process:
     //   "Batch: K Row: J {StepName} Checkpoint: {ms}"
     //   "Batch: K Row: J MpStatusFetch: {ms}"
     //   "Row J | BKY {label}: ... | {ms}ms"
     return this.query(`
       traces
-      | where operation_Id == '${opId}'
+      | where ${filter}
       | where message contains 'ImportGenericUpdateApprovedContent'
       | where (message contains 'Checkpoint:' and message contains 'Row')
              or message contains 'MpStatusFetch:'

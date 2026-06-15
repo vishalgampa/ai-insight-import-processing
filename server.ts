@@ -29,11 +29,63 @@ import { ImportOrchestrator } from "./src/imports/importOrchestrator";
 import { SQLiteReportRepository } from "./src/persistence/SQLiteReportRepository";
 import { ImportMonitor } from "./src/scheduler/importMonitor";
 import { compareAgainstBaseline } from "./src/imports/timingAnalyzer";
+import { renderImportToHtml, renderComparisonToHtml } from "./src/report/importReportRenderer";
 
 const app = express();
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 app.use("/reports", express.static(path.join(__dirname, "reports")));
+
+app.get("/reports/import_:id.html", async (req, res) => {
+  try {
+    const id = req.params.id;
+    // Check files on disk first, since a file on disk might contain comparison data
+    const reportsDir = path.join(__dirname, "reports");
+    const jsonPath = path.join(reportsDir, `import_${id}.json`);
+    if (fs.existsSync(jsonPath)) {
+      const data = JSON.parse(fs.readFileSync(jsonPath, "utf-8"));
+      let htmlContent = "";
+      if (data.type === "comparison") {
+        htmlContent = renderComparisonToHtml(data);
+      } else {
+        htmlContent = renderImportToHtml(data.primary || data);
+      }
+      res.setHeader("Content-Type", "text/html");
+      return res.send(htmlContent);
+    }
+
+    // Check if the report exists in database
+    const report = await reportRepo.getReportByUploadId(id);
+    if (report) {
+      const analysis = JSON.parse(report.analysisJson);
+      const htmlContent = renderImportToHtml(analysis);
+      res.setHeader("Content-Type", "text/html");
+      return res.send(htmlContent);
+    }
+
+    // If not found anywhere, send 404
+    res.status(404).send(`Report not found for ID: ${id}`);
+  } catch (err: any) {
+    res.status(500).send(`Error rendering report: ${err.message}`);
+  }
+});
+
+app.get("/reports/comparison/:idA/vs/:idB", async (req, res) => {
+  try {
+    const { idA, idB } = req.params as any;
+    const reportsDir = path.join(__dirname, "reports");
+    const jsonPath = path.join(reportsDir, `comparison_${idA}_vs_${idB}.json`);
+    if (fs.existsSync(jsonPath)) {
+      const data = JSON.parse(fs.readFileSync(jsonPath, "utf-8"));
+      const htmlContent = renderComparisonToHtml(data);
+      res.setHeader("Content-Type", "text/html");
+      return res.send(htmlContent);
+    }
+    res.status(404).send(`Comparison report not found for: ${idA} vs ${idB}`);
+  } catch (err: any) {
+    res.status(500).send(`Error rendering report: ${err.message}`);
+  }
+});
 
 const reportsDir = path.join(__dirname, "reports");
 if (!fs.existsSync(reportsDir)) {
@@ -64,138 +116,20 @@ function saveReport(type: string, id: string, data: any) {
   if (type === "import") {
     const htmlFileName = `${type}_${id}.html`;
     const htmlPath = path.join(reportsDir, htmlFileName);
-    // Use the primary analysis if available
-    const analysis = data.primary || data;
-    if (analysis.clientFileUploadId) {
-      const htmlContent = renderImportToHtml(analysis);
+    let htmlContent = "";
+    if (data.type === "comparison") {
+      htmlContent = renderComparisonToHtml(data);
+    } else {
+      const analysis = data.primary || data;
+      if (analysis.clientFileUploadId) {
+        htmlContent = renderImportToHtml(analysis);
+      }
+    }
+    if (htmlContent) {
       fs.writeFileSync(htmlPath, htmlContent);
       console.log(`Report HTML saved to ${htmlPath}`);
     }
   }
-}
-
-function renderImportToHtml(analysis: any): string {
-  // Use the same template as in ImportMonitor
-  return `
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Import Report - ${analysis.clientFileUploadId}</title>
-    <style>
-        body { font-family: sans-serif; line-height: 1.5; color: #333; max-width: 900px; margin: 40px auto; padding: 20px; }
-        h1 { color: #0056b3; border-bottom: 2px solid #eee; padding-bottom: 10px; }
-        .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin: 20px 0; }
-        .stat-card { background: #f8f9fa; padding: 15px; border-radius: 8px; border-left: 4px solid #0056b3; }
-        .stat-value { font-size: 1.2rem; font-weight: bold; margin-top: 5px; }
-        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-        th, td { text-align: left; padding: 12px; border-bottom: 1px solid #ddd; }
-        th { background: #f2f2f2; }
-        .flag-slow { color: #856404; background: #fff3cd; padding: 2px 6px; border-radius: 4px; }
-        .flag-critical { color: #721c24; background: #f8d7da; padding: 2px 6px; border-radius: 4px; }
-    </style>
-</head>
-<body>
-    <h1>Import Analysis Report</h1>
-    <div class="stat-grid">
-        <div class="stat-card">
-            <div>Client File Upload ID</div>
-            <div class="stat-value">${analysis.clientFileUploadId}</div>
-        </div>
-        <div class="stat-card">
-            <div>Row Count</div>
-            <div class="stat-value">${analysis.rowCount?.toLocaleString() ?? "Unknown"}</div>
-        </div>
-        <div class="stat-card">
-            <div>Total Estimated Duration</div>
-            <div class="stat-value">${(analysis.totalEstimatedMs / 1000).toFixed(1)}s</div>
-        </div>
-    </div>
-
-    <h2>High-Level Step Breakdown</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>Step Name</th>
-                <th>Duration (s)</th>
-                <th>% of Total</th>
-                <th>Note</th>
-            </tr>
-        </thead>
-        <tbody>
-            ${(analysis.stepContributions || [])
-              .map(
-                (s: any) => `
-                <tr>
-                    <td>${s.stepName}</td>
-                    <td>${(s.durationMs / 1000).toFixed(2)}s</td>
-                    <td>${s.percentOfTotal}%</td>
-                    <td><span class="flag-${s.flag}">${s.note ?? ""}</span></td>
-                </tr>
-            `,
-              )
-              .join("")}
-        </tbody>
-    </table>
-
-    ${analysis.validationRowInsights?.length ? `
-    <h2>Validation Row-Level Insights (Projected)</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>Rule Name</th>
-                <th>Avg Ms</th>
-                <th>Occurrences</th>
-                <th>Projected Total</th>
-                <th>Note</th>
-            </tr>
-        </thead>
-        <tbody>
-            ${analysis.validationRowInsights.map((r: any) => `
-                <tr>
-                    <td>${r.stepName}</td>
-                    <td>${r.avgMs.toFixed(1)}ms</td>
-                    <td>${r.occurrences.toLocaleString()}</td>
-                    <td>${(r.projectedTotalMs / 1000 / 60).toFixed(1)} min</td>
-                    <td><span class="flag-${r.flag}">${r.note ?? ""}</span></td>
-                </tr>
-            `).join('')}
-        </tbody>
-    </table>
-    ` : ''}
-
-    ${analysis.submissionRowInsights?.length ? `
-    <h2>Submission Row-Level Insights (Projected)</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>Step Name</th>
-                <th>Avg Ms</th>
-                <th>Occurrences</th>
-                <th>Projected Total</th>
-                <th>Note</th>
-            </tr>
-        </thead>
-        <tbody>
-            ${analysis.submissionRowInsights.map((r: any) => `
-                <tr>
-                    <td>${r.stepName}</td>
-                    <td>${r.avgMs.toFixed(1)}ms</td>
-                    <td>${r.occurrences.toLocaleString()}</td>
-                    <td>${(r.projectedTotalMs / 1000 / 60).toFixed(1)} min</td>
-                    <td><span class="flag-${r.flag}">${r.note ?? ""}</span></td>
-                </tr>
-            `).join('')}
-        </tbody>
-    </table>
-    ` : ''}
-
-    <h2>Insights</h2>
-    <ul>
-        ${(analysis.insights || []).map((i: string) => `<li>${i}</li>`).join("")}
-    </ul>
-</body>
-</html>
-    `;
 }
 
 // ── App Insights REST helper ───────────────────────────────────────────────
@@ -745,15 +679,32 @@ app.post("/api/import-analyze", async (req, res) => {
     const responseData = { ...result, plainAnswer };
 
     if (saveIndividualReports) {
-      saveReport("import", result.primary.clientFileUploadId, responseData);
-      const bucket = Math.floor((result.primary.rowCount ?? 0) / 5000) * 5000;
+      // 1. Save primary individual report
+      saveReport("import", result.primary.clientFileUploadId, { primary: result.primary });
+      const bucketA = Math.floor((result.primary.rowCount ?? 0) / 5000) * 5000;
       await reportRepo.saveReport({
         clientFileUploadId: result.primary.clientFileUploadId,
         rowCount: result.primary.rowCount,
-        sizeBucket: bucket,
+        sizeBucket: bucketA,
         timestamp: new Date().toISOString(),
         analysisJson: JSON.stringify(result.primary),
       });
+
+      // 2. Save secondary individual report (if comparison)
+      if (result.secondary) {
+        saveReport("import", result.secondary.clientFileUploadId, { primary: result.secondary });
+        const bucketB = Math.floor((result.secondary.rowCount ?? 0) / 5000) * 5000;
+        await reportRepo.saveReport({
+          clientFileUploadId: result.secondary.clientFileUploadId,
+          rowCount: result.secondary.rowCount,
+          sizeBucket: bucketB,
+          timestamp: new Date().toISOString(),
+          analysisJson: JSON.stringify(result.secondary),
+        });
+
+        // 3. Save comparison report
+        saveReport("comparison", `${result.primary.clientFileUploadId}_vs_${result.secondary.clientFileUploadId}`, responseData);
+      }
     }
 
     const duration = ((Date.now() - start) / 1000).toFixed(1);
@@ -801,7 +752,16 @@ app.post("/api/import-list", async (req, res) => {
       })
       .filter((i) => i.clientFileUploadId !== "unknown");
 
-    res.json({ imports });
+    const seen = new Set<string>();
+    const uniqueImports = [];
+    for (const item of imports) {
+      if (!seen.has(item.clientFileUploadId)) {
+        seen.add(item.clientFileUploadId);
+        uniqueImports.push(item);
+      }
+    }
+
+    res.json({ imports: uniqueImports });
   } catch (err: any) {
     res.status(500).json({ error: err.message ?? "Internal server error" });
   }

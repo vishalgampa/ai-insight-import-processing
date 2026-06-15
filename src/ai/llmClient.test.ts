@@ -20,6 +20,7 @@ class MockHttpClient implements HttpClient {
 }
 
 const baseConfig: LLMConfig = {
+  provider: 'openai',
   apiEndpoint: 'https://api.example.com/v1/chat/completions',
   apiKey: 'test-key-123',
 };

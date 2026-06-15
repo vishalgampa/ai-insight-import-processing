@@ -90,67 +90,67 @@
         "flag": "critical"
       },
       {
-        "stepName": "Submission Bundle 2500 DB fetch",
+        "stepName": "Submission Bundle 1 DB fetch",
         "durationMs": 145228,
         "percentOfTotal": 2.2,
         "flag": "critical"
       },
       {
-        "stepName": "Submission Bundle 5000 DB fetch",
+        "stepName": "Submission Bundle 2 DB fetch",
         "durationMs": 119102,
         "percentOfTotal": 1.8,
         "flag": "critical"
       },
       {
-        "stepName": "Submission Bundle 7500 DB fetch",
+        "stepName": "Submission Bundle 3 DB fetch",
         "durationMs": 60083,
         "percentOfTotal": 0.9,
         "flag": "critical"
       },
       {
-        "stepName": "Submission Bundle 10000 DB fetch",
+        "stepName": "Submission Bundle 4 DB fetch",
         "durationMs": 52298,
         "percentOfTotal": 0.8,
         "flag": "critical"
       },
       {
-        "stepName": "Submission Bundle 12500 DB fetch",
+        "stepName": "Submission Bundle 5 DB fetch",
         "durationMs": 49126,
         "percentOfTotal": 0.7,
         "flag": "critical"
       },
       {
-        "stepName": "Submission Bundle 15000 DB fetch",
+        "stepName": "Submission Bundle 6 DB fetch",
         "durationMs": 42454,
         "percentOfTotal": 0.6,
         "flag": "critical"
       },
       {
-        "stepName": "Submission Bundle 17500 DB fetch",
+        "stepName": "Submission Bundle 7 DB fetch",
         "durationMs": 39182,
         "percentOfTotal": 0.6,
         "flag": "critical"
       },
       {
-        "stepName": "Submission Bundle 20000 DB fetch",
+        "stepName": "Submission Bundle 8 DB fetch",
         "durationMs": 35345,
         "percentOfTotal": 0.5,
         "flag": "critical"
       },
       {
-        "stepName": "Submission Bundle 22500 DB fetch",
+        "stepName": "Submission Bundle 9 DB fetch",
         "durationMs": 34579,
         "percentOfTotal": 0.5,
         "flag": "critical"
       },
       {
-        "stepName": "Submission Bundle 25000 DB fetch",
+        "stepName": "Submission Bundle 10 DB fetch",
         "durationMs": 38328,
         "percentOfTotal": 0.6,
         "flag": "critical"
       },
       {
-        "stepName": "Submission Bundle 27500 DB fetch",
+        "stepName": "Submission Bundle 11 DB fetch",
         "durationMs": 36641,
         "percentOfTotal": 0.6,
         "flag": "critical"
@@ -687,6 +687,2594 @@
         "flag": "ok"
       }
     ],
+    "slowCheckpoints": [
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 8,
+        "timestamp": "2026-06-01T10:41:29.9138323Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Date only field check",
+        "ms": 66,
+        "timestamp": "2026-06-01T10:41:30.6212978Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 71,
+        "timestamp": "2026-06-01T10:41:30.6212978Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 9,
+        "timestamp": "2026-06-01T10:41:30.661316Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched cell value and field name",
+        "ms": 26,
+        "timestamp": "2026-06-01T10:41:31.5546827Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fields validation",
+        "ms": 32,
+        "timestamp": "2026-06-01T10:41:31.5896656Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 66,
+        "timestamp": "2026-06-01T10:41:31.5946089Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched mapping value and column name",
+        "ms": 64,
+        "timestamp": "2026-06-01T10:41:31.6894037Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 70,
+        "timestamp": "2026-06-01T10:41:31.6937156Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 68,
+        "timestamp": "2026-06-01T10:41:31.789482Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched cell value and field name",
+        "ms": 64,
+        "timestamp": "2026-06-01T10:41:31.789482Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fields validation",
+        "ms": 32,
+        "timestamp": "2026-06-01T10:41:31.8893681Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 36,
+        "timestamp": "2026-06-01T10:41:31.8893681Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched cell value and field name",
+        "ms": 7,
+        "timestamp": "2026-06-01T10:41:31.9347013Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 11,
+        "timestamp": "2026-06-01T10:41:31.9375307Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 35,
+        "timestamp": "2026-06-01T10:41:31.9893808Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched cell value and field name",
+        "ms": 32,
+        "timestamp": "2026-06-01T10:41:31.9893808Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 56,
+        "timestamp": "2026-06-01T10:41:32.0894722Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched mapping value and column name",
+        "ms": 52,
+        "timestamp": "2026-06-01T10:41:32.0894722Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Date only field check",
+        "ms": 146,
+        "timestamp": "2026-06-01T10:41:32.9184985Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 151,
+        "timestamp": "2026-06-01T10:41:32.9218672Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fields validation",
+        "ms": 8,
+        "timestamp": "2026-06-01T10:41:33.822436Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 11,
+        "timestamp": "2026-06-01T10:41:33.822436Z"
+      },
+      {
+        "chunk": 0,
+        "step": "BulkInsert for rows 2 to 1001",
+        "ms": 64220,
+        "timestamp": "2026-06-01T10:42:38.6777205Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 6,
+        "timestamp": "2026-06-01T10:42:38.6818759Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched cell value and field name",
+        "ms": 7,
+        "timestamp": "2026-06-01T10:42:39.3777821Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 11,
+        "timestamp": "2026-06-01T10:42:39.3777821Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Country, State and ZIP processing",
+        "ms": 9,
+        "timestamp": "2026-06-01T10:42:39.6850039Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 6,
+        "timestamp": "2026-06-01T10:42:40.2003409Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched cell value and field name",
+        "ms": 8,
+        "timestamp": "2026-06-01T10:42:40.2779325Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 12,
+        "timestamp": "2026-06-01T10:42:40.2816805Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Country, State and ZIP processing",
+        "ms": 7,
+        "timestamp": "2026-06-01T10:42:41.2690242Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 12,
+        "timestamp": "2026-06-01T10:42:42.1738962Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fields validation",
+        "ms": 9,
+        "timestamp": "2026-06-01T10:42:42.1738962Z"
+      },
+      {
+        "chunk": 0,
+        "step": "BulkInsert for rows 1002 to 2001",
+        "ms": 48725,
+        "timestamp": "2026-06-01T10:43:31.474878Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 6,
+        "timestamp": "2026-06-01T10:43:31.5293786Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 11,
+        "timestamp": "2026-06-01T10:43:31.6296282Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched cell value and field name",
+        "ms": 7,
+        "timestamp": "2026-06-01T10:43:31.6296282Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 10,
+        "timestamp": "2026-06-01T10:43:31.6574454Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 6,
+        "timestamp": "2026-06-01T10:43:31.669627Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 7,
+        "timestamp": "2026-06-01T10:43:31.6776969Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 7,
+        "timestamp": "2026-06-01T10:43:31.7020329Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 8,
+        "timestamp": "2026-06-01T10:43:31.8818627Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 8,
+        "timestamp": "2026-06-01T10:43:32.0423508Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 6,
+        "timestamp": "2026-06-01T10:43:32.1345644Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 6,
+        "timestamp": "2026-06-01T10:43:32.1655776Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched cell value and field name",
+        "ms": 10,
+        "timestamp": "2026-06-01T10:43:32.3445188Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 13,
+        "timestamp": "2026-06-01T10:43:32.3458444Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 6,
+        "timestamp": "2026-06-01T10:43:32.3777282Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 8,
+        "timestamp": "2026-06-01T10:43:32.5058894Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 9,
+        "timestamp": "2026-06-01T10:43:32.8779328Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched mapping value and column name",
+        "ms": 7,
+        "timestamp": "2026-06-01T10:43:33.3133075Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 10,
+        "timestamp": "2026-06-01T10:43:33.3133075Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched cell value and field name",
+        "ms": 7,
+        "timestamp": "2026-06-01T10:43:34.2315724Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 11,
+        "timestamp": "2026-06-01T10:43:34.2341668Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 6,
+        "timestamp": "2026-06-01T10:43:35.0936027Z"
+      },
+      {
+        "chunk": 0,
+        "step": "ValidateGenericUpdateContentValue",
+        "ms": 7,
+        "timestamp": "2026-06-01T10:43:35.1844033Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 11,
+        "timestamp": "2026-06-01T10:43:35.1853614Z"
+      },
+      {
+        "chunk": 0,
+        "step": "BulkInsert for rows 2002 to 3001",
+        "ms": 42199,
+        "timestamp": "2026-06-01T10:44:17.9237936Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched mapping value and column name",
+        "ms": 8,
+        "timestamp": "2026-06-01T10:44:19.6305583Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 12,
+        "timestamp": "2026-06-01T10:44:19.6336111Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 10,
+        "timestamp": "2026-06-01T10:44:20.5434909Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fields validation",
+        "ms": 7,
+        "timestamp": "2026-06-01T10:44:20.5434909Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched cell value and field name",
+        "ms": 7,
+        "timestamp": "2026-06-01T10:44:21.4394047Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 10,
+        "timestamp": "2026-06-01T10:44:21.4417997Z"
+      },
+      {
+        "chunk": 0,
+        "step": "BulkInsert for rows 3002 to 4001",
+        "ms": 36287,
+        "timestamp": "2026-06-01T10:44:58.2178258Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 6,
+        "timestamp": "2026-06-01T10:44:58.221947Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched cell value and field name",
+        "ms": 7,
+        "timestamp": "2026-06-01T10:44:59.0714444Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 11,
+        "timestamp": "2026-06-01T10:44:59.0714444Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fields validation",
+        "ms": 7,
+        "timestamp": "2026-06-01T10:44:59.9714607Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 10,
+        "timestamp": "2026-06-01T10:44:59.9733429Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 14,
+        "timestamp": "2026-06-01T10:45:00.8861559Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched cell value and field name",
+        "ms": 10,
+        "timestamp": "2026-06-01T10:45:00.8861559Z"
+      },
+      {
+        "chunk": 0,
+        "step": "BulkInsert for rows 4002 to 5001",
+        "ms": 32157,
+        "timestamp": "2026-06-01T10:45:34.4394256Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 6,
+        "timestamp": "2026-06-01T10:46:02.3475921Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Country, State and ZIP processing",
+        "ms": 94,
+        "timestamp": "2026-06-01T10:46:02.9284782Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 6,
+        "timestamp": "2026-06-01T10:46:02.9336383Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched cell value and field name",
+        "ms": 198,
+        "timestamp": "2026-06-01T10:46:04.0468877Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 202,
+        "timestamp": "2026-06-01T10:46:04.0468877Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fields validation",
+        "ms": 7,
+        "timestamp": "2026-06-01T10:46:04.9840464Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 10,
+        "timestamp": "2026-06-01T10:46:04.9840464Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 11,
+        "timestamp": "2026-06-01T10:46:05.9324742Z"
+      },
+      {
+        "chunk": 0,
+        "step": "BulkInsert for rows 2 to 1001",
+        "ms": 30130,
+        "timestamp": "2026-06-01T10:46:36.8227194Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 6,
+        "timestamp": "2026-06-01T10:46:37.0218539Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched cell value and field name",
+        "ms": 7,
+        "timestamp": "2026-06-01T10:46:37.424334Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 10,
+        "timestamp": "2026-06-01T10:46:37.4264769Z"
+      },
+      {
+        "chunk": 0,
+        "step": "MP Status Override Permission Check processing",
+        "ms": 8,
+        "timestamp": "2026-06-01T10:46:38.3653558Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Country, State and ZIP processing",
+        "ms": 7,
+        "timestamp": "2026-06-01T10:46:39.2794993Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 6,
+        "timestamp": "2026-06-01T10:46:39.3304173Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 8,
+        "timestamp": "2026-06-01T10:46:39.4777507Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched mapping value and column name",
+        "ms": 7,
+        "timestamp": "2026-06-01T10:46:40.2191923Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 10,
+        "timestamp": "2026-06-01T10:46:40.2191923Z"
+      },
+      {
+        "chunk": 0,
+        "step": "BulkInsert for rows 1002 to 2001",
+        "ms": 27815,
+        "timestamp": "2026-06-01T10:47:08.7553926Z"
+      },
+      {
+        "chunk": 0,
+        "step": "ValidateGenericUpdateContentValue",
+        "ms": 7,
+        "timestamp": "2026-06-01T10:47:09.3913943Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 11,
+        "timestamp": "2026-06-01T10:47:09.3944545Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 7,
+        "timestamp": "2026-06-01T10:47:09.5668311Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 11,
+        "timestamp": "2026-06-01T10:47:10.3384521Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched cell value and field name",
+        "ms": 8,
+        "timestamp": "2026-06-01T10:47:11.2551779Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 12,
+        "timestamp": "2026-06-01T10:47:11.2551779Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 11,
+        "timestamp": "2026-06-01T10:47:12.1655086Z"
+      },
+      {
+        "chunk": 0,
+        "step": "BulkInsert for rows 2002 to 3001",
+        "ms": 26309,
+        "timestamp": "2026-06-01T10:47:39.1233541Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Country, State and ZIP processing",
+        "ms": 8,
+        "timestamp": "2026-06-01T10:47:39.8256571Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 12,
+        "timestamp": "2026-06-01T10:47:40.7465673Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched cell value and field name",
+        "ms": 16,
+        "timestamp": "2026-06-01T10:47:41.6691437Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 20,
+        "timestamp": "2026-06-01T10:47:41.6693912Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched cell value and field name",
+        "ms": 7,
+        "timestamp": "2026-06-01T10:47:42.5810129Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 11,
+        "timestamp": "2026-06-01T10:47:42.5834561Z"
+      },
+      {
+        "chunk": 0,
+        "step": "BulkInsert for rows 3002 to 4001",
+        "ms": 25072,
+        "timestamp": "2026-06-01T10:48:08.2893251Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched mapping value and column name",
+        "ms": 8,
+        "timestamp": "2026-06-01T10:48:09.0289466Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 12,
+        "timestamp": "2026-06-01T10:48:09.0299746Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched cell value and field name",
+        "ms": 8,
+        "timestamp": "2026-06-01T10:48:09.9548893Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 11,
+        "timestamp": "2026-06-01T10:48:09.9548893Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fields validation",
+        "ms": 8,
+        "timestamp": "2026-06-01T10:48:10.8779701Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 12,
+        "timestamp": "2026-06-01T10:48:10.8779701Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Country, State and ZIP processing",
+        "ms": 9,
+        "timestamp": "2026-06-01T10:48:11.8150546Z"
+      },
+      {
+        "chunk": 0,
+        "step": "BulkInsert for rows 4002 to 5001",
+        "ms": 24291,
+        "timestamp": "2026-06-01T10:48:36.6798484Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 6,
+        "timestamp": "2026-06-01T10:49:03.606123Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 111,
+        "timestamp": "2026-06-01T10:49:04.1992573Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched cell value and field name",
+        "ms": 232,
+        "timestamp": "2026-06-01T10:49:05.3413498Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 237,
+        "timestamp": "2026-06-01T10:49:05.3413498Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched mapping value and column name",
+        "ms": 9,
+        "timestamp": "2026-06-01T10:49:06.2692399Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 12,
+        "timestamp": "2026-06-01T10:49:06.2705693Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched cell value and field name",
+        "ms": 7,
+        "timestamp": "2026-06-01T10:49:07.2225544Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 11,
+        "timestamp": "2026-06-01T10:49:07.2264807Z"
+      },
+      {
+        "chunk": 0,
+        "step": "BulkInsert for rows 2 to 1001",
+        "ms": 22100,
+        "timestamp": "2026-06-01T10:49:30.1127422Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Country, State and ZIP processing",
+        "ms": 9,
+        "timestamp": "2026-06-01T10:49:30.6816135Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched cell value and field name",
+        "ms": 7,
+        "timestamp": "2026-06-01T10:49:31.5839957Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 11,
+        "timestamp": "2026-06-01T10:49:31.5861655Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched cell value and field name",
+        "ms": 7,
+        "timestamp": "2026-06-01T10:49:32.4887883Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 10,
+        "timestamp": "2026-06-01T10:49:32.4903298Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fields validation",
+        "ms": 7,
+        "timestamp": "2026-06-01T10:49:33.3919683Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 11,
+        "timestamp": "2026-06-01T10:49:33.3939723Z"
+      },
+      {
+        "chunk": 0,
+        "step": "BulkInsert for rows 1002 to 2001",
+        "ms": 22056,
+        "timestamp": "2026-06-01T10:49:56.1710184Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched cell value and field name",
+        "ms": 9,
+        "timestamp": "2026-06-01T10:49:56.7820087Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 14,
+        "timestamp": "2026-06-01T10:49:56.7859298Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 6,
+        "timestamp": "2026-06-01T10:49:57.1133477Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 12,
+        "timestamp": "2026-06-01T10:49:57.4577302Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched mapping value and column name",
+        "ms": 9,
+        "timestamp": "2026-06-01T10:49:57.4577302Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 6,
+        "timestamp": "2026-06-01T10:49:57.6138126Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 11,
+        "timestamp": "2026-06-01T10:49:57.7653882Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 6,
+        "timestamp": "2026-06-01T10:49:58.0584652Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched mapping value and column name",
+        "ms": 6,
+        "timestamp": "2026-06-01T10:49:58.0708457Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 10,
+        "timestamp": "2026-06-01T10:49:58.0735075Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 6,
+        "timestamp": "2026-06-01T10:49:58.1071188Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 9,
+        "timestamp": "2026-06-01T10:49:58.2267257Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 6,
+        "timestamp": "2026-06-01T10:49:58.6456097Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched mapping value and column name",
+        "ms": 7,
+        "timestamp": "2026-06-01T10:49:58.7420657Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 11,
+        "timestamp": "2026-06-01T10:49:58.7459833Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 8,
+        "timestamp": "2026-06-01T10:49:58.8978238Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 26,
+        "timestamp": "2026-06-01T10:49:59.6779653Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched cell value and field name",
+        "ms": 22,
+        "timestamp": "2026-06-01T10:49:59.6779653Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 6,
+        "timestamp": "2026-06-01T10:49:59.6857955Z"
+      },
+      {
+        "chunk": 0,
+        "step": "BulkInsert for rows 2002 to 3001",
+        "ms": 21530,
+        "timestamp": "2026-06-01T10:50:21.8941643Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched cell value and field name",
+        "ms": 7,
+        "timestamp": "2026-06-01T10:50:22.5712303Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 11,
+        "timestamp": "2026-06-01T10:50:22.5738989Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Address processing",
+        "ms": 8,
+        "timestamp": "2026-06-01T10:50:23.4884309Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 11,
+        "timestamp": "2026-06-01T10:50:24.4020535Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fields validation",
+        "ms": 7,
+        "timestamp": "2026-06-01T10:50:24.4020535Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Date only field check",
+        "ms": 8,
+        "timestamp": "2026-06-01T10:50:25.3195194Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 11,
+        "timestamp": "2026-06-01T10:50:25.3219954Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 6,
+        "timestamp": "2026-06-01T10:50:25.7630506Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 6,
+        "timestamp": "2026-06-01T10:50:25.7701544Z"
+      },
+      {
+        "chunk": 0,
+        "step": "BulkInsert for rows 3002 to 4001",
+        "ms": 20191,
+        "timestamp": "2026-06-01T10:50:46.1649576Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched mapping value and column name",
+        "ms": 8,
+        "timestamp": "2026-06-01T10:50:46.8965482Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 12,
+        "timestamp": "2026-06-01T10:50:46.8965482Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched cell value and field name",
+        "ms": 7,
+        "timestamp": "2026-06-01T10:50:47.8263783Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 11,
+        "timestamp": "2026-06-01T10:50:47.8263783Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched cell value and field name",
+        "ms": 7,
+        "timestamp": "2026-06-01T10:50:48.7478617Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 11,
+        "timestamp": "2026-06-01T10:50:48.7497503Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 6,
+        "timestamp": "2026-06-01T10:50:49.6499048Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 6,
+        "timestamp": "2026-06-01T10:50:49.6546363Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 6,
+        "timestamp": "2026-06-01T10:50:49.6899546Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Date only field check",
+        "ms": 12,
+        "timestamp": "2026-06-01T10:50:49.7055621Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 19,
+        "timestamp": "2026-06-01T10:50:49.7099575Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 6,
+        "timestamp": "2026-06-01T10:50:49.7176719Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 6,
+        "timestamp": "2026-06-01T10:50:49.7664098Z"
+      },
+      {
+        "chunk": 0,
+        "step": "BulkInsert for rows 4002 to 5001",
+        "ms": 20087,
+        "timestamp": "2026-06-01T10:51:10.4373824Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 6,
+        "timestamp": "2026-06-01T10:51:37.1310156Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 8,
+        "timestamp": "2026-06-01T10:51:37.3093721Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Date only field check",
+        "ms": 128,
+        "timestamp": "2026-06-01T10:51:37.7941406Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 133,
+        "timestamp": "2026-06-01T10:51:37.7979675Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Phone number processing",
+        "ms": 211,
+        "timestamp": "2026-06-01T10:51:38.9583769Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 23,
+        "timestamp": "2026-06-01T10:51:38.9893515Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched mapping value and column name",
+        "ms": 20,
+        "timestamp": "2026-06-01T10:51:38.9893515Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched cell value and field name",
+        "ms": 7,
+        "timestamp": "2026-06-01T10:51:39.9086927Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 11,
+        "timestamp": "2026-06-01T10:51:39.9108741Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 7,
+        "timestamp": "2026-06-01T10:51:39.9865938Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched cell value and field name",
+        "ms": 10,
+        "timestamp": "2026-06-01T10:51:40.8609905Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 14,
+        "timestamp": "2026-06-01T10:51:40.8627595Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 6,
+        "timestamp": "2026-06-01T10:51:40.9677585Z"
+      },
+      {
+        "chunk": 0,
+        "step": "BulkInsert for rows 2 to 1001",
+        "ms": 19043,
+        "timestamp": "2026-06-01T10:52:00.6991897Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fields validation",
+        "ms": 8,
+        "timestamp": "2026-06-01T10:52:01.2907231Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 12,
+        "timestamp": "2026-06-01T10:52:01.2939592Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fields validation",
+        "ms": 7,
+        "timestamp": "2026-06-01T10:52:02.2051863Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 11,
+        "timestamp": "2026-06-01T10:52:02.2055612Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 11,
+        "timestamp": "2026-06-01T10:52:03.1152749Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Required/Blank field validation",
+        "ms": 8,
+        "timestamp": "2026-06-01T10:52:03.1152749Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 7,
+        "timestamp": "2026-06-01T10:52:03.1616058Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched mapping value and column name",
+        "ms": 9,
+        "timestamp": "2026-06-01T10:52:04.0330725Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 13,
+        "timestamp": "2026-06-01T10:52:04.0344148Z"
+      },
+      {
+        "chunk": 0,
+        "step": "BulkInsert for rows 1002 to 2001",
+        "ms": 18597,
+        "timestamp": "2026-06-01T10:52:23.3601573Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Country, State and ZIP processing",
+        "ms": 7,
+        "timestamp": "2026-06-01T10:52:23.406635Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched cell value and field name",
+        "ms": 7,
+        "timestamp": "2026-06-01T10:52:24.0405314Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 11,
+        "timestamp": "2026-06-01T10:52:24.0414225Z"
+      },
+      {
+        "chunk": 0,
+        "step": "SetGenericUpdateContentValue",
+        "ms": 7,
+        "timestamp": "2026-06-01T10:52:24.9513324Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 11,
+        "timestamp": "2026-06-01T10:52:24.9513324Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fields validation",
+        "ms": 7,
+        "timestamp": "2026-06-01T10:52:25.8669514Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 10,
+        "timestamp": "2026-06-01T10:52:25.8699406Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 12,
+        "timestamp": "2026-06-01T10:52:26.7885312Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched cell value and field name",
+        "ms": 8,
+        "timestamp": "2026-06-01T10:52:26.7885312Z"
+      },
+      {
+        "chunk": 0,
+        "step": "BulkInsert for rows 2002 to 3001",
+        "ms": 18199,
+        "timestamp": "2026-06-01T10:52:45.6509572Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 14,
+        "timestamp": "2026-06-01T10:52:46.3382836Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched mapping value and column name",
+        "ms": 11,
+        "timestamp": "2026-06-01T10:52:46.3382836Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched mapping value and column name",
+        "ms": 8,
+        "timestamp": "2026-06-01T10:52:47.2786524Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 11,
+        "timestamp": "2026-06-01T10:52:47.2786524Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 11,
+        "timestamp": "2026-06-01T10:52:48.2036289Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched cell value and field name",
+        "ms": 7,
+        "timestamp": "2026-06-01T10:52:48.2036289Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched mapping value and column name",
+        "ms": 7,
+        "timestamp": "2026-06-01T10:52:49.1230318Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 11,
+        "timestamp": "2026-06-01T10:52:49.1230318Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched mapping value and column name",
+        "ms": 11,
+        "timestamp": "2026-06-01T10:52:49.6529032Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 16,
+        "timestamp": "2026-06-01T10:52:49.6552296Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 6,
+        "timestamp": "2026-06-01T10:52:49.6909423Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched cell value and field name",
+        "ms": 24,
+        "timestamp": "2026-06-01T10:52:49.7893808Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 28,
+        "timestamp": "2026-06-01T10:52:49.7893808Z"
+      },
+      {
+        "chunk": 0,
+        "step": "BulkInsert for rows 3002 to 4001",
+        "ms": 17219,
+        "timestamp": "2026-06-01T10:53:07.0524883Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 6,
+        "timestamp": "2026-06-01T10:53:07.0579556Z"
+      },
+      {
+        "chunk": 0,
+        "step": "SetGenericUpdateContentValue",
+        "ms": 8,
+        "timestamp": "2026-06-01T10:53:07.3718899Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 12,
+        "timestamp": "2026-06-01T10:53:07.3742671Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 10,
+        "timestamp": "2026-06-01T10:53:07.8521387Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched mapping value and column name",
+        "ms": 7,
+        "timestamp": "2026-06-01T10:53:07.8521387Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched mapping value and column name",
+        "ms": 6,
+        "timestamp": "2026-06-01T10:53:08.3191784Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 10,
+        "timestamp": "2026-06-01T10:53:08.3213435Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched cell value and field name",
+        "ms": 6,
+        "timestamp": "2026-06-01T10:53:08.7863077Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 10,
+        "timestamp": "2026-06-01T10:53:08.7895723Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Country, State and ZIP processing",
+        "ms": 7,
+        "timestamp": "2026-06-01T10:53:09.257162Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 12,
+        "timestamp": "2026-06-01T10:53:09.7286868Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Country, State and ZIP processing",
+        "ms": 8,
+        "timestamp": "2026-06-01T10:53:10.2071709Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched cell value and field name",
+        "ms": 7,
+        "timestamp": "2026-06-01T10:53:10.6794701Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 11,
+        "timestamp": "2026-06-01T10:53:10.6817426Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fields validation",
+        "ms": 7,
+        "timestamp": "2026-06-01T10:53:11.158053Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 11,
+        "timestamp": "2026-06-01T10:53:11.1613499Z"
+      },
+      {
+        "chunk": 0,
+        "step": "BulkInsert for rows 4002 to 5001",
+        "ms": 17707,
+        "timestamp": "2026-06-01T10:53:28.9441504Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched cell value and field name",
+        "ms": 273,
+        "timestamp": "2026-06-01T10:53:56.7902108Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 277,
+        "timestamp": "2026-06-01T10:53:56.7939313Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 6,
+        "timestamp": "2026-06-01T10:53:57.0739997Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 6,
+        "timestamp": "2026-06-01T10:53:57.0786407Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 6,
+        "timestamp": "2026-06-01T10:53:57.0857565Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched cell value and field name",
+        "ms": 10,
+        "timestamp": "2026-06-01T10:53:57.2901495Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 14,
+        "timestamp": "2026-06-01T10:53:57.2942244Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched cell value and field name",
+        "ms": 36,
+        "timestamp": "2026-06-01T10:53:57.8054935Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 43,
+        "timestamp": "2026-06-01T10:53:57.8116063Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched cell value and field name",
+        "ms": 6,
+        "timestamp": "2026-06-01T10:53:58.2860715Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 10,
+        "timestamp": "2026-06-01T10:53:58.2860715Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Adding errors and warnings",
+        "ms": 6,
+        "timestamp": "2026-06-01T10:53:58.752421Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 10,
+        "timestamp": "2026-06-01T10:53:59.2302907Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched mapping value and column name",
+        "ms": 6,
+        "timestamp": "2026-06-01T10:53:59.2302907Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched mapping value and column name",
+        "ms": 8,
+        "timestamp": "2026-06-01T10:53:59.6982939Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 12,
+        "timestamp": "2026-06-01T10:53:59.7023104Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched cell value and field name",
+        "ms": 6,
+        "timestamp": "2026-06-01T10:54:00.1710227Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 10,
+        "timestamp": "2026-06-01T10:54:00.1734263Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 10,
+        "timestamp": "2026-06-01T10:54:00.6495Z"
+      },
+      {
+        "chunk": 0,
+        "step": "BulkInsert for rows 2 to 1001",
+        "ms": 17047,
+        "timestamp": "2026-06-01T10:54:17.9981064Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 9,
+        "timestamp": "2026-06-01T10:54:18.141991Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched mapping value and column name",
+        "ms": 6,
+        "timestamp": "2026-06-01T10:54:18.6199459Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 10,
+        "timestamp": "2026-06-01T10:54:18.6213144Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 11,
+        "timestamp": "2026-06-01T10:54:19.0863967Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched cell value and field name",
+        "ms": 7,
+        "timestamp": "2026-06-01T10:54:19.0863967Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fields validation",
+        "ms": 7,
+        "timestamp": "2026-06-01T10:54:19.5425209Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 10,
+        "timestamp": "2026-06-01T10:54:19.5425209Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 10,
+        "timestamp": "2026-06-01T10:54:20.0334105Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 10,
+        "timestamp": "2026-06-01T10:54:20.4870253Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fields validation",
+        "ms": 7,
+        "timestamp": "2026-06-01T10:54:20.4870253Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 10,
+        "timestamp": "2026-06-01T10:54:20.9631903Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched cell value and field name",
+        "ms": 7,
+        "timestamp": "2026-06-01T10:54:20.9631903Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fields validation",
+        "ms": 6,
+        "timestamp": "2026-06-01T10:54:21.4223783Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 10,
+        "timestamp": "2026-06-01T10:54:21.4223783Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 15,
+        "timestamp": "2026-06-01T10:54:21.891413Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Date only field check",
+        "ms": 11,
+        "timestamp": "2026-06-01T10:54:21.891413Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 8,
+        "timestamp": "2026-06-01T10:54:21.9103669Z"
+      },
+      {
+        "chunk": 0,
+        "step": "BulkInsert for rows 1002 to 2001",
+        "ms": 16666,
+        "timestamp": "2026-06-01T10:54:38.8184134Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 8,
+        "timestamp": "2026-06-01T10:54:39.0079834Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 7,
+        "timestamp": "2026-06-01T10:54:39.0737421Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 6,
+        "timestamp": "2026-06-01T10:54:39.1388666Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 6,
+        "timestamp": "2026-06-01T10:54:39.3088287Z"
+      },
+      {
+        "chunk": 0,
+        "step": "SetGenericUpdateContentValue",
+        "ms": 7,
+        "timestamp": "2026-06-01T10:54:39.4656611Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 13,
+        "timestamp": "2026-06-01T10:54:39.4696353Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched cell value and field name",
+        "ms": 8,
+        "timestamp": "2026-06-01T10:54:39.5118982Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 12,
+        "timestamp": "2026-06-01T10:54:39.5118982Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 6,
+        "timestamp": "2026-06-01T10:54:39.8814026Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 11,
+        "timestamp": "2026-06-01T10:54:40.0115351Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 7,
+        "timestamp": "2026-06-01T10:54:40.09797Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 13,
+        "timestamp": "2026-06-01T10:54:40.5113322Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched cell value and field name",
+        "ms": 9,
+        "timestamp": "2026-06-01T10:54:40.5113322Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 8,
+        "timestamp": "2026-06-01T10:54:40.702781Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 6,
+        "timestamp": "2026-06-01T10:54:40.8576973Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Required/Blank field validation",
+        "ms": 7,
+        "timestamp": "2026-06-01T10:54:41.0084858Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 12,
+        "timestamp": "2026-06-01T10:54:41.0096701Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 9,
+        "timestamp": "2026-06-01T10:54:41.0934317Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched cell value and field name",
+        "ms": 7,
+        "timestamp": "2026-06-01T10:54:41.4968645Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 11,
+        "timestamp": "2026-06-01T10:54:41.497617Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 10,
+        "timestamp": "2026-06-01T10:54:41.9567696Z"
+      },
+      {
+        "chunk": 0,
+        "step": "ValidateGenericUpdateContentValue",
+        "ms": 7,
+        "timestamp": "2026-06-01T10:54:41.9567696Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 10,
+        "timestamp": "2026-06-01T10:54:42.4221894Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Country, State and ZIP processing",
+        "ms": 7,
+        "timestamp": "2026-06-01T10:54:42.8798911Z"
+      },
+      {
+        "chunk": 0,
+        "step": "BulkInsert for rows 2002 to 3001",
+        "ms": 16144,
+        "timestamp": "2026-06-01T10:54:59.2180091Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 9,
+        "timestamp": "2026-06-01T10:54:59.4632674Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fields validation",
+        "ms": 7,
+        "timestamp": "2026-06-01T10:54:59.9406322Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 11,
+        "timestamp": "2026-06-01T10:54:59.9426194Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fields validation",
+        "ms": 6,
+        "timestamp": "2026-06-01T10:55:00.4029315Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 10,
+        "timestamp": "2026-06-01T10:55:00.4029315Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 10,
+        "timestamp": "2026-06-01T10:55:00.8770033Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched mapping value and column name",
+        "ms": 6,
+        "timestamp": "2026-06-01T10:55:00.8770033Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Phone number processing",
+        "ms": 8,
+        "timestamp": "2026-06-01T10:55:01.3427835Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Adding errors and warnings",
+        "ms": 7,
+        "timestamp": "2026-06-01T10:55:01.8168197Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched cell value and field name",
+        "ms": 7,
+        "timestamp": "2026-06-01T10:55:02.2795031Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 12,
+        "timestamp": "2026-06-01T10:55:02.2817307Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 11,
+        "timestamp": "2026-06-01T10:55:02.7416371Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 10,
+        "timestamp": "2026-06-01T10:55:03.2023077Z"
+      },
+      {
+        "chunk": 0,
+        "step": "BulkInsert for rows 3002 to 4001",
+        "ms": 15797,
+        "timestamp": "2026-06-01T10:55:19.1478774Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 7,
+        "timestamp": "2026-06-01T10:55:19.1704137Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched mapping value and column name",
+        "ms": 6,
+        "timestamp": "2026-06-01T10:55:19.4550831Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 10,
+        "timestamp": "2026-06-01T10:55:19.4584891Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched mapping value and column name",
+        "ms": 7,
+        "timestamp": "2026-06-01T10:55:19.9547705Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 11,
+        "timestamp": "2026-06-01T10:55:19.9577578Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 11,
+        "timestamp": "2026-06-01T10:55:20.4221567Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched mapping value and column name",
+        "ms": 8,
+        "timestamp": "2026-06-01T10:55:20.4221567Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 11,
+        "timestamp": "2026-06-01T10:55:20.8958327Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Date only field check",
+        "ms": 7,
+        "timestamp": "2026-06-01T10:55:20.8958327Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched cell value and field name",
+        "ms": 7,
+        "timestamp": "2026-06-01T10:55:21.3651345Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 11,
+        "timestamp": "2026-06-01T10:55:21.3656942Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 10,
+        "timestamp": "2026-06-01T10:55:21.8409848Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Adding errors and warnings",
+        "ms": 6,
+        "timestamp": "2026-06-01T10:55:22.3036165Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Date only field check",
+        "ms": 22,
+        "timestamp": "2026-06-01T10:55:22.7841598Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 29,
+        "timestamp": "2026-06-01T10:55:22.7902782Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched mapping value and column name",
+        "ms": 6,
+        "timestamp": "2026-06-01T10:55:23.2466919Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 10,
+        "timestamp": "2026-06-01T10:55:23.250199Z"
+      },
+      {
+        "chunk": 0,
+        "step": "BulkInsert for rows 4002 to 5001",
+        "ms": 15491,
+        "timestamp": "2026-06-01T10:55:38.8348296Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched cell value and field name",
+        "ms": 309,
+        "timestamp": "2026-06-01T10:56:06.6359775Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 313,
+        "timestamp": "2026-06-01T10:56:06.6381489Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 6,
+        "timestamp": "2026-06-01T10:56:06.699049Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 6,
+        "timestamp": "2026-06-01T10:56:06.711317Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 7,
+        "timestamp": "2026-06-01T10:56:07.0335843Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 6,
+        "timestamp": "2026-06-01T10:56:07.0541421Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 6,
+        "timestamp": "2026-06-01T10:56:07.0613582Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 6,
+        "timestamp": "2026-06-01T10:56:07.1746483Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched mapping value and column name",
+        "ms": 11,
+        "timestamp": "2026-06-01T10:56:07.1875025Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 15,
+        "timestamp": "2026-06-01T10:56:07.1906017Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 7,
+        "timestamp": "2026-06-01T10:56:07.3635301Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 6,
+        "timestamp": "2026-06-01T10:56:07.4740429Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 6,
+        "timestamp": "2026-06-01T10:56:07.5241962Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Date only field check",
+        "ms": 44,
+        "timestamp": "2026-06-01T10:56:07.747709Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 50,
+        "timestamp": "2026-06-01T10:56:07.7498179Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 8,
+        "timestamp": "2026-06-01T10:56:07.823137Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Country, State and ZIP processing",
+        "ms": 11,
+        "timestamp": "2026-06-01T10:56:08.2443011Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched cell value and field name",
+        "ms": 7,
+        "timestamp": "2026-06-01T10:56:08.7217195Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 11,
+        "timestamp": "2026-06-01T10:56:08.7217195Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Date only field check",
+        "ms": 8,
+        "timestamp": "2026-06-01T10:56:09.1902439Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 11,
+        "timestamp": "2026-06-01T10:56:09.1937604Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 13,
+        "timestamp": "2026-06-01T10:56:09.6631422Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched mapping value and column name",
+        "ms": 10,
+        "timestamp": "2026-06-01T10:56:09.6631422Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Phone number processing",
+        "ms": 7,
+        "timestamp": "2026-06-01T10:56:10.1366324Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fields validation",
+        "ms": 6,
+        "timestamp": "2026-06-01T10:56:10.6079657Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 10,
+        "timestamp": "2026-06-01T10:56:10.6098356Z"
+      },
+      {
+        "chunk": 0,
+        "step": "BulkInsert for rows 2 to 1001",
+        "ms": 15281,
+        "timestamp": "2026-06-01T10:56:26.1992918Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 9,
+        "timestamp": "2026-06-01T10:56:26.3341168Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched mapping value and column name",
+        "ms": 6,
+        "timestamp": "2026-06-01T10:56:26.8073237Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 10,
+        "timestamp": "2026-06-01T10:56:26.8094585Z"
+      },
+      {
+        "chunk": 0,
+        "step": "MP Status Override Permission Check processing",
+        "ms": 8,
+        "timestamp": "2026-06-01T10:56:27.2951637Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 11,
+        "timestamp": "2026-06-01T10:56:27.7656372Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched cell value and field name",
+        "ms": 7,
+        "timestamp": "2026-06-01T10:56:27.7656372Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched mapping value and column name",
+        "ms": 7,
+        "timestamp": "2026-06-01T10:56:28.2446591Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 11,
+        "timestamp": "2026-06-01T10:56:28.2462709Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched cell value and field name",
+        "ms": 9,
+        "timestamp": "2026-06-01T10:56:28.7202587Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 13,
+        "timestamp": "2026-06-01T10:56:28.7216402Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched cell value and field name",
+        "ms": 8,
+        "timestamp": "2026-06-01T10:56:29.1867249Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 12,
+        "timestamp": "2026-06-01T10:56:29.1893076Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched mapping value and column name",
+        "ms": 11,
+        "timestamp": "2026-06-01T10:56:29.6661015Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 15,
+        "timestamp": "2026-06-01T10:56:29.6661015Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched cell value and field name",
+        "ms": 7,
+        "timestamp": "2026-06-01T10:56:30.1354738Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 10,
+        "timestamp": "2026-06-01T10:56:30.1354738Z"
+      },
+      {
+        "chunk": 0,
+        "step": "BulkInsert for rows 1002 to 2001",
+        "ms": 14412,
+        "timestamp": "2026-06-01T10:56:44.8112266Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 11,
+        "timestamp": "2026-06-01T10:56:44.9980591Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fields validation",
+        "ms": 7,
+        "timestamp": "2026-06-01T10:56:44.9980591Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched mapping value and column name",
+        "ms": 7,
+        "timestamp": "2026-06-01T10:56:45.4725084Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 11,
+        "timestamp": "2026-06-01T10:56:45.4741388Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched cell value and field name",
+        "ms": 6,
+        "timestamp": "2026-06-01T10:56:45.950698Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 10,
+        "timestamp": "2026-06-01T10:56:45.9545453Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 7,
+        "timestamp": "2026-06-01T10:56:46.1821252Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 11,
+        "timestamp": "2026-06-01T10:56:46.441853Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched mapping value and column name",
+        "ms": 8,
+        "timestamp": "2026-06-01T10:56:46.441853Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 11,
+        "timestamp": "2026-06-01T10:56:46.9165531Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched mapping value and column name",
+        "ms": 7,
+        "timestamp": "2026-06-01T10:56:47.3925968Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 11,
+        "timestamp": "2026-06-01T10:56:47.3925968Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Country, State and ZIP processing",
+        "ms": 8,
+        "timestamp": "2026-06-01T10:56:47.871721Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 11,
+        "timestamp": "2026-06-01T10:56:48.3496371Z"
+      },
+      {
+        "chunk": 0,
+        "step": "ValidateGenericUpdateContentValue",
+        "ms": 7,
+        "timestamp": "2026-06-01T10:56:48.3496371Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 11,
+        "timestamp": "2026-06-01T10:56:48.8137491Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fields validation",
+        "ms": 8,
+        "timestamp": "2026-06-01T10:56:48.8137491Z"
+      },
+      {
+        "chunk": 0,
+        "step": "BulkInsert for rows 2002 to 3001",
+        "ms": 14619,
+        "timestamp": "2026-06-01T10:57:03.6403017Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Phone number processing",
+        "ms": 8,
+        "timestamp": "2026-06-01T10:57:03.8899732Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Address processing",
+        "ms": 7,
+        "timestamp": "2026-06-01T10:57:04.3763508Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 11,
+        "timestamp": "2026-06-01T10:57:04.8399547Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched cell value and field name",
+        "ms": 7,
+        "timestamp": "2026-06-01T10:57:04.8399547Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 11,
+        "timestamp": "2026-06-01T10:57:05.3079798Z"
+      },
+      {
+        "chunk": 0,
+        "step": "ValidateGenericUpdateContentValue",
+        "ms": 7,
+        "timestamp": "2026-06-01T10:57:05.3079798Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Address processing",
+        "ms": 7,
+        "timestamp": "2026-06-01T10:57:05.7834321Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Dispute and Lot Group validations",
+        "ms": 8,
+        "timestamp": "2026-06-01T10:57:06.2529931Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 13,
+        "timestamp": "2026-06-01T10:57:06.7416695Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 13,
+        "timestamp": "2026-06-01T10:57:07.2709406Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched cell value and field name",
+        "ms": 7,
+        "timestamp": "2026-06-01T10:57:07.7581739Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 11,
+        "timestamp": "2026-06-01T10:57:07.7616248Z"
+      },
+      {
+        "chunk": 0,
+        "step": "BulkInsert for rows 3002 to 4001",
+        "ms": 14616,
+        "timestamp": "2026-06-01T10:57:22.5355928Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fields validation",
+        "ms": 7,
+        "timestamp": "2026-06-01T10:57:22.8407742Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 11,
+        "timestamp": "2026-06-01T10:57:22.8425502Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Country, State and ZIP processing",
+        "ms": 6,
+        "timestamp": "2026-06-01T10:57:23.3120099Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched mapping value and column name",
+        "ms": 7,
+        "timestamp": "2026-06-01T10:57:23.7835537Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 11,
+        "timestamp": "2026-06-01T10:57:23.7856475Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 11,
+        "timestamp": "2026-06-01T10:57:24.2537545Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched mapping value and column name",
+        "ms": 7,
+        "timestamp": "2026-06-01T10:57:24.2537545Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched cell value and field name",
+        "ms": 7,
+        "timestamp": "2026-06-01T10:57:24.7309214Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 11,
+        "timestamp": "2026-06-01T10:57:24.7336633Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched cell value and field name",
+        "ms": 9,
+        "timestamp": "2026-06-01T10:57:25.2027912Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 13,
+        "timestamp": "2026-06-01T10:57:25.2055815Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fields validation",
+        "ms": 9,
+        "timestamp": "2026-06-01T10:57:25.6828871Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 14,
+        "timestamp": "2026-06-01T10:57:25.6862519Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 6,
+        "timestamp": "2026-06-01T10:57:25.6941347Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 11,
+        "timestamp": "2026-06-01T10:57:26.17815Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fields validation",
+        "ms": 8,
+        "timestamp": "2026-06-01T10:57:26.17815Z"
+      },
+      {
+        "chunk": 0,
+        "step": "For loop for ClFields",
+        "ms": 12,
+        "timestamp": "2026-06-01T10:57:26.6595744Z"
+      },
+      {
+        "chunk": 0,
+        "step": "Fetched cell value and field name",
+        "ms": 8,
+        "timestamp": "2026-06-01T10:57:26.6595744Z"
+      },
+      {
+        "chunk": 0,
+        "step": "BulkInsert for rows 4002 to 5001",
+        "ms": 14380,
+        "timestamp": "2026-06-01T10:57:41.1475951Z"
+      }
+    ],
     "submissionStageStats": [
       {
         "stepName": "MappedContent & total rows fetch",
@@ -706,7 +3294,7 @@
     "submissionBundleStats": [
       {
         "bundleIdx": 0,
-        "startRow": 2,
+        "startRow": 0,
         "endRow": 2501,
         "attributeCount": 10001,
         "bundleDbFetchMs": 288092,
@@ -716,8 +3304,8 @@
         "bankruptcyRecords": 10001
       },
       {
-        "bundleIdx": 2500,
-        "startRow": 2502,
+        "bundleIdx": 1,
+        "startRow": 2500,
         "endRow": 5001,
         "attributeCount": 3436,
         "bundleDbFetchMs": 145228,
@@ -727,8 +3315,8 @@
         "bankruptcyRecords": 10000
       },
       {
-        "bundleIdx": 5000,
-        "startRow": 5002,
+        "bundleIdx": 2,
+        "startRow": 5000,
         "endRow": 7501,
         "attributeCount": 0,
         "bundleDbFetchMs": 119102,
@@ -738,8 +3326,8 @@
         "bankruptcyRecords": 10000
       },
       {
-        "bundleIdx": 7500,
-        "startRow": 7502,
+        "bundleIdx": 3,
+        "startRow": 7500,
         "endRow": 10001,
         "attributeCount": 0,
         "bundleDbFetchMs": 60083,
@@ -749,8 +3337,8 @@
         "bankruptcyRecords": 9999
       },
       {
-        "bundleIdx": 10000,
-        "startRow": 10002,
+        "bundleIdx": 4,
+        "startRow": 10000,
         "endRow": 12501,
         "attributeCount": 0,
         "bundleDbFetchMs": 52298,
@@ -760,8 +3348,8 @@
         "bankruptcyRecords": 10000
       },
       {
-        "bundleIdx": 12500,
-        "startRow": 12502,
+        "bundleIdx": 5,
+        "startRow": 12500,
         "endRow": 15001,
         "attributeCount": 0,
         "bundleDbFetchMs": 49126,
@@ -771,8 +3359,8 @@
         "bankruptcyRecords": 10000
       },
       {
-        "bundleIdx": 15000,
-        "startRow": 15002,
+        "bundleIdx": 6,
+        "startRow": 15000,
         "endRow": 17501,
         "attributeCount": 0,
         "bundleDbFetchMs": 42454,
@@ -782,8 +3370,8 @@
         "bankruptcyRecords": 10000
       },
       {
-        "bundleIdx": 17500,
-        "startRow": 17502,
+        "bundleIdx": 7,
+        "startRow": 17500,
         "endRow": 20001,
         "attributeCount": 0,
         "bundleDbFetchMs": 39182,
@@ -793,8 +3381,8 @@
         "bankruptcyRecords": 10000
       },
       {
-        "bundleIdx": 20000,
-        "startRow": 20002,
+        "bundleIdx": 8,
+        "startRow": 20000,
         "endRow": 22501,
         "attributeCount": 0,
         "bundleDbFetchMs": 35345,
@@ -804,8 +3392,8 @@
         "bankruptcyRecords": 7500
       },
       {
-        "bundleIdx": 22500,
-        "startRow": 22502,
+        "bundleIdx": 9,
+        "startRow": 22500,
         "endRow": 25001,
         "attributeCount": 0,
         "bundleDbFetchMs": 34579,
@@ -815,8 +3403,8 @@
         "bankruptcyRecords": 7500
       },
       {
-        "bundleIdx": 25000,
-        "startRow": 25002,
+        "bundleIdx": 10,
+        "startRow": 25000,
         "endRow": 27501,
         "attributeCount": 0,
         "bundleDbFetchMs": 38328,
@@ -826,8 +3414,8 @@
         "bankruptcyRecords": 7500
       },
       {
-        "bundleIdx": 27500,
-        "startRow": 27502,
+        "bundleIdx": 11,
+        "startRow": 27500,
         "endRow": 30001,
         "attributeCount": 0,
         "bundleDbFetchMs": 36641,
@@ -895,9 +3483,9 @@
       },
       {
         "batchIdx": 0,
-        "bundleIdx": 2500,
-        "startRow": 12500000,
-        "endRow": 12500499,
+        "bundleIdx": 1,
+        "startRow": 2500,
+        "endRow": 2999,
         "loopProcessingMs": 5148,
         "bulkProcessingMs": 119459.0166,
         "totalProcessingMs": 124607.0166,
@@ -906,9 +3494,9 @@
       },
       {
         "batchIdx": 500,
-        "bundleIdx": 2500,
-        "startRow": 12500500,
-        "endRow": 12500999,
+        "bundleIdx": 1,
+        "startRow": 3000,
+        "endRow": 3499,
         "loopProcessingMs": 4470,
         "bulkProcessingMs": 115213.3473,
         "totalProcessingMs": 119683.3473,
@@ -917,9 +3505,9 @@
       },
       {
         "batchIdx": 1000,
-        "bundleIdx": 2500,
-        "startRow": 12501000,
-        "endRow": 12501499,
+        "bundleIdx": 1,
+        "startRow": 3500,
+        "endRow": 3999,
         "loopProcessingMs": 5242,
         "bulkProcessingMs": 100225.66100000001,
         "totalProcessingMs": 105467.66100000001,
@@ -928,9 +3516,9 @@
       },
       {
         "batchIdx": 1500,
-        "bundleIdx": 2500,
-        "startRow": 12501500,
-        "endRow": 12501999,
+        "bundleIdx": 1,
+        "startRow": 4000,
+        "endRow": 4499,
         "loopProcessingMs": 4343,
         "bulkProcessingMs": 94627.1821,
         "totalProcessingMs": 98970.1821,
@@ -939,9 +3527,9 @@
       },
       {
         "batchIdx": 2000,
-        "bundleIdx": 2500,
-        "startRow": 12502000,
-        "endRow": 12502499,
+        "bundleIdx": 1,
+        "startRow": 4500,
+        "endRow": 4999,
         "loopProcessingMs": 5155,
         "bulkProcessingMs": 89816.5198,
         "totalProcessingMs": 94971.5198,
@@ -950,9 +3538,9 @@
       },
       {
         "batchIdx": 0,
-        "bundleIdx": 5000,
-        "startRow": 25000000,
-        "endRow": 25000499,
+        "bundleIdx": 2,
+        "startRow": 5000,
+        "endRow": 5499,
         "loopProcessingMs": 4131,
         "bulkProcessingMs": 83865.1215,
         "totalProcessingMs": 87996.1215,
@@ -961,9 +3549,9 @@
       },
       {
         "batchIdx": 500,
-        "bundleIdx": 5000,
-        "startRow": 25000500,
-        "endRow": 25000999,
+        "bundleIdx": 2,
+        "startRow": 5500,
+        "endRow": 5999,
         "loopProcessingMs": 4724,
         "bulkProcessingMs": 78853.6402,
         "totalProcessingMs": 83577.6402,
@@ -972,9 +3560,9 @@
       },
       {
         "batchIdx": 1000,
-        "bundleIdx": 5000,
-        "startRow": 25001000,
-        "endRow": 25001499,
+        "bundleIdx": 2,
+        "startRow": 6000,
+        "endRow": 6499,
         "loopProcessingMs": 4302,
         "bulkProcessingMs": 78735.79,
         "totalProcessingMs": 83037.79,
@@ -983,9 +3571,9 @@
       },
       {
         "batchIdx": 1500,
-        "bundleIdx": 5000,
-        "startRow": 25001500,
-        "endRow": 25001999,
+        "bundleIdx": 2,
+        "startRow": 6500,
+        "endRow": 6999,
         "loopProcessingMs": 4764,
         "bulkProcessingMs": 74955.9209,
         "totalProcessingMs": 79719.9209,
@@ -994,9 +3582,9 @@
       },
       {
         "batchIdx": 2000,
-        "bundleIdx": 5000,
-        "startRow": 25002000,
-        "endRow": 25002499,
+        "bundleIdx": 2,
+        "startRow": 7000,
+        "endRow": 7499,
         "loopProcessingMs": 4621,
         "bulkProcessingMs": 73162.9403,
         "totalProcessingMs": 77783.9403,
@@ -1005,9 +3593,9 @@
       },
       {
         "batchIdx": 0,
-        "bundleIdx": 7500,
-        "startRow": 37500000,
-        "endRow": 37500499,
+        "bundleIdx": 3,
+        "startRow": 7500,
+        "endRow": 7999,
         "loopProcessingMs": 4387,
         "bulkProcessingMs": 69016.26520000001,
         "totalProcessingMs": 73403.26520000001,
@@ -1016,9 +3604,9 @@
       },
       {
         "batchIdx": 500,
-        "bundleIdx": 7500,
-        "startRow": 37500500,
-        "endRow": 37500999,
+        "bundleIdx": 3,
+        "startRow": 8000,
+        "endRow": 8499,
         "loopProcessingMs": 4413,
         "bulkProcessingMs": 70806.6878,
         "totalProcessingMs": 75219.6878,
@@ -1027,9 +3615,9 @@
       },
       {
         "batchIdx": 1000,
-        "bundleIdx": 7500,
-        "startRow": 37501000,
-        "endRow": 37501499,
+        "bundleIdx": 3,
+        "startRow": 8500,
+        "endRow": 8999,
         "loopProcessingMs": 4760,
         "bulkProcessingMs": 65282.1071,
         "totalProcessingMs": 70042.1071,
@@ -1038,9 +3626,9 @@
       },
       {
         "batchIdx": 1500,
-        "bundleIdx": 7500,
-        "startRow": 37501500,
-        "endRow": 37501999,
+        "bundleIdx": 3,
+        "startRow": 9000,
+        "endRow": 9499,
         "loopProcessingMs": 4705,
         "bulkProcessingMs": 68681.67850000001,
         "totalProcessingMs": 73386.67850000001,
@@ -1049,9 +3637,9 @@
       },
       {
         "batchIdx": 2000,
-        "bundleIdx": 7500,
-        "startRow": 37502000,
-        "endRow": 37502499,
+        "bundleIdx": 3,
+        "startRow": 9500,
+        "endRow": 9999,
         "loopProcessingMs": 4860,
         "bulkProcessingMs": 67783.62520000001,
         "totalProcessingMs": 72643.62520000001,
@@ -1060,9 +3648,9 @@
       },
       {
         "batchIdx": 0,
-        "bundleIdx": 10000,
-        "startRow": 50000000,
-        "endRow": 50000499,
+        "bundleIdx": 4,
+        "startRow": 10000,
+        "endRow": 10499,
         "loopProcessingMs": 4194,
         "bulkProcessingMs": 68648.3561,
         "totalProcessingMs": 72842.3561,
@@ -1071,9 +3659,9 @@
       },
       {
         "batchIdx": 500,
-        "bundleIdx": 10000,
-        "startRow": 50000500,
-        "endRow": 50000999,
+        "bundleIdx": 4,
+        "startRow": 10500,
+        "endRow": 10999,
         "loopProcessingMs": 4031,
         "bulkProcessingMs": 68079.8452,
         "totalProcessingMs": 72110.8452,
@@ -1082,9 +3670,9 @@
       },
       {
         "batchIdx": 1000,
-        "bundleIdx": 10000,
-        "startRow": 50001000,
-        "endRow": 50001499,
+        "bundleIdx": 4,
+        "startRow": 11000,
+        "endRow": 11499,
         "loopProcessingMs": 4502,
         "bulkProcessingMs": 66634.0041,
         "totalProcessingMs": 71136.0041,
@@ -1093,9 +3681,9 @@
       },
       {
         "batchIdx": 1500,
-        "bundleIdx": 10000,
-        "startRow": 50001500,
-        "endRow": 50001999,
+        "bundleIdx": 4,
+        "startRow": 11500,
+        "endRow": 11999,
         "loopProcessingMs": 4102,
         "bulkProcessingMs": 61826.0446,
         "totalProcessingMs": 65928.0446,
@@ -1104,9 +3692,9 @@
       },
       {
         "batchIdx": 2000,
-        "bundleIdx": 10000,
-        "startRow": 50002000,
-        "endRow": 50002499,
+        "bundleIdx": 4,
+        "startRow": 12000,
+        "endRow": 12499,
         "loopProcessingMs": 4017,
         "bulkProcessingMs": 61562.556200000006,
         "totalProcessingMs": 65579.5562,
@@ -1115,9 +3703,9 @@
       },
       {
         "batchIdx": 0,
-        "bundleIdx": 12500,
-        "startRow": 62500000,
-        "endRow": 62500499,
+        "bundleIdx": 5,
+        "startRow": 12500,
+        "endRow": 12999,
         "loopProcessingMs": 4303,
         "bulkProcessingMs": 61052.0342,
         "totalProcessingMs": 65355.0342,
@@ -1126,9 +3714,9 @@
       },
       {
         "batchIdx": 500,
-        "bundleIdx": 12500,
-        "startRow": 62500500,
-        "endRow": 62500999,
+        "bundleIdx": 5,
+        "startRow": 13000,
+        "endRow": 13499,
         "loopProcessingMs": 3970,
         "bulkProcessingMs": 59866.2909,
         "totalProcessingMs": 63836.2909,
@@ -1137,9 +3725,9 @@
       },
       {
         "batchIdx": 1000,
-        "bundleIdx": 12500,
-        "startRow": 62501000,
-        "endRow": 62501499,
+        "bundleIdx": 5,
+        "startRow": 13500,
+        "endRow": 13999,
         "loopProcessingMs": 3881,
         "bulkProcessingMs": 57158.666099999995,
         "totalProcessingMs": 61039.666099999995,
@@ -1148,9 +3736,9 @@
       },
       {
         "batchIdx": 1500,
-        "bundleIdx": 12500,
-        "startRow": 62501500,
-        "endRow": 62501999,
+        "bundleIdx": 5,
+        "startRow": 14000,
+        "endRow": 14499,
         "loopProcessingMs": 4031,
         "bulkProcessingMs": 61300.9266,
         "totalProcessingMs": 65331.9266,
@@ -1159,9 +3747,9 @@
       },
       {
         "batchIdx": 2000,
-        "bundleIdx": 12500,
-        "startRow": 62502000,
-        "endRow": 62502499,
+        "bundleIdx": 5,
+        "startRow": 14500,
+        "endRow": 14999,
         "loopProcessingMs": 4025,
         "bulkProcessingMs": 58299.1051,
         "totalProcessingMs": 62324.1051,
@@ -1170,9 +3758,9 @@
       },
       {
         "batchIdx": 0,
-        "bundleIdx": 15000,
-        "startRow": 75000000,
-        "endRow": 75000499,
+        "bundleIdx": 6,
+        "startRow": 15000,
+        "endRow": 15499,
         "loopProcessingMs": 3753,
         "bulkProcessingMs": 58381.725099999996,
         "totalProcessingMs": 62134.725099999996,
@@ -1181,9 +3769,9 @@
       },
       {
         "batchIdx": 500,
-        "bundleIdx": 15000,
-        "startRow": 75000500,
-        "endRow": 75000999,
+        "bundleIdx": 6,
+        "startRow": 15500,
+        "endRow": 15999,
         "loopProcessingMs": 3609,
         "bulkProcessingMs": 56313.9486,
         "totalProcessingMs": 59922.9486,
@@ -1192,9 +3780,9 @@
       },
       {
         "batchIdx": 1000,
-        "bundleIdx": 15000,
-        "startRow": 75001000,
-        "endRow": 75001499,
+        "bundleIdx": 6,
+        "startRow": 16000,
+        "endRow": 16499,
         "loopProcessingMs": 3881,
         "bulkProcessingMs": 56093.1425,
         "totalProcessingMs": 59974.1425,
@@ -1203,9 +3791,9 @@
       },
       {
         "batchIdx": 1500,
-        "bundleIdx": 15000,
-        "startRow": 75001500,
-        "endRow": 75001999,
+        "bundleIdx": 6,
+        "startRow": 16500,
+        "endRow": 16999,
         "loopProcessingMs": 3920,
         "bulkProcessingMs": 56477.6296,
         "totalProcessingMs": 60397.6296,
@@ -1214,9 +3802,9 @@
       },
       {
         "batchIdx": 2000,
-        "bundleIdx": 15000,
-        "startRow": 75002000,
-        "endRow": 75002499,
+        "bundleIdx": 6,
+        "startRow": 17000,
+        "endRow": 17499,
         "loopProcessingMs": 4481,
         "bulkProcessingMs": 53717.950600000004,
         "totalProcessingMs": 58198.950600000004,
@@ -1225,9 +3813,9 @@
       },
       {
         "batchIdx": 0,
-        "bundleIdx": 17500,
-        "startRow": 87500000,
-        "endRow": 87500499,
+        "bundleIdx": 7,
+        "startRow": 17500,
+        "endRow": 17999,
         "loopProcessingMs": 3727,
         "bulkProcessingMs": 51228.1069,
         "totalProcessingMs": 54955.1069,
@@ -1236,9 +3824,9 @@
       },
       {
         "batchIdx": 500,
-        "bundleIdx": 17500,
-        "startRow": 87500500,
-        "endRow": 87500999,
+        "bundleIdx": 7,
+        "startRow": 18000,
+        "endRow": 18499,
         "loopProcessingMs": 3840,
         "bulkProcessingMs": 50727.2892,
         "totalProcessingMs": 54567.2892,
@@ -1247,9 +3835,9 @@
       },
       {
         "batchIdx": 1000,
-        "bundleIdx": 17500,
-        "startRow": 87501000,
-        "endRow": 87501499,
+        "bundleIdx": 7,
+        "startRow": 18500,
+        "endRow": 18999,
         "loopProcessingMs": 4000,
         "bulkProcessingMs": 51624.5663,
         "totalProcessingMs": 55624.5663,
@@ -1258,9 +3846,9 @@
       },
       {
         "batchIdx": 1500,
-        "bundleIdx": 17500,
-        "startRow": 87501500,
-        "endRow": 87501999,
+        "bundleIdx": 7,
+        "startRow": 19000,
+        "endRow": 19499,
         "loopProcessingMs": 3713,
         "bulkProcessingMs": 52964.6659,
         "totalProcessingMs": 56677.6659,
@@ -1269,9 +3857,9 @@
       },
       {
         "batchIdx": 2000,
-        "bundleIdx": 17500,
-        "startRow": 87502000,
-        "endRow": 87502499,
+        "bundleIdx": 7,
+        "startRow": 19500,
+        "endRow": 19999,
         "loopProcessingMs": 4156,
         "bulkProcessingMs": 52378.4984,
         "totalProcessingMs": 56534.4984,
@@ -1280,9 +3868,9 @@
       },
       {
         "batchIdx": 0,
-        "bundleIdx": 20000,
-        "startRow": 100000000,
-        "endRow": 100000499,
+        "bundleIdx": 8,
+        "startRow": 20000,
+        "endRow": 20499,
         "loopProcessingMs": 4332,
         "bulkProcessingMs": 50419.1948,
         "totalProcessingMs": 54751.1948,
@@ -1291,9 +3879,9 @@
       },
       {
         "batchIdx": 500,
-        "bundleIdx": 20000,
-        "startRow": 100000500,
-        "endRow": 100000999,
+        "bundleIdx": 8,
+        "startRow": 20500,
+        "endRow": 20999,
         "loopProcessingMs": 4242,
         "bulkProcessingMs": 49318.1364,
         "totalProcessingMs": 53560.1364,
@@ -1302,9 +3890,9 @@
       },
       {
         "batchIdx": 1000,
-        "bundleIdx": 20000,
-        "startRow": 100001000,
-        "endRow": 100001499,
+        "bundleIdx": 8,
+        "startRow": 21000,
+        "endRow": 21499,
         "loopProcessingMs": 4128,
         "bulkProcessingMs": 47936.8917,
         "totalProcessingMs": 52064.8917,
@@ -1313,9 +3901,9 @@
       },
       {
         "batchIdx": 1500,
-        "bundleIdx": 20000,
-        "startRow": 100001500,
-        "endRow": 100001999,
+        "bundleIdx": 8,
+        "startRow": 21500,
+        "endRow": 21999,
         "loopProcessingMs": 4179,
         "bulkProcessingMs": 47591.9433,
         "totalProcessingMs": 51770.9433,
@@ -1324,9 +3912,9 @@
       },
       {
         "batchIdx": 2000,
-        "bundleIdx": 20000,
-        "startRow": 100002000,
-        "endRow": 100002499,
+        "bundleIdx": 8,
+        "startRow": 22000,
+        "endRow": 22499,
         "loopProcessingMs": 4515,
         "bulkProcessingMs": 47617.902200000004,
         "totalProcessingMs": 52132.902200000004,
@@ -1335,9 +3923,9 @@
       },
       {
         "batchIdx": 0,
-        "bundleIdx": 22500,
-        "startRow": 112500000,
-        "endRow": 112500499,
+        "bundleIdx": 9,
+        "startRow": 22500,
+        "endRow": 22999,
         "loopProcessingMs": 3706,
         "bulkProcessingMs": 47878.9102,
         "totalProcessingMs": 51584.9102,
@@ -1346,9 +3934,9 @@
       },
       {
         "batchIdx": 500,
-        "bundleIdx": 22500,
-        "startRow": 112500500,
-        "endRow": 112500999,
+        "bundleIdx": 9,
+        "startRow": 23000,
+        "endRow": 23499,
         "loopProcessingMs": 3941,
         "bulkProcessingMs": 46505.859000000004,
         "totalProcessingMs": 50446.859000000004,
@@ -1357,9 +3945,9 @@
       },
       {
         "batchIdx": 1000,
-        "bundleIdx": 22500,
-        "startRow": 112501000,
-        "endRow": 112501499,
+        "bundleIdx": 9,
+        "startRow": 23500,
+        "endRow": 23999,
         "loopProcessingMs": 4041,
         "bulkProcessingMs": 46696.4121,
         "totalProcessingMs": 50737.4121,
@@ -1368,9 +3956,9 @@
       },
       {
         "batchIdx": 1500,
-        "bundleIdx": 22500,
-        "startRow": 112501500,
-        "endRow": 112501999,
+        "bundleIdx": 9,
+        "startRow": 24000,
+        "endRow": 24499,
         "loopProcessingMs": 4125,
         "bulkProcessingMs": 49519.4003,
         "totalProcessingMs": 53644.4003,
@@ -1379,9 +3967,9 @@
       },
       {
         "batchIdx": 2000,
-        "bundleIdx": 22500,
-        "startRow": 112502000,
-        "endRow": 112502499,
+        "bundleIdx": 9,
+        "startRow": 24500,
+        "endRow": 24999,
         "loopProcessingMs": 3603,
         "bulkProcessingMs": 46442.1284,
         "totalProcessingMs": 50045.1284,
@@ -1390,9 +3978,9 @@
       },
       {
         "batchIdx": 0,
-        "bundleIdx": 25000,
-        "startRow": 125000000,
-        "endRow": 125000499,
+        "bundleIdx": 10,
+        "startRow": 25000,
+        "endRow": 25499,
         "loopProcessingMs": 4214,
         "bulkProcessingMs": 49765.532999999996,
         "totalProcessingMs": 53979.532999999996,
@@ -1401,9 +3989,9 @@
       },
       {
         "batchIdx": 500,
-        "bundleIdx": 25000,
-        "startRow": 125000500,
-        "endRow": 125000999,
+        "bundleIdx": 10,
+        "startRow": 25500,
+        "endRow": 25999,
         "loopProcessingMs": 3761,
         "bulkProcessingMs": 67365.9605,
         "totalProcessingMs": 71126.9605,
@@ -1412,9 +4000,9 @@
       },
       {
         "batchIdx": 1000,
-        "bundleIdx": 25000,
-        "startRow": 125001000,
-        "endRow": 125001499,
+        "bundleIdx": 10,
+        "startRow": 26000,
+        "endRow": 26499,
         "loopProcessingMs": 4529,
         "bulkProcessingMs": 50466.1591,
         "totalProcessingMs": 54995.1591,
@@ -1423,9 +4011,9 @@
       },
       {
         "batchIdx": 1500,
-        "bundleIdx": 25000,
-        "startRow": 125001500,
-        "endRow": 125001999,
+        "bundleIdx": 10,
+        "startRow": 26500,
+        "endRow": 26999,
         "loopProcessingMs": 3952,
         "bulkProcessingMs": 47603.5347,
         "totalProcessingMs": 51555.5347,
@@ -1434,9 +4022,9 @@
       },
       {
         "batchIdx": 2000,
-        "bundleIdx": 25000,
-        "startRow": 125002000,
-        "endRow": 125002499,
+        "bundleIdx": 10,
+        "startRow": 27000,
+        "endRow": 27499,
         "loopProcessingMs": 3861,
         "bulkProcessingMs": 47103.9263,
         "totalProcessingMs": 50964.9263,
@@ -1445,9 +4033,9 @@
       },
       {
         "batchIdx": 0,
-        "bundleIdx": 27500,
-        "startRow": 137500000,
-        "endRow": 137500499,
+        "bundleIdx": 11,
+        "startRow": 27500,
+        "endRow": 27999,
         "loopProcessingMs": 4122,
         "bulkProcessingMs": 45752.813,
         "totalProcessingMs": 49874.813,
@@ -1456,9 +4044,9 @@
       },
       {
         "batchIdx": 500,
-        "bundleIdx": 27500,
-        "startRow": 137500500,
-        "endRow": 137500999,
+        "bundleIdx": 11,
+        "startRow": 28000,
+        "endRow": 28499,
         "loopProcessingMs": 3698,
         "bulkProcessingMs": 47942.036,
         "totalProcessingMs": 51640.036,
@@ -1467,9 +4055,9 @@
       },
       {
         "batchIdx": 1000,
-        "bundleIdx": 27500,
-        "startRow": 137501000,
-        "endRow": 137501499,
+        "bundleIdx": 11,
+        "startRow": 28500,
+        "endRow": 28999,
         "loopProcessingMs": 3932,
         "bulkProcessingMs": 46845.5091,
         "totalProcessingMs": 50777.5091,
@@ -1478,9 +4066,9 @@
       },
       {
         "batchIdx": 1500,
-        "bundleIdx": 27500,
-        "startRow": 137501500,
-        "endRow": 137501999,
+        "bundleIdx": 11,
+        "startRow": 29000,
+        "endRow": 29499,
         "loopProcessingMs": 3514,
         "bulkProcessingMs": 48207.1414,
         "totalProcessingMs": 51721.1414,
@@ -1489,9 +4077,9 @@
       },
       {
         "batchIdx": 2000,
-        "bundleIdx": 27500,
-        "startRow": 137502000,
-        "endRow": 137502499,
+        "bundleIdx": 11,
+        "startRow": 29500,
+        "endRow": 29999,
         "loopProcessingMs": 4487,
         "bulkProcessingMs": 44968.549699999996,
         "totalProcessingMs": 49455.549699999996,
@@ -1499,7 +4087,103 @@
         "endTime": "2026-06-01T12:46:24.0745204Z"
       }
     ],
-    "submissionRowInsights": [],
+    "submissionRowInsights": [
+      {
+        "stepName": "UpdatedAdmin",
+        "avgMs": 1.979220338983051,
+        "maxMs": 76,
+        "occurrences": 29500,
+        "projectedTotalMs": 58387,
+        "projectedTotalMin": 0.9731166666666666,
+        "flag": "ok",
+        "note": "High variance: avg 2.0ms, max 76.0ms"
+      },
+      {
+        "stepName": "Phones, emails, addresses and custom field",
+        "avgMs": 1.1807241168892806,
+        "maxMs": 67,
+        "occurrences": 29498,
+        "projectedTotalMs": 34829,
+        "projectedTotalMin": 0.5804833333333334,
+        "flag": "ok",
+        "note": "High variance: avg 1.2ms, max 67.0ms"
+      },
+      {
+        "stepName": "note",
+        "avgMs": 1.1409782719229857,
+        "maxMs": 56,
+        "occurrences": 29501,
+        "projectedTotalMs": 33660,
+        "projectedTotalMin": 0.561,
+        "flag": "ok",
+        "note": "High variance: avg 1.1ms, max 56.0ms"
+      },
+      {
+        "stepName": "DB-CHECK",
+        "avgMs": 1.201936376210235,
+        "maxMs": 80,
+        "occurrences": 5784,
+        "projectedTotalMs": 6952,
+        "projectedTotalMin": 0.11586666666666667,
+        "flag": "ok",
+        "note": "High variance: avg 1.2ms, max 80.0ms"
+      },
+      {
+        "stepName": "Deceased",
+        "avgMs": 1.4806565064478312,
+        "maxMs": 66,
+        "occurrences": 853,
+        "projectedTotalMs": 1263,
+        "projectedTotalMin": 0.02105,
+        "flag": "ok",
+        "note": "High variance: avg 1.5ms, max 66.0ms"
+      },
+      {
+        "stepName": "Legal",
+        "avgMs": 2.057471264367816,
+        "maxMs": 28,
+        "occurrences": 174,
+        "projectedTotalMs": 358,
+        "projectedTotalMin": 0.005966666666666667,
+        "flag": "ok"
+      },
+      {
+        "stepName": "Added content",
+        "avgMs": 7.4,
+        "maxMs": 24,
+        "occurrences": 10,
+        "projectedTotalMs": 74,
+        "projectedTotalMin": 0.0012333333333333332,
+        "flag": "ok"
+      },
+      {
+        "stepName": "ADD PRIMARY",
+        "avgMs": 2.769230769230769,
+        "maxMs": 13,
+        "occurrences": 13,
+        "projectedTotalMs": 36,
+        "projectedTotalMin": 0.0006,
+        "flag": "ok"
+      },
+      {
+        "stepName": "Dispute",
+        "avgMs": 3.7142857142857144,
+        "maxMs": 9,
+        "occurrences": 7,
+        "projectedTotalMs": 26,
+        "projectedTotalMin": 0.0004333333333333333,
+        "flag": "ok"
+      },
+      {
+        "stepName": "StatId, agentId, coAgentId",
+        "avgMs": 1,
+        "maxMs": 1,
+        "occurrences": 1,
+        "projectedTotalMs": 1,
+        "projectedTotalMin": 0.000016666666666666667,
+        "flag": "ok"
+      }
+    ],
     "insights": [
       "⚠️ Validation \"Fetched cell value and field name\": High variance: avg 19.0ms, max 309.0ms",
       "⚠️ Validation \"Date only field check\": High variance: avg 23.7ms, max 146.0ms",

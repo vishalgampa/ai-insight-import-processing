@@ -7,6 +7,7 @@ import {
   ParsedImportLogs, PerRowStepStat,
   ValidationBundleStat, ValidationBatchStat,
   SubmissionStageStat, SubmissionBundleStat, SubmissionBatchStat,
+  SlowCheckpoint,
 } from './importLogParser';
 import { FetchDiagnostics } from './importLogFetcher';
 import { THRESHOLDS } from './knownPatterns';
@@ -46,6 +47,7 @@ export interface ImportAnalysis {
   validationBundleStats: ValidationBundleStat[];
   validationBatchStats: ValidationBatchStat[];
   validationRowInsights: PerRowInsight[];   // per-row with projections
+  slowCheckpoints: SlowCheckpoint[];
 
   // ── SUBMISSION ──
   submissionStageStats: SubmissionStageStat[];
@@ -75,7 +77,18 @@ export interface ComparisonResult {
   insights: string[];
   // Structured Nested Diffs for "Deep-Dive"
   validationBundleDiff?: { index: number, msA: number, msB: number, deltaMs: number }[];
-  submissionBatchDiff?: { index: number, msA: number, msB: number, deltaMs: number, bulkMsA: number, bulkMsB: number }[];
+  submissionBatchDiff?: { 
+    index?: number, 
+    bundleIdx: number, 
+    batchIdx: number, 
+    startRow: number, 
+    endRow: number, 
+    msA: number, 
+    msB: number, 
+    deltaMs: number, 
+    bulkMsA: number, 
+    bulkMsB: number 
+  }[];
   rowInsightDiff?: { stepName: string, avgMsA: number, avgMsB: number, deltaMs: number }[];
   
   sourceReports?: { id: string, rowCount: number | null, timestamp: string }[];
@@ -125,6 +138,10 @@ export function compareAgainstBaseline(current: ImportAnalysis, baseline: Bucket
   // 2. Submission Batches (Total & Bulk)
   const submissionBatchDiff = current.submissionBatchStats.map(b => ({
     index: b.batchIdx,
+    bundleIdx: b.bundleIdx,
+    batchIdx: b.batchIdx,
+    startRow: b.startRow ?? 0,
+    endRow: b.endRow ?? 0,
     msA: baseline.submissionBatchAverages[b.batchIdx]?.total ?? 0,
     msB: b.totalProcessingMs ?? 0,
     deltaMs: (b.totalProcessingMs ?? 0) - (baseline.submissionBatchAverages[b.batchIdx]?.total ?? 0),
@@ -293,6 +310,7 @@ export function analyzeImport(id: string, logs: ParsedImportLogs): ImportAnalysi
     validationBundleStats: logs.validationBundleStats,
     validationBatchStats: logs.validationBatchStats,
     validationRowInsights,
+    slowCheckpoints: logs.slowCheckpoints,
     submissionStageStats: logs.submissionStageStats,
     submissionBundleStats: logs.submissionBundleStats,
     submissionBatchStats: logs.submissionBatchStats,
@@ -303,7 +321,19 @@ export function analyzeImport(id: string, logs: ParsedImportLogs): ImportAnalysi
 }
 
 export function compareImports(idA: string, logsA: ParsedImportLogs, idB: string, logsB: ParsedImportLogs): ComparisonResult {
-  const mapA = buildStepMap(logsA), mapB = buildStepMap(logsB);
+  const analysisA = analyzeImport(idA, logsA);
+  const analysisB = analyzeImport(idB, logsB);
+
+  const mapA = new Map<string, number>();
+  for (const s of analysisA.stepContributions) {
+    mapA.set(s.stepName, s.durationMs);
+  }
+
+  const mapB = new Map<string, number>();
+  for (const s of analysisB.stepContributions) {
+    mapB.set(s.stepName, s.durationMs);
+  }
+
   const keys = [...new Set([...mapA.keys(), ...mapB.keys()])];
   const stepDiff = keys.map(k => {
     const msA = mapA.get(k) ?? 0, msB = mapB.get(k) ?? 0;
@@ -317,21 +347,118 @@ export function compareImports(idA: string, logsA: ParsedImportLogs, idB: string
     insights.push(`"${s.stepName}" is ${(s.deltaMs/1000).toFixed(1)}s slower in ${idB} (+${s.deltaPercent}%)`);
   for (const f of stepDiff.filter(s => s.flag === 'faster' && Math.abs(s.deltaMs) > 1000).slice(0, 2))
     insights.push(`"${f.stepName}" is ${(Math.abs(f.deltaMs)/1000).toFixed(1)}s faster in ${idB} (${f.deltaPercent}%)`);
-  const rcA = logsA.counts.totalRows, rcB = logsB.counts.totalRows;
+  const rcA = analysisA.rowCount, rcB = analysisB.rowCount;
   if (rcA && rcB && rcA !== rcB)
     insights.push(`File sizes differ: ${idA} had ${rcA.toLocaleString()} rows, ${idB} had ${rcB.toLocaleString()} rows.`);
 
-  return { idA, idB, rowCountA: rcA, rowCountB: rcB, stepDiff, insights };
-}
+  // ── Deep-Dive Structured Diffs (A vs B) ──
+  
+  // 1. Validation Bundles
+  const valBundlesA = new Map<number, number>();
+  analysisA.validationBundleStats.forEach(b => valBundlesA.set(b.bundleIdx, b.totalMs ?? 0));
+  const valBundlesB = new Map<number, number>();
+  analysisB.validationBundleStats.forEach(b => valBundlesB.set(b.bundleIdx, b.totalMs ?? 0));
+  const valBundleIndices = [...new Set([...valBundlesA.keys(), ...valBundlesB.keys()])].sort((a, b) => a - b);
+  
+  const validationBundleDiff = valBundleIndices.map(idx => {
+    const msA = valBundlesA.get(idx) ?? 0;
+    const msB = valBundlesB.get(idx) ?? 0;
+    return {
+      index: idx,
+      msA,
+      msB,
+      deltaMs: msB - msA
+    };
+  });
 
-function buildStepMap(logs: ParsedImportLogs): Map<string, number> {
-  const m = new Map<string, number>();
-  if (logs.mappingDurationSec !== null) m.set('Mapping', logs.mappingDurationSec * 1000);
-  if (logs.allDbFetchesMs !== null) m.set('Validation: DB Fetches', logs.allDbFetchesMs);
-  if (logs.chunksCompletedMs !== null) m.set('Validation: Chunks', logs.chunksCompletedMs);
-  for (const s of logs.submissionStageStats)
-    if (s.valueMs !== null) m.set(`Submission: ${s.stepName}`, s.valueMs);
-  const bulkMs = logs.submissionBatchStats.reduce((s, b) => s + (b.bulkProcessingMs ?? 0), 0);
-  if (bulkMs > 0) m.set('Submission: Bulk Processing', bulkMs);
-  return m;
+  // 2. Submission Batches
+  const subBatchesA = new Map<string, { total: number, bulk: number, bundleIdx: number, batchIdx: number, startRow: number, endRow: number }>();
+  analysisA.submissionBatchStats.forEach(b => {
+    const key = `${b.bundleIdx}:${b.batchIdx}`;
+    subBatchesA.set(key, {
+      total: b.totalProcessingMs ?? 0,
+      bulk: b.bulkProcessingMs ?? 0,
+      bundleIdx: b.bundleIdx,
+      batchIdx: b.batchIdx,
+      startRow: b.startRow ?? 0,
+      endRow: b.endRow ?? 0
+    });
+  });
+
+  const subBatchesB = new Map<string, { total: number, bulk: number, bundleIdx: number, batchIdx: number, startRow: number, endRow: number }>();
+  analysisB.submissionBatchStats.forEach(b => {
+    const key = `${b.bundleIdx}:${b.batchIdx}`;
+    subBatchesB.set(key, {
+      total: b.totalProcessingMs ?? 0,
+      bulk: b.bulkProcessingMs ?? 0,
+      bundleIdx: b.bundleIdx,
+      batchIdx: b.batchIdx,
+      startRow: b.startRow ?? 0,
+      endRow: b.endRow ?? 0
+    });
+  });
+
+  const subBatchKeys = [...new Set([...subBatchesA.keys(), ...subBatchesB.keys()])].sort((key1, key2) => {
+    const [bundle1, batch1] = key1.split(':').map(Number);
+    const [bundle2, batch2] = key2.split(':').map(Number);
+    return bundle1 !== bundle2 ? bundle1 - bundle2 : batch1 - batch2;
+  });
+
+  const submissionBatchDiff = subBatchKeys.map(key => {
+    const bA = subBatchesA.get(key);
+    const bB = subBatchesB.get(key);
+    const info = bB || bA!;
+    
+    const msA = bA?.total ?? 0;
+    const msB = bB?.total ?? 0;
+    const bulkMsA = bA?.bulk ?? 0;
+    const bulkMsB = bB?.bulk ?? 0;
+
+    return {
+      index: info.batchIdx,
+      bundleIdx: info.bundleIdx,
+      batchIdx: info.batchIdx,
+      startRow: info.startRow,
+      endRow: info.endRow,
+      msA,
+      msB,
+      deltaMs: msB - msA,
+      bulkMsA,
+      bulkMsB
+    };
+  });
+
+  // 3. Row-Level Rules
+  const rowInsightsA = new Map<string, number>();
+  analysisA.validationRowInsights.forEach(r => rowInsightsA.set(`Validation: ${r.stepName}`, r.avgMs));
+  analysisA.submissionRowInsights.forEach(r => rowInsightsA.set(`Submission: ${r.stepName}`, r.avgMs));
+
+  const rowInsightsB = new Map<string, number>();
+  analysisB.validationRowInsights.forEach(r => rowInsightsB.set(`Validation: ${r.stepName}`, r.avgMs));
+  analysisB.submissionRowInsights.forEach(r => rowInsightsB.set(`Submission: ${r.stepName}`, r.avgMs));
+
+  const rowStepNames = [...new Set([...rowInsightsA.keys(), ...rowInsightsB.keys()])];
+
+  const rowInsightDiff = rowStepNames.map(name => {
+    const avgMsA = rowInsightsA.get(name) ?? 0;
+    const avgMsB = rowInsightsB.get(name) ?? 0;
+    return {
+      stepName: name,
+      avgMsA,
+      avgMsB,
+      deltaMs: avgMsB - avgMsA
+    };
+  });
+
+  return { 
+    idA, 
+    idB, 
+    rowCountA: rcA, 
+    rowCountB: rcB, 
+    stepDiff, 
+    insights,
+    validationBundleDiff,
+    submissionBatchDiff,
+    rowInsightDiff
+  };
 }

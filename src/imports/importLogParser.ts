@@ -32,6 +32,13 @@ export interface DataCounts {
   dictionaryEntries: number | null;
 }
 
+export interface SlowCheckpoint {
+  chunk: number;
+  step: string;
+  ms: number;
+  timestamp: string;
+}
+
 // ── Validation structured output ──────────────────────────────────────────
 
 export interface ValidationBundleStat {
@@ -107,6 +114,9 @@ export interface ParsedImportLogs {
 
   // Validation — Row (aggregated, conditional — only fires when >0ms)
   validationRowStats: PerRowStepStat[];
+
+  // Slow row checkpoints (>5ms)
+  slowCheckpoints: SlowCheckpoint[];
 
   // Submission — Stage (1× per job)
   submissionStageStats: SubmissionStageStat[];
@@ -187,6 +197,7 @@ export function parseImportLogs(
     validationBundleStats: [],
     validationBatchStats: [],
     validationRowStats: [],
+    slowCheckpoints: [],
     submissionStageStats: [],
     submissionBundleStats: [],
     submissionBatchStats: [],
@@ -321,6 +332,24 @@ export function parseImportLogs(
       });
   }
 
+  // ── VALIDATION — Slow checkpoints (>5ms per-row ops) ─────────────────
+  const SLOW_MS = 5;
+  let currentChunkVal = 0;
+  for (const row of validationPerRowRaw) {
+    const msg = row.message;
+    const chunkMatch = msg.match(/Processing generic update chunk\s+(\d+)/i);
+    if (chunkMatch) { currentChunkVal = parseInt(chunkMatch[1], 10); continue; }
+    if (!msg.includes('UploadGenericUpdateAccountDataWithValidations:')) continue;
+    // Skip bundle-level logs
+    if (msg.includes('Fetched existing users') || msg.includes('Fetched batch size from redis')) continue;
+    const ms = extractMs(msg);
+    if (ms === null || ms <= SLOW_MS) continue;
+    const stepMatch = msg.match(/UploadGenericUpdateAccountDataWithValidations:\s*(.+?)(?:\s+(?:in|took|for)\s+\d)/i);
+    const step = stepMatch ? stepMatch[1].trim()
+      : msg.split('UploadGenericUpdateAccountDataWithValidations:')[1]?.trim() ?? 'unknown';
+    result.slowCheckpoints.push({ chunk: currentChunkVal, step, ms, timestamp: row.timestamp });
+  }
+
   // ── SUBMISSION — Stage logs ───────────────────────────────────────────
   // 1× per job: MappedContentCount fetch, Dictionary created, Global DB fetch
   for (const row of submissionRows) {
@@ -379,14 +408,30 @@ export function parseImportLogs(
     return subBundleMap.get(idx)!;
   };
 
-  // Pass 1: collect "For bundle" timestamps → bundleIdx mapping
+  // Pass 0: Parse "For bundle" log lines to find the submission bundle size
+  let subBundleSize = 5000; // default fallback
+  for (const row of submissionRows) {
+    const msg = row.message;
+    if (msg.includes('For bundle')) {
+      const start = extractNumber(msg, /startRow\s*=\s*(\d+)/i);
+      const end = extractNumber(msg, /endRow\s*=\s*(\d+)/i);
+      if (start !== null && end !== null && end > start) {
+        subBundleSize = end - start + 1;
+        break;
+      }
+    }
+  }
+
+  // Pass 1: collect "For bundle" timestamps → bundleIdx mapping (normalized to sequential index)
   const forBundleTimeline: { ts: number; bundleIdx: number }[] = [];
   for (const row of submissionRows) {
     const msg = row.message;
     if (msg.includes('For bundle')) {
       const idxMatch = msg.match(/For bundle\s+(\d+)/i);
       if (idxMatch) {
-        forBundleTimeline.push({ ts: new Date(row.timestamp).getTime(), bundleIdx: parseInt(idxMatch[1], 10) });
+        const startRow = parseInt(idxMatch[1], 10);
+        const seqIdx = Math.floor(startRow / subBundleSize);
+        forBundleTimeline.push({ ts: new Date(row.timestamp).getTime(), bundleIdx: seqIdx });
       }
     }
   }
@@ -399,15 +444,17 @@ export function parseImportLogs(
 
     if (msg.includes('For bundle')) {
       const idxMatch = msg.match(/For bundle\s+(\d+)/i);
-      const idx = idxMatch ? parseInt(idxMatch[1], 10) : 0;
+      const startRow = idxMatch ? parseInt(idxMatch[1], 10) : 0;
+      const idx = Math.floor(startRow / subBundleSize);
       const b = ensureSubBundle(idx);
-      b.startRow = extractNumber(msg, /startRow\s*=\s*(\d+)/i);
+      b.startRow = startRow;
       b.endRow = extractNumber(msg, /endRow\s*=\s*(\d+)/i);
       b.attributeCount = extractNumber(msg, /Status Attributes Count\s*:\s*(\d+)/i);
     }
     if (msg.includes('Bundle DB fetch')) {
       const idxMatch = msg.match(/fetch for\s+(\d+)/i);
-      const idx = idxMatch ? parseInt(idxMatch[1], 10) : 0;
+      const startRow = idxMatch ? parseInt(idxMatch[1], 10) : 0;
+      const idx = Math.floor(startRow / subBundleSize);
       const ms = extractNumber(msg, /fetch for\s+\d+:\s*(\d+)/i);
       ensureSubBundle(idx).bundleDbFetchMs = ms;
     }
@@ -522,8 +569,7 @@ export function parseImportLogs(
   }
 
   for (const batch of sortedBatches) {
-    const bSize = result.bundleSize || 5000;
-    batch.startRow = batch.bundleIdx * bSize + batch.batchIdx;
+    batch.startRow = batch.bundleIdx * subBundleSize + batch.batchIdx;
     batch.endRow = batch.startRow + batchSize - 1;
   }
 
